@@ -46,7 +46,7 @@ Hono's WebSocket upgrade, so access checks for files and editing sessions live i
 Routes are defined in code (`src/router.tsx`): `/login` signs in or creates an account; every
 other page needs a session ([accounts](accounts.md)). `/` and `/folders/:id` list a folder, `/recent`,
 `/shared` (what others shared, [sharing](accounts.md#sharing)) and `/trash` the other views,
-`/settings` the language of the interface, the storage the files take and the access tokens for MCP clients ([files](files.md#storage), [MCP server](mcp.md); in local mode only the language), `/invite/:token` a link someone shared (readable before signing in), `/edit/:id` opens a file in its editor with the whole window
+`/settings` the language of the interface, the storage the files take and the access tokens for MCP clients ([files](files.md#storage), [MCP server](mcp.md); in local mode only the language), `/invite/:token` a link someone shared (readable before signing in), `/open?url=…&name=…` a file another app hands over ([files](files.md#opening-a-file-from-another-app)), `/edit/:id` opens a file in its editor with the whole window
 (`src/editor/`: the word view for .docx, the sheet view for .xlsx, the slide view for .pptx, the PDF view for .pdf, the text view for .md and .txt, sharing
 the header with the editable name, the menu bar, status, versions, download and save). Reads go
 through TanStack Query with the keys in `src/api/files.ts`; every write refreshes all keys under
@@ -60,7 +60,7 @@ In development `bun run dev` prepares the engine if needed, starts the server an
 (`SCHREIBZEUG_API_URL`, default `http://localhost:3000`). The E2E run starts its own server on an empty
 database (`e2e/server.ts`, port 3100) and the app on port 5174; beside them the desktop app's local
 server with an app of its own (`e2e/local-server.ts`), and a stand-in for Kontext with a server
-signed in through it (`e2e/fake-kontext.ts`, `e2e/kontext-server.ts`; `e2e/playwright.config.ts`). Without Playwright's own browser download, an installed
+signed in through it (`e2e/fake-kontext.ts`, `e2e/kontext-server.ts`), and a stand-in for an archive that hands over files by a link (`e2e/fake-archive.ts`; `e2e/playwright.config.ts`). Without Playwright's own browser download, an installed
 Chromium can be used: `PLAYWRIGHT_CHROMIUM_PATH=/path/to/chrome bun run test:e2e`.
 
 ## Interface texts

@@ -190,11 +190,10 @@ export const CHANGED_SINCE =
 const MAX_NAME_LENGTH = 255;
 
 /**
- * The name of the n-th copy of a file next to the original: "Bericht (Kopie 2).docx". A name that
- * would grow past what a name may be loses the end of its base, not the mark or the extension.
+ * The name with a mark before its extension. A name that would grow past what a name may be loses
+ * the end of its base, not the mark or the extension.
  */
-export const copyName = (name: string, attempt: number): string => {
-  const mark = ` (Kopie${attempt > 1 ? ` ${attempt}` : ""})`;
+const withMark = (name: string, mark: string): string => {
   const dot = name.lastIndexOf(".");
   // An "extension" that leaves no room for the base is part of the name.
   const split = dot > 0 && name.length - dot + mark.length < MAX_NAME_LENGTH;
@@ -204,6 +203,14 @@ export const copyName = (name: string, attempt: number): string => {
   const kept = base.length > room ? base.slice(0, room).replace(/[\uD800-\uDBFF]$/, "") : base;
   return `${kept}${mark}${extension}`;
 };
+
+/** The name of the n-th copy of a file next to the original: "Bericht (Kopie 2).docx". */
+export const copyName = (name: string, attempt: number): string =>
+  withMark(name, ` (Kopie${attempt > 1 ? ` ${attempt}` : ""})`);
+
+/** The name to try the n-th time when it is taken: "Bericht.docx", then "Bericht (2).docx". */
+export const numberedName = (name: string, attempt: number): string =>
+  attempt > 1 ? withMark(name, ` (${attempt})`) : name;
 
 export const folderListingSchema = z.object({
   folder: nodeSchema.nullable(),
@@ -238,6 +245,16 @@ export const createBlankFileSchema = z.object({
   format: blankFormatSchema,
 });
 
+/**
+ * A file to fetch from another app's link and store as a new file (POST /files/import). `name` is
+ * taken when it is a valid name; else the one the link's answer gives.
+ */
+export const importFileSchema = z.object({
+  url: z.string().min(1, "Kein Link angegeben.").max(4096, "Der Link ist zu lang."),
+  name: z.string().max(1000).optional(),
+  parentId: nodeIdSchema.nullable().optional(),
+});
+
 export const updateNodeSchema = z
   .object({
     name: nodeNameSchema.optional(),
@@ -252,6 +269,10 @@ export const apiErrorKindSchema = z.enum([
   "not_a_folder",
   "conflict",
   "too_large",
+  /** A link to fetch a file from has expired or never held (POST /files/import). */
+  "link_expired",
+  /** The server a file was to be fetched from did not answer as it should (POST /files/import). */
+  "upstream_failed",
   "unauthorized",
   "forbidden",
   "internal",
@@ -276,6 +297,7 @@ export type CreateFolder = z.infer<typeof createFolderSchema>;
 export type CreateBlankFile = z.infer<typeof createBlankFileSchema>;
 export type BlankFormat = z.infer<typeof blankFormatSchema>;
 export type UpdateNode = z.infer<typeof updateNodeSchema>;
+export type ImportFile = z.infer<typeof importFileSchema>;
 export type TokenScope = z.infer<typeof tokenScopeSchema>;
 export type AccessToken = z.infer<typeof accessTokenSchema>;
 export type CreateAccessToken = z.infer<typeof createAccessTokenSchema>;

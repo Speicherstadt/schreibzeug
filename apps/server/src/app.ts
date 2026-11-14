@@ -10,6 +10,7 @@ import { requireTrustedOrigin } from "./auth/origin";
 import { tokenRoutes } from "./auth/token-routes";
 import type { Hub } from "./collab/hub";
 import { collabRoutes } from "./collab/routes";
+import { importRoutes } from "./files/import-routes";
 import { type FilesDeps, filesRoutes, invitationRoutes } from "./files/routes";
 import { authBodyLimit, defaultBodyLimit } from "./limits";
 import { bindSignInSession, openSockets } from "./sockets";
@@ -27,6 +28,10 @@ export type AppDeps = FilesDeps & {
   agent?: AgentHub;
   /** Origins besides the request's own whose pages may change things with a session (auth/origin.ts). */
   trustedOrigins?: readonly string[];
+  /** Origins whose links `POST /files/import` may fetch (SCHREIBZEUG_IMPORT_ORIGINS); empty: none. */
+  importOrigins?: readonly string[];
+  /** How long fetching a linked file may take; absent: files/import.ts IMPORT_TIMEOUT_MS. */
+  importTimeoutMs?: number;
 };
 
 /**
@@ -49,6 +54,8 @@ export const createApp = ({
   bearer,
   agent = createAgentHub(),
   trustedOrigins = [],
+  importOrigins = [],
+  importTimeoutMs,
   ...deps
 }: AppDeps) => {
   // A socket is checked when it opens; after a change to who may open what, the open ones again.
@@ -71,6 +78,10 @@ export const createApp = ({
     .use(requireTrustedOrigin(trustedOrigins))
     .route("/", tokenRoutes(deps))
     .route("/", filesRoutes({ ...deps, relay: collab?.hub, onAccessChange: sockets.accessChanged }))
+    .route(
+      "/",
+      importRoutes({ ...deps, importOrigins, ...(importTimeoutMs === undefined ? {} : { importTimeoutMs }) }),
+    )
     .route("/", agentRoutes({ db: deps.db, hub: agent }))
     .use("/collab/*", requireSession, bindSignInSession(auth))
     .use("/agent/*", requireSession, bindSignInSession(auth))

@@ -7,6 +7,11 @@ installers: the [releases](https://github.com/firsttris/schreibzeug/releases). H
 
 ## Unreleased
 
+- **Opening a file from another app**: an app such as an archive can open
+  `https://<schreibzeug>/open?url={url}&name={name}`; Schreibzeug fetches a copy of the file behind
+  the link into your files and opens it in its editor, after signing in if needed. Only links on the
+  origins in the new setting `SCHREIBZEUG_IMPORT_ORIGINS` are fetched; without it nothing changes
+  ([files](https://firsttris.github.io/schreibzeug/files.html#opening-a-file-from-another-app)).
 - **Container hardening**: `deploy/compose.yaml` and the `docker run` examples start the server
   read-only except `/data` and `/tmp`, without capabilities and with `no-new-privileges`. The image
   leaves out the peer dependencies and with them the build tools (vite, vitest, drizzle-kit,

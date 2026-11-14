@@ -30,6 +30,8 @@ export const startServer = async ({
   collab,
   rateLimit,
   trustedOrigins,
+  importOrigins,
+  importTimeoutMs,
 }: {
   /** Gets what closes a person's sockets when it signs them out everywhere, as main.ts wires it. */
   bearer?: (db: Database, onSessionsEnded: (userId: string) => void) => Bearer;
@@ -40,6 +42,9 @@ export const startServer = async ({
   rateLimit?: boolean;
   /** Origins besides the request's own that may change things with a session. */
   trustedOrigins?: string[];
+  /** Origins whose links `POST /files/import` may fetch. */
+  importOrigins?: string[];
+  importTimeoutMs?: number;
 } = {}) => {
   const dataDir = await mkdtemp(join(tmpdir(), "schreibzeug-test-"));
   const connection = connect(join(dataDir, "schreibzeug.db"));
@@ -65,6 +70,8 @@ export const startServer = async ({
     pendingShares,
     ...(collab ? { collab } : {}),
     ...(trustedOrigins ? { trustedOrigins } : {}),
+    ...(importOrigins ? { importOrigins } : {}),
+    ...(importTimeoutMs === undefined ? {} : { importTimeoutMs }),
     log: () => {},
   });
 

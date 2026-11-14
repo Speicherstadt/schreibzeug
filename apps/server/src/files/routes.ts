@@ -25,7 +25,6 @@ import type { Disk } from "../disk";
 import { fail, ok, type Result, statusOf } from "../result";
 import * as invites from "./invites";
 import { hasMedia, imageTypeOf, mediaNameOf, parseMediaName, recordMedia } from "./media";
-import { mimeOf } from "./mime";
 import * as repository from "./repository";
 import {
   contentDisposition,
@@ -37,6 +36,7 @@ import {
 } from "./serialize";
 import * as shares from "./shares";
 import { usageOf } from "./storage";
+import { createStoredFile } from "./store";
 import { thinVersions, type VersionPolicy } from "./thinning";
 
 export type FilesDeps = {
@@ -62,7 +62,10 @@ export type FilesDeps = {
 const userOf = (c: Context<AuthEnv>) => c.var.user.id;
 
 /** Validation failures in the same shape as every other API error. */
-const validate = <T extends "json" | "query" | "param" | "form", S extends z.ZodType>(target: T, schema: S) =>
+export const validate = <T extends "json" | "query" | "param" | "form", S extends z.ZodType>(
+  target: T,
+  schema: S,
+) =>
   zValidator(target, schema, (result, c) => {
     if (!result.success) {
       const message = result.error.issues[0]?.message ?? "Ungültige Anfrage.";
@@ -70,7 +73,12 @@ const validate = <T extends "json" | "query" | "param" | "form", S extends z.Zod
     }
   });
 
-const respond = <T, R>(c: Context, result: Result<T>, map: (value: T) => R, status: 200 | 201 = 200) =>
+export const respond = <T, R>(
+  c: Context,
+  result: Result<T>,
+  map: (value: T) => R,
+  status: 200 | 201 = 200,
+) =>
   result.ok
     ? c.json(map(result.value), status)
     : c.json({ error: result.error }, statusOf(result.error.kind));
@@ -143,12 +151,8 @@ export const filesRoutes = ({
 
   const store = async (bytes: Uint8Array) => ({ size: bytes.byteLength, sha256: await blobs.put(bytes) });
 
-  const createStoredFile = async (user: string, parentId: string | null, name: string, bytes: Uint8Array) => {
-    // Checked before the bytes go into the blob store.
-    const parent = repository.findTargetFolder(db, user, parentId);
-    if (!parent.ok) return parent;
-    return repository.createFile(db, user, { parentId, name, mime: mimeOf(name), ...(await store(bytes)) });
-  };
+  const createFile = (user: string, parentId: string | null, name: string, bytes: Uint8Array) =>
+    createStoredFile({ db, blobs }, user, { parentId, name, bytes });
 
   return (
     new Hono<AuthEnv>()
@@ -206,12 +210,7 @@ export const filesRoutes = ({
         if (!name.success)
           return respond(c, fail("invalid", name.error.issues[0]?.message ?? "Ungültiger Name."), toFileNode);
         const bytes = new Uint8Array(await file.arrayBuffer());
-        return respond(
-          c,
-          await createStoredFile(userOf(c), parentId ?? null, name.data, bytes),
-          toFileNode,
-          201,
-        );
+        return respond(c, await createFile(userOf(c), parentId ?? null, name.data, bytes), toFileNode, 201);
       })
       .post("/files/blank", validate("json", createBlankFileSchema), async (c) => {
         const { parentId, name, format } = c.req.valid("json");
@@ -224,7 +223,7 @@ export const filesRoutes = ({
             fail("invalid", fullName.error.issues[0]?.message ?? "Ungültiger Name."),
             toFileNode,
           );
-        const created = await createStoredFile(userOf(c), parentId, fullName.data, blank.bytes());
+        const created = await createFile(userOf(c), parentId, fullName.data, blank.bytes());
         return respond(c, created, toFileNode, 201);
       })
       .get("/files/:id/content", validate("param", idParam), validate("query", versionQuery), async (c) => {

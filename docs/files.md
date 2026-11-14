@@ -79,7 +79,7 @@ All under `/api`; bodies are JSON unless noted. Every route but `/health`, `/inf
 [MCP server](mcp.md#access-tokens)). Errors are
 `{ "error": { "kind", "message" } }`, with `kind` one of `not_found` (404), `invalid` (400),
 `unauthorized` (401), `forbidden` (403: the role is too weak), `not_a_folder` (422), `name_taken` and `conflict` (409), `too_large` (413),
-`internal` (500).
+`internal` (500), and from `POST /files/import` also `link_expired` (410) and `upstream_failed` (502).
 
 Only the uploads (`POST /files`, `PUT /files/:id/content`, `POST /files/:id/media`) take bodies up to
 `SCHREIBZEUG_MAX_UPLOAD_MB`. Better Auth's `/auth/*` answers a body over 64 KB with `413` before it
@@ -109,6 +109,7 @@ Every node in an answer carries `role`, what the user may do with it: `owner`, `
 | `POST /invites/:token/accept` | Accept a link: a share with its role, never weaker than one the user has |
 | `POST /folders` | New folder (`parentId`, `name`) |
 | `POST /files` | Upload (multipart: `file`, optional `parentId`) |
+| `POST /files/import` | A copy of the file behind another app's link as a new file (`url`, optional `name`, `parentId`), [below](#opening-a-file-from-another-app) |
 | `POST /files/blank` | New file (`parentId`, `name`, `format`: `docx`, `xlsx`, `pptx`, or `md` and `txt`, which are empty) |
 | `GET /files/:id/content[?version=n]` | The bytes of the newest or a given version, as a download (`Content-Disposition: attachment`, `X-Content-Type-Options: nosniff`) |
 | `PUT /files/:id/content` | Save: the body becomes a new version; from a shared session with `x-schreibzeug-session-save` (409 when that session is gone; the edit role is checked first, so someone without it gets 404/403 whatever the session's state), see [collaboration](collaboration.md#saving). With `If-Match: "<sha256>"` only while the newest version's content has that SHA-256, else 409 (the text editor, [Markdown and text files](text.md#saving)); a malformed one is 400 |
@@ -155,6 +156,35 @@ saves may soon fail (`apps/web/src/lib/storage.ts`); a share of the drive would 
 a large one is still plenty. The desktop app's local server answers the same route with the drive
 of its folder and no `usage`, and the app shows only that notice ([desktop app](desktop.md)).
 
+## Opening a file from another app
+
+Another app can hand over a file with a link, such as an archive's "Öffnen mit Schreibzeug" button.
+It opens `/open?url=<link>&name=<file name>` in the web app (both URL-encoded); the page asks to
+sign in first if needed, has the server fetch the file (`POST /api/files/import`) and opens the
+new file in its editor. Schreibzeug edits a copy in the user's files; the original stays in the
+other app. The archive's admin sets the address as `https://<schreibzeug>/open?url={url}&name={name}`.
+
+The server only fetches links on an origin listed in `SCHREIBZEUG_IMPORT_ORIGINS`
+([installation](installation.md#settings)); without it the route answers `404` and fetches
+nothing. A link must be `http(s)`, without user name or password, and on exactly one of those
+origins (`src/files/import.ts`), so nobody can make the server fetch addresses in its own network.
+Redirects are not followed. The download may take 60 seconds and at most
+`SCHREIBZEUG_MAX_UPLOAD_MB`, counted as the bytes come, not by `Content-Length`. Then the file is
+stored as an upload is.
+
+The name is `name` when it is a valid name, else the one in the answer's `Content-Disposition`,
+else "Datei"; a name without a known extension gets the one of the `Content-Type`. When it is
+taken in the folder, the file becomes "Name (2).ext", "Name (3).ext" and so on.
+
+| Answer | When |
+|---|---|
+| `201` with the new node | Stored |
+| `404 not_found` | `SCHREIBZEUG_IMPORT_ORIGINS` is not set |
+| `403 forbidden` | The link's origin is not allowed |
+| `410 link_expired` | The other app answered `404` or `410`: the link has expired or the file was deleted |
+| `413 too_large` | Larger than `SCHREIBZEUG_MAX_UPLOAD_MB` |
+| `502 upstream_failed` | Not reachable, too slow, a redirect or another error |
+
 ## Templates
 
 "Neu → Aus Vorlage …" (`apps/web/src/files/template-dialog.tsx`) starts a file from a template:
@@ -176,6 +206,7 @@ needs nothing of its own for it and an own template stays as it is.
 | `SCHREIBZEUG_DATA_DIR` | `data`: the database `schreibzeug.db`, the blobs in `blobs/`, the generated `auth-secret` |
 | `PORT` | `3000` |
 | `SCHREIBZEUG_MAX_UPLOAD_MB` | `512` |
+| `SCHREIBZEUG_IMPORT_ORIGINS` | unset: no file is fetched from a link, [above](#opening-a-file-from-another-app) |
 | `SCHREIBZEUG_OPEN_SIGNUP`, `SCHREIBZEUG_AUTH_SECRET`, `SCHREIBZEUG_TRUSTED_ORIGINS`, `SCHREIBZEUG_TRUSTED_PROXIES` | see [accounts](accounts.md) |
 | `SCHREIBZEUG_URL`, `SCHREIBZEUG_EMBED_ORIGIN`, `OIDC_ISSUER`, `OIDC_CLIENT_ID`, `OIDC_CLIENT_SECRET`, `OIDC_NAME` | see [Schreibzeug in Kontext](kontext.md#settings) |
 | `SCHREIBZEUG_WEB_DIR` | unset: the API only. The built web app (`apps/web/dist`, after `bun run build`) to serve beside it, so one address serves the app and the API (every file with `X-Content-Type-Options: nosniff`, so a browser never takes it for another type); the [desktop app](desktop.md) opens that address |
@@ -203,3 +234,6 @@ database through a small Bun script (`e2e/sqlite.ts`), since Playwright runs on 
 names and small helpers. Templates: `apps/web/src/files/templates.test.ts` (which files count, the
 names) and `e2e/templates.spec.ts` (a file from a built-in and from an own template, opened in its
 editor). `e2e/files.spec.ts` goes through the file list as a person does.
+Opening from a link: `apps/server/test/import.test.ts` against a Bun server on a free port as the
+other app (allowed origins, redirects, limits, expired links, names), and `e2e/open.spec.ts` with
+a stand-in archive (`e2e/fake-archive.ts`), signing in first included.

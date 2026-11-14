@@ -78,8 +78,27 @@ describe("readConfig", () => {
         trustedOrigins: [],
         trustedProxies: [],
         versionPolicy: "thin",
+        importOrigins: [],
       },
     });
+  });
+
+  it("reads the origins whose links may be fetched, and refuses what is no origin", () => {
+    expect(
+      readConfig({ SCHREIBZEUG_IMPORT_ORIGINS: "https://archive.example.org, http://localhost:8080/" }),
+    ).toMatchObject({
+      ok: true,
+      value: { importOrigins: ["https://archive.example.org", "http://localhost:8080"] },
+    });
+    for (const wrong of [
+      "archive.example.org",
+      "https://archive.example.org/api",
+      "file:///etc",
+      "ftp://x.org",
+    ]) {
+      const config = readConfig({ SCHREIBZEUG_IMPORT_ORIGINS: wrong });
+      expect(config.ok ? "" : config.error).toContain("SCHREIBZEUG_IMPORT_ORIGINS");
+    }
   });
 
   it("keeps every version when asked to, and refuses another policy", () => {

@@ -7,6 +7,7 @@ import {
   Outlet,
   type RouterHistory,
   redirect,
+  useLocation,
 } from "@tanstack/react-router";
 import { z } from "zod";
 import { UserProvider } from "./account/context";
@@ -17,6 +18,7 @@ import { EditPage } from "./editor/edit-page";
 import { EmbedBridge } from "./embed/bridge";
 import { type Embed, withoutEmbedParam } from "./embed/embed";
 import { FolderPage } from "./files/folder-page";
+import { OpenPage, openParamsOf } from "./files/open-page";
 import { RecentPage } from "./files/recent-page";
 import { SharedPage } from "./files/shared-page";
 import { TrashPage } from "./files/trash-page";
@@ -166,12 +168,23 @@ const editRoute = createRoute({
   },
 });
 
+/** Another app hands over a file by a link (files/open-page.tsx); signed in first, like every page. */
+const openRoute = createRoute({
+  getParentRoute: () => signedInRoute,
+  path: "/open",
+  component: () => {
+    const { url, name } = openParamsOf(useLocation({ select: (location) => location.searchStr }));
+    return <OpenPage url={url} name={name} />;
+  },
+});
+
 const routeTree = rootRoute.addChildren([
   loginRoute,
   inviteRoute,
   signedInRoute.addChildren([
     shellRoute.addChildren([homeRoute, folderRoute, recentRoute, sharedRoute, trashRoute, settingsRoute]),
     editRoute,
+    openRoute,
   ]),
 ]);
 

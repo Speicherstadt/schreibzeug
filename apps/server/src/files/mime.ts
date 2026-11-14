@@ -19,11 +19,19 @@ const MIME_BY_EXTENSION: Record<string, string> = {
   jpeg: "image/jpeg",
 };
 
-const FALLBACK = "application/octet-stream";
+/** The type of a file whose extension says nothing we know. */
+export const UNKNOWN_MIME = "application/octet-stream";
 
 /** By extension, not by the browser's guess: the browser sends what the OS thinks, which varies. */
 export const mimeOf = (name: string): string => {
   const dot = name.lastIndexOf(".");
-  if (dot <= 0) return FALLBACK;
-  return MIME_BY_EXTENSION[name.slice(dot + 1).toLowerCase()] ?? FALLBACK;
+  if (dot <= 0) return UNKNOWN_MIME;
+  return MIME_BY_EXTENSION[name.slice(dot + 1).toLowerCase()] ?? UNKNOWN_MIME;
+};
+
+/** The extension a file of this type usually has ("application/pdf; x=y" → ".pdf"), if known. */
+export const extensionOf = (contentType: string | null): string | undefined => {
+  const mime = contentType?.split(";")[0]?.trim().toLowerCase();
+  const found = Object.entries(MIME_BY_EXTENSION).find(([, known]) => known === mime);
+  return found && `.${found[0]}`;
 };

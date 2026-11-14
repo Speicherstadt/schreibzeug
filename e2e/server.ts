@@ -6,6 +6,7 @@
  */
 import { rm } from "node:fs/promises";
 import { join } from "node:path";
+import { E2E_ARCHIVE_URL } from "./archive";
 import { E2E_DATA_DIR } from "./database";
 
 await rm(E2E_DATA_DIR, { recursive: true, force: true });
@@ -17,6 +18,8 @@ const server = Bun.spawn(["bun", join(import.meta.dir, "../apps/server/src/main.
     PORT: process.env.E2E_SERVER_PORT ?? "3100",
     // Every test signs up an account of its own.
     SCHREIBZEUG_OPEN_SIGNUP: "true",
+    // Files handed over by a link come from the stand-in archive (open.spec.ts).
+    SCHREIBZEUG_IMPORT_ORIGINS: E2E_ARCHIVE_URL,
   },
   stdio: ["inherit", "inherit", "inherit"],
 });

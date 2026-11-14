@@ -85,7 +85,8 @@ persönlichen Zugangsschlüssel und handelt für dessen Benutzer ([Konten](accou
 [MCP-Server](mcp.md#access-tokens)). Fehler sind
 `{ "error": { "kind", "message" } }`, wobei `kind` eines ist von `not_found` (404), `invalid`
 (400), `unauthorized` (401), `forbidden` (403: die Rolle reicht nicht), `not_a_folder` (422),
-`name_taken` und `conflict` (409), `too_large` (413), `internal` (500).
+`name_taken` und `conflict` (409), `too_large` (413), `internal` (500), und von
+`POST /files/import` auch `link_expired` (410) und `upstream_failed` (502).
 
 Nur die Uploads (`POST /files`, `PUT /files/:id/content`, `POST /files/:id/media`) nehmen Bodys bis
 `SCHREIBZEUG_MAX_UPLOAD_MB`. Better Auths `/auth/*` beantwortet einen Body über 64 KB mit `413`,
@@ -117,6 +118,7 @@ Jeder Knoten in einer Antwort trägt `role`, was der Benutzer damit darf: `owner
 | `POST /invites/:token/accept` | Einen Link annehmen: eine Freigabe mit seiner Rolle, nie schwächer als eine, die der Benutzer schon hat |
 | `POST /folders` | Neuer Ordner (`parentId`, `name`) |
 | `POST /files` | Hochladen (multipart: `file`, optional `parentId`) |
+| `POST /files/import` | Eine Kopie der Datei hinter dem Link einer anderen App als neue Datei (`url`, optional `name`, `parentId`), [unten](#opening-a-file-from-another-app) |
 | `POST /files/blank` | Neue Datei (`parentId`, `name`, `format`: `docx`, `xlsx`, `pptx`, oder `md` und `txt`, die leer sind) |
 | `GET /files/:id/content[?version=n]` | Die Bytes der neuesten oder einer bestimmten Version, als Download (`Content-Disposition: attachment`, `X-Content-Type-Options: nosniff`) |
 | `PUT /files/:id/content` | Speichern: Der Body wird zu einer neuen Version; aus einer gemeinsamen Sitzung mit `x-schreibzeug-session-save` (409, wenn diese Sitzung nicht mehr besteht; die Bearbeiten-Rolle wird zuerst geprüft, wer sie nicht hat, bekommt also 404/403, egal in welchem Zustand die Sitzung ist), siehe [Zusammenarbeit](collaboration.md#saving). Mit `If-Match: "<sha256>"` nur, solange der Inhalt der neuesten Version diesen SHA-256 hat, sonst 409 (der Texteditor, [Markdown- und Textdateien](text.md#saving)); ein fehlerhafter ergibt 400 |
@@ -166,6 +168,36 @@ fehlschlagen können (`apps/web/src/lib/storage.ts`); ein Anteil am Laufwerk wü
 Route mit dem Laufwerk seines Ordners und ohne `usage`, und die App zeigt nur diesen Hinweis
 ([Desktop-App](desktop.md)).
 
+## Eine Datei aus einer anderen App öffnen { #opening-a-file-from-another-app }
+
+Eine andere App kann eine Datei mit einem Link übergeben, etwa der Knopf „Öffnen mit Schreibzeug“
+eines Archivs. Sie öffnet `/open?url=<Link>&name=<Dateiname>` in der Web-App (beides URL-kodiert);
+die Seite lässt, wenn nötig, zuerst anmelden, lässt den Server die Datei holen
+(`POST /api/files/import`) und öffnet die neue Datei in ihrem Editor. Schreibzeug bearbeitet eine
+Kopie in den Dateien des Benutzers; das Original bleibt in der anderen App. Wer das Archiv
+verwaltet, trägt als Adresse `https://<schreibzeug>/open?url={url}&name={name}` ein.
+
+Der Server holt nur Links auf einem Origin aus `SCHREIBZEUG_IMPORT_ORIGINS`
+([Installation](installation.md#settings)); ohne die Variable antwortet die Route `404` und holt
+nichts. Ein Link muss `http(s)` sein, ohne Benutzernamen oder Passwort, und genau auf einem dieser
+Origins liegen (`src/files/import.ts`), damit niemand den Server Adressen in seinem eigenen Netz
+abrufen lassen kann. Weiterleitungen werden nicht verfolgt. Der Download darf 60 Sekunden dauern
+und höchstens `SCHREIBZEUG_MAX_UPLOAD_MB` groß sein, gezählt, während die Bytes kommen, nicht nach
+`Content-Length`. Dann wird die Datei gespeichert wie ein Upload.
+
+Der Name ist `name`, wenn er ein gültiger Name ist, sonst der aus `Content-Disposition` der
+Antwort, sonst „Datei“; ein Name ohne bekannte Endung bekommt die des `Content-Type`. Ist er im
+Ordner vergeben, wird die Datei zu „Name (2).ext“, „Name (3).ext“ und so weiter.
+
+| Antwort | Wann |
+|---|---|
+| `201` mit dem neuen Knoten | Gespeichert |
+| `404 not_found` | `SCHREIBZEUG_IMPORT_ORIGINS` ist nicht gesetzt |
+| `403 forbidden` | Der Origin des Links ist nicht erlaubt |
+| `410 link_expired` | Die andere App antwortete `404` oder `410`: Der Link ist abgelaufen oder die Datei gelöscht |
+| `413 too_large` | Größer als `SCHREIBZEUG_MAX_UPLOAD_MB` |
+| `502 upstream_failed` | Nicht erreichbar, zu langsam, eine Weiterleitung oder ein anderer Fehler |
+
 ## Vorlagen { #templates }
 
 „Neu → Aus Vorlage …“ (`apps/web/src/files/template-dialog.tsx`) beginnt eine Datei aus einer
@@ -190,6 +222,7 @@ ist.
 | `SCHREIBZEUG_DATA_DIR` | `data`: die Datenbank `schreibzeug.db`, die Blobs in `blobs/`, das erzeugte `auth-secret` |
 | `PORT` | `3000` |
 | `SCHREIBZEUG_MAX_UPLOAD_MB` | `512` |
+| `SCHREIBZEUG_IMPORT_ORIGINS` | nicht gesetzt: Aus Links wird keine Datei geholt, [oben](#opening-a-file-from-another-app) |
 | `SCHREIBZEUG_OPEN_SIGNUP`, `SCHREIBZEUG_AUTH_SECRET`, `SCHREIBZEUG_TRUSTED_ORIGINS`, `SCHREIBZEUG_TRUSTED_PROXIES` | siehe [Konten](accounts.md) |
 | `SCHREIBZEUG_URL`, `SCHREIBZEUG_EMBED_ORIGIN`, `OIDC_ISSUER`, `OIDC_CLIENT_ID`, `OIDC_CLIENT_SECRET`, `OIDC_NAME` | siehe [Schreibzeug in Kontext](kontext.md#settings) |
 | `SCHREIBZEUG_WEB_DIR` | nicht gesetzt: nur die API. Die gebaute Web-App (`apps/web/dist`, nach `bun run build`), die daneben ausgeliefert wird, sodass eine Adresse App und API ausliefert (jede Datei mit `X-Content-Type-Options: nosniff`, damit ein Browser sie nie für einen anderen Typ hält); die [Desktop-App](desktop.md) öffnet diese Adresse |
@@ -219,3 +252,7 @@ was `/storage` zählt, `units.test.ts` die Einstellungen, Namen und kleine Hilfs
 Vorlagen: `apps/web/src/files/templates.test.ts` (welche Dateien zählen, die Namen) und
 `e2e/templates.spec.ts` (eine Datei aus einer eingebauten und aus einer eigenen Vorlage, in ihrem
 Editor geöffnet). `e2e/files.spec.ts` geht die Dateiliste durch, wie ein Mensch es tut.
+Öffnen aus einem Link: `apps/server/test/import.test.ts` gegen einen Bun-Server auf einem freien
+Port als andere App (erlaubte Origins, Weiterleitungen, Grenzen, abgelaufene Links, Namen) und
+`e2e/open.spec.ts` mit einem Ersatz-Archiv (`e2e/fake-archive.ts`), einschließlich der Anmeldung
+vorher.

@@ -127,6 +127,7 @@ Alle Einstellungen sind Umgebungsvariablen (`apps/server/src/config.ts`); das Im
 | `SCHREIBZEUG_EMBED_ORIGIN` | – | Die eine Website, die Schreibzeug in einem Frame zeigen darf ([Kontext](kontext.md)) |
 | `OIDC_ISSUER`, `OIDC_CLIENT_ID`, `OIDC_CLIENT_SECRET` | – | Anmeldung über einen OpenID-Connect-Anbieter, alle drei zusammen ([Kontext](kontext.md)) |
 | `OIDC_NAME` | `Kontext` | Der Name auf dem Anmeldeknopf |
+| `SCHREIBZEUG_IMPORT_ORIGINS` | – | Die Origins anderer Apps, deren Links eine Datei übergeben dürfen, z. B. `https://archive.example.org`, durch Kommas getrennt; Schreibzeug holt nur von diesen ([Eine Datei aus einer anderen App öffnen](files.md#opening-a-file-from-another-app)) |
 | `SCHREIBZEUG_VERSIONS` | `thin` | `thin`: Ältere Versionen werden mit dem Alter ausgedünnt, behaltene bleiben ([Versionen](files.md#versions)); `all`: Jede Speicherung bleibt als Version erhalten |
 
 ## Hinter einem Reverse Proxy { #behind-a-reverse-proxy }

@@ -985,5 +985,10 @@
   "shell_demo": "Demo, without a server",
   "demo_notice_title": "Demo",
   "demo_notice_text": "The files live in this tab only: reloading starts over. Editing together, sharing and versions come with a Schreibzeug server.",
-  "demo_notice_install": "Install Schreibzeug"
+  "demo_notice_install": "Install Schreibzeug",
+  "open_page_title": "Open file",
+  "open_page_loading": "Fetching the file…",
+  "open_page_failed": "The file could not be opened.",
+  "open_page_no_link": "This address names no link to a file.",
+  "open_page_to_files": "Go to my files"
 }

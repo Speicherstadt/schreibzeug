@@ -37,6 +37,21 @@ const addressList = z
     message: "SCHREIBZEUG_TRUSTED_PROXIES takes IP addresses or CIDR ranges, separated by commas.",
   });
 
+/** An http(s) origin as the browser writes it: scheme, host and port, nothing after. */
+const isOrigin = (entry: string) => {
+  const url = URL.parse(entry);
+  return url !== null && (url.protocol === "http:" || url.protocol === "https:") && url.origin === entry;
+};
+
+const originList = z
+  .string()
+  .optional()
+  .transform((value) => listOf(value).map((entry) => entry.replace(/\/+$/, "")))
+  .refine((entries) => entries.every(isOrigin), {
+    message:
+      "SCHREIBZEUG_IMPORT_ORIGINS takes origins such as https://archive.example.org (no path), separated by commas.",
+  });
+
 const configSchema = z.object({
   SCHREIBZEUG_DATA_DIR: z.string().min(1).default("data"),
   PORT: z.coerce.number().int().min(1).max(65535).default(3000),
@@ -56,6 +71,7 @@ const configSchema = z.object({
   OIDC_CLIENT_SECRET: z.string().min(1).optional(),
   OIDC_NAME: z.string().min(1).default("Kontext"),
   SCHREIBZEUG_VERSIONS: z.enum(["thin", "all"]).default("thin"),
+  SCHREIBZEUG_IMPORT_ORIGINS: originList,
 });
 
 /** Signing in through another service (OpenID Connect), e.g. Kontext. */
@@ -89,6 +105,8 @@ export type Config = {
   oidc: OidcConfig | undefined;
   /** "thin": older versions are thinned out with age (files/thinning.ts); "all": every one stays. */
   versionPolicy: "thin" | "all";
+  /** The origins whose links `POST /api/files/import` may fetch (files/import.ts); empty: none. */
+  importOrigins: string[];
 };
 
 type ParsedConfig = z.infer<typeof configSchema>;
@@ -132,6 +150,7 @@ export const readConfig = (env: Record<string, string | undefined>) => {
     embedOrigin: value.SCHREIBZEUG_EMBED_ORIGIN && new URL(value.SCHREIBZEUG_EMBED_ORIGIN).origin,
     oidc,
     versionPolicy: value.SCHREIBZEUG_VERSIONS,
+    importOrigins: value.SCHREIBZEUG_IMPORT_ORIGINS,
   };
   return { ok: true as const, value: config };
 };

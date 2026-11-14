@@ -38,6 +38,7 @@ const {
   embedOrigin,
   oidc,
   versionPolicy,
+  importOrigins,
 } = config.value;
 // One SQLite file next to the blobs: backing up the data folder backs up everything.
 const { db, close } = connect(join(resolve(dataDir), "schreibzeug.db"));
@@ -81,6 +82,7 @@ const app = createApp({
   blobs,
   versionPolicy,
   maxUploadBytes,
+  importOrigins,
   disk: diskSpace(resolve(dataDir)),
   pendingShares: Boolean(oidc),
   collab: { hub, upgradeWebSocket },

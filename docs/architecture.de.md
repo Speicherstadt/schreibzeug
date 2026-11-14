@@ -51,7 +51,8 @@ Ordner, `/recent`, `/shared` (was andere geteilt haben, [Teilen](accounts.md#sha
 die anderen Ansichten, `/settings` die Sprache der Oberfläche, den Speicherplatz, den die Dateien
 belegen, und die Zugriffstokens für MCP-Clients ([Dateien](files.md#storage),
 [MCP-Server](mcp.md); im lokalen Modus nur die Sprache), `/invite/:token` einen Link, den jemand
-geteilt hat (lesbar vor der Anmeldung), `/edit/:id` öffnet eine Datei in ihrem Editor im ganzen
+geteilt hat (lesbar vor der Anmeldung), `/open?url=…&name=…` eine Datei, die eine andere App
+übergibt ([Dateien](files.md#opening-a-file-from-another-app)), `/edit/:id` öffnet eine Datei in ihrem Editor im ganzen
 Fenster (`src/editor/`: die Wortansicht für .docx, die Blattansicht für .xlsx, die Folienansicht für
 .pptx, die PDF-Ansicht für .pdf, die Textansicht für .md und .txt, die sich die Kopfzeile mit dem
 bearbeitbaren Namen, die Menüleiste, Status, Versionen, Download und Speichern teilen). Lesezugriffe
@@ -69,7 +70,8 @@ die App auf Port 5173 aus, der `/api`, mit WebSockets, und `/mcp` an den Server 
 Server auf einer leeren Datenbank (`e2e/server.ts`, Port 3100) und die App auf Port 5174; daneben
 den lokalen Server der Desktop-App mit einer eigenen App (`e2e/local-server.ts`) und einen Ersatz
 für Kontext mit einem Server, der sich darüber anmeldet (`e2e/fake-kontext.ts`,
-`e2e/kontext-server.ts`; `e2e/playwright.config.ts`). Ohne den eigenen Browser-Download von
+`e2e/kontext-server.ts`), und einen Ersatz für ein Archiv, das Dateien per Link übergibt
+(`e2e/fake-archive.ts`; `e2e/playwright.config.ts`). Ohne den eigenen Browser-Download von
 Playwright lässt sich ein installiertes Chromium verwenden:
 `PLAYWRIGHT_CHROMIUM_PATH=/path/to/chrome bun run test:e2e`.
 

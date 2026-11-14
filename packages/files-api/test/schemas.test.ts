@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { copyName, nodeNameSchema, updateNodeSchema } from "../src";
+import { copyName, nodeNameSchema, numberedName, updateNodeSchema } from "../src";
 
 describe("nodeNameSchema", () => {
   it("accepts ordinary names and trims them", () => {
@@ -48,5 +48,19 @@ describe("copyName", () => {
     expect(nodeNameSchema.safeParse(name).success).toBe(true);
     expect(copyName(`a.${"x".repeat(253)}`, 1)).toBe(`a.${"x".repeat(245)} (Kopie)`);
     expect(copyName(`${"😀".repeat(125)}x.docx`, 1)).not.toMatch(/[\uD800-\uDBFF](?![\uDC00-\uDFFF])/);
+  });
+});
+
+describe("numberedName", () => {
+  it("keeps the name the first time, then numbers it before the extension", () => {
+    expect(numberedName("Bericht.docx", 1)).toBe("Bericht.docx");
+    expect(numberedName("Bericht.docx", 2)).toBe("Bericht (2).docx");
+    expect(numberedName("Notizen", 3)).toBe("Notizen (3)");
+  });
+
+  it("shortens the base of a long name, so the numbered name is still one", () => {
+    const name = numberedName(`${"a".repeat(250)}.docx`, 2);
+    expect(name).toBe(`${"a".repeat(246)} (2).docx`);
+    expect(nodeNameSchema.safeParse(name).success).toBe(true);
   });
 });

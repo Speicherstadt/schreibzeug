@@ -1,4 +1,5 @@
 import { defineConfig, devices } from "@playwright/test";
+import { E2E_ARCHIVE_PORT } from "./archive";
 import { E2E_DEMO_URL, E2E_DEMO_WEB_PORT } from "./demo";
 import { E2E_EMBEDDED_PORT, E2E_EMBEDDED_WEB_PORT, E2E_KONTEXT_PORT } from "./kontext";
 import { E2E_LOCAL_PORT as localPort, E2E_LOCAL_WEB_PORT as localWebPort } from "./local";
@@ -87,6 +88,15 @@ export default defineConfig({
       url: `http://localhost:${localWebPort}`,
       env: { SCHREIBZEUG_API_URL: `http://localhost:${localPort}` },
       reuseExistingServer: !process.env.CI,
+      timeout: 60_000,
+    },
+    {
+      // An app that hands over files by a link (fake-archive.ts, open.spec.ts).
+      command: "bun e2e/fake-archive.ts",
+      cwd: "..",
+      url: `http://localhost:${E2E_ARCHIVE_PORT}/health`,
+      env: { E2E_ARCHIVE_PORT: String(E2E_ARCHIVE_PORT) },
+      reuseExistingServer: false,
       timeout: 60_000,
     },
     {

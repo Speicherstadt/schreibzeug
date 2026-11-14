@@ -101,6 +101,9 @@ export const fileCommands = (api: ApiClient) => ({
     expectJson(api.files.blank.$post({ json: { parentId, name, format } }), nodeSchema),
   upload: (parentId: string | null, file: File) =>
     expectJson(api.files.$post({ form: { file, ...(parentId ? { parentId } : {}) } }), nodeSchema),
+  /** A copy of the file behind another app's link, as a new file (POST /files/import). */
+  importFile: (url: string, name?: string) =>
+    expectJson(api.files.import.$post({ json: { url, ...(name ? { name } : {}) } }), nodeSchema),
   update: (id: string, update: UpdateNode) =>
     expectJson(api.nodes[":id"].$patch({ param: { id }, json: update }), nodeSchema),
   trash: (id: string) => expectJson(api.nodes[":id"].trash.$post({ param: { id } }), nodeSchema),
