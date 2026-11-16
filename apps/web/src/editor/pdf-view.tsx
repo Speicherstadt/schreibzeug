@@ -1,4 +1,4 @@
-import { initialPdfState, openPdfDocument } from "@schreibzeug/editor-core";
+import { hasUnsavedChanges, initialPdfState, openPdfDocument } from "@schreibzeug/editor-core";
 import type { SignatureCheck } from "@schreibzeug/pdf-sign";
 import { useEffect, useRef, useState } from "react";
 import { m } from "../paraglide/messages";
@@ -21,6 +21,7 @@ import { type PdfMenuContext, pagesLabel, pdfContextMenu, pdfMenus } from "./pdf
 import type { EditorViewProps } from "./props";
 import { documentStatusOf } from "./save-status";
 import { SignatureDialog } from "./signature-dialog";
+import { useArchive } from "./use-archive";
 import { useCommentsPanel } from "./use-comments-panel";
 import { useDocumentSave } from "./use-document-save";
 import { useEditorChrome } from "./use-editor-chrome";
@@ -56,6 +57,7 @@ const useSignatureChecks = (bytes: Uint8Array): SignatureCheck[] => {
 
 export const PdfView = ({
   file,
+  fileId,
   name,
   onSave,
   fileActions,
@@ -72,6 +74,14 @@ export const PdfView = ({
     initialPdfState,
   );
   const saving = useDocumentSave(editor, state, onSave, file.readOnly);
+  const archive = useArchive({
+    fileId,
+    name,
+    readOnly: file.readOnly,
+    editor,
+    unsaved: hasUnsavedChanges(state),
+    save: saving.save,
+  });
   const chrome = useEditorChrome(editor, container, name, file.readOnly, () => void saving.save());
   const comments = useCommentsPanel(editor, state, file.readOnly, "page");
   const [signing, setSigning] = useState(false);
@@ -168,6 +178,7 @@ export const PdfView = ({
         onRename={onRename}
         onDownload={download}
         pdf={chrome.pdf && { print: chrome.pdf.print, downloadPdfA: chrome.pdf.downloadPdfA }}
+        archive={archive}
         menus={file.readOnly ? [] : pdfMenus(context)}
         shortcuts={PDF_SHORTCUTS}
         notice={chrome.notice}

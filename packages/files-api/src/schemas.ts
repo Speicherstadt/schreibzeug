@@ -104,6 +104,11 @@ export const serverInfoSchema = z.discriminatedUnion("mode", [
     oidc: z.object({ name: z.string() }).optional(),
     /** The site that may show Schreibzeug in a frame and talk to it (Kontext), as an origin. */
     embedOrigin: z.string().optional(),
+    /**
+     * Documents can be saved to an archive (POST /files/:id/archive); `name` is what the admin
+     * calls it (SCHREIBZEUG_ARCHIVE_NAME), absent: the interface says "Archiv".
+     */
+    archive: z.object({ name: z.string().optional() }).optional(),
   }),
   z.object({ mode: z.literal("local"), rootName: z.string() }),
 ]);
@@ -255,6 +260,22 @@ export const importFileSchema = z.object({
   parentId: nodeIdSchema.nullable().optional(),
 });
 
+/** What was saved to the archive: "pdf" the PDF/A the browser made, "original" the file itself. */
+export const archivedDocumentSchema = z.object({
+  kind: z.enum(["pdf", "original"]),
+  name: z.string(),
+  /** The archive's id of the new document. */
+  id: z.string(),
+  /** The archive's page of the document. */
+  url: z.string(),
+});
+
+/** The answer to POST /files/:id/archive: the version sent (now kept) and what the archive holds. */
+export const archivedSchema = z.object({
+  version: z.number().int().positive(),
+  documents: z.array(archivedDocumentSchema),
+});
+
 export const updateNodeSchema = z
   .object({
     name: nodeNameSchema.optional(),
@@ -271,8 +292,10 @@ export const apiErrorKindSchema = z.enum([
   "too_large",
   /** A link to fetch a file from has expired or never held (POST /files/import). */
   "link_expired",
-  /** The server a file was to be fetched from did not answer as it should (POST /files/import). */
+  /** The server a file was to be fetched from or sent to did not answer as it should. */
   "upstream_failed",
+  /** The archive refused this server's token (POST /files/:id/archive): a matter for the admin. */
+  "upstream_refused",
   "unauthorized",
   "forbidden",
   "internal",
@@ -298,6 +321,8 @@ export type CreateBlankFile = z.infer<typeof createBlankFileSchema>;
 export type BlankFormat = z.infer<typeof blankFormatSchema>;
 export type UpdateNode = z.infer<typeof updateNodeSchema>;
 export type ImportFile = z.infer<typeof importFileSchema>;
+export type Archived = z.infer<typeof archivedSchema>;
+export type ArchivedDocument = z.infer<typeof archivedDocumentSchema>;
 export type TokenScope = z.infer<typeof tokenScopeSchema>;
 export type AccessToken = z.infer<typeof accessTokenSchema>;
 export type CreateAccessToken = z.infer<typeof createAccessTokenSchema>;

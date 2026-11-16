@@ -7,6 +7,12 @@ installers: the [releases](https://github.com/firsttris/schreibzeug/releases). H
 
 ## Unreleased
 
+- **Saving to an archive**: with the new settings `SCHREIBZEUG_ARCHIVE_URL` and
+  `SCHREIBZEUG_ARCHIVE_TOKEN` (and optionally `SCHREIBZEUG_ARCHIVE_NAME`), "Datei → Im Archiv
+  ablegen …" sends the saved version of a document as PDF/A, and on request the Office file too, to
+  an archive such as Belegt, links to the new documents there and keeps that version. The token
+  stays on the server; without the settings nothing changes
+  ([files](https://firsttris.github.io/schreibzeug/files.html#saving-to-an-archive)).
 - **Opening a file from another app**: an app such as an archive can open
   `https://<schreibzeug>/open?url={url}&name={name}`; Schreibzeug fetches a copy of the file behind
   the link into your files and opens it in its editor, after signing in if needed. Only links on the

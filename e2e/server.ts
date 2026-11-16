@@ -6,7 +6,7 @@
  */
 import { rm } from "node:fs/promises";
 import { join } from "node:path";
-import { E2E_ARCHIVE_URL } from "./archive";
+import { E2E_ARCHIVE_NAME, E2E_ARCHIVE_TOKEN, E2E_ARCHIVE_URL } from "./archive";
 import { E2E_DATA_DIR } from "./database";
 
 await rm(E2E_DATA_DIR, { recursive: true, force: true });
@@ -20,6 +20,10 @@ const server = Bun.spawn(["bun", join(import.meta.dir, "../apps/server/src/main.
     SCHREIBZEUG_OPEN_SIGNUP: "true",
     // Files handed over by a link come from the stand-in archive (open.spec.ts).
     SCHREIBZEUG_IMPORT_ORIGINS: E2E_ARCHIVE_URL,
+    // Documents saved to the archive go to the same stand-in (save-to-archive.spec.ts).
+    SCHREIBZEUG_ARCHIVE_URL: E2E_ARCHIVE_URL,
+    SCHREIBZEUG_ARCHIVE_TOKEN: E2E_ARCHIVE_TOKEN,
+    SCHREIBZEUG_ARCHIVE_NAME: E2E_ARCHIVE_NAME,
   },
   stdio: ["inherit", "inherit", "inherit"],
 });

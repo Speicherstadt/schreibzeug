@@ -52,6 +52,34 @@ const originList = z
       "SCHREIBZEUG_IMPORT_ORIGINS takes origins such as https://archive.example.org (no path), separated by commas.",
   });
 
+/** An empty variable counts as unset, as `KEY=` in a compose file or an env file leaves it. */
+const unsetIfEmpty = (value: unknown) => (value === "" ? undefined : value);
+
+const archiveUrl = z.preprocess(
+  unsetIfEmpty,
+  z
+    .string()
+    .transform((value) => value.replace(/\/+$/, ""))
+    .refine(isOrigin, {
+      message: "SCHREIBZEUG_ARCHIVE_URL takes an origin such as https://archive.example.org (no path).",
+    })
+    .optional(),
+);
+
+// The token goes into a header as it is; the message never repeats the value.
+const archiveToken = z.preprocess(
+  unsetIfEmpty,
+  z
+    .string()
+    .regex(/^[\x21-\x7e]+$/, { message: "SCHREIBZEUG_ARCHIVE_TOKEN takes one word of printable characters." })
+    .optional(),
+);
+
+const archiveName = z.preprocess(
+  unsetIfEmpty,
+  z.string().trim().min(1).max(60, "SCHREIBZEUG_ARCHIVE_NAME takes at most 60 characters.").optional(),
+);
+
 const configSchema = z.object({
   SCHREIBZEUG_DATA_DIR: z.string().min(1).default("data"),
   PORT: z.coerce.number().int().min(1).max(65535).default(3000),
@@ -72,6 +100,9 @@ const configSchema = z.object({
   OIDC_NAME: z.string().min(1).default("Kontext"),
   SCHREIBZEUG_VERSIONS: z.enum(["thin", "all"]).default("thin"),
   SCHREIBZEUG_IMPORT_ORIGINS: originList,
+  SCHREIBZEUG_ARCHIVE_URL: archiveUrl,
+  SCHREIBZEUG_ARCHIVE_TOKEN: archiveToken,
+  SCHREIBZEUG_ARCHIVE_NAME: archiveName,
 });
 
 /** Signing in through another service (OpenID Connect), e.g. Kontext. */
@@ -82,6 +113,16 @@ export type OidcConfig = {
   clientSecret: string;
   /** The name on the button: "Anmelden mit <name>". */
   name: string;
+};
+
+/** The archive documents are saved to (files/archive.ts). */
+export type ArchiveConfig = {
+  /** Its origin; documents go to `<url>/api/dokumente`. */
+  url: string;
+  /** Its API token, a secret: only ever sent to `url`, in the Authorization header. */
+  token: string;
+  /** What the interface calls it; absent: "Archiv". */
+  name: string | undefined;
 };
 
 export type Config = {
@@ -107,6 +148,8 @@ export type Config = {
   versionPolicy: "thin" | "all";
   /** The origins whose links `POST /api/files/import` may fetch (files/import.ts); empty: none. */
   importOrigins: string[];
+  /** Absent: saving to an archive is not offered. */
+  archive: ArchiveConfig | undefined;
 };
 
 type ParsedConfig = z.infer<typeof configSchema>;
@@ -137,6 +180,13 @@ export const readConfig = (env: Record<string, string | undefined>) => {
         "Signing in through OIDC (OIDC_ISSUER, OIDC_CLIENT_ID, OIDC_CLIENT_SECRET) needs SCHREIBZEUG_URL, the address people open.",
     };
   }
+  // One without the other is a setup half done; say so instead of hiding the feature.
+  if (Boolean(value.SCHREIBZEUG_ARCHIVE_URL) !== Boolean(value.SCHREIBZEUG_ARCHIVE_TOKEN)) {
+    return {
+      ok: false as const,
+      error: "Saving to an archive needs both SCHREIBZEUG_ARCHIVE_URL and SCHREIBZEUG_ARCHIVE_TOKEN.",
+    };
+  }
   const config: Config = {
     dataDir: value.SCHREIBZEUG_DATA_DIR,
     port: value.PORT,
@@ -151,6 +201,14 @@ export const readConfig = (env: Record<string, string | undefined>) => {
     oidc,
     versionPolicy: value.SCHREIBZEUG_VERSIONS,
     importOrigins: value.SCHREIBZEUG_IMPORT_ORIGINS,
+    archive:
+      value.SCHREIBZEUG_ARCHIVE_URL && value.SCHREIBZEUG_ARCHIVE_TOKEN
+        ? {
+            url: value.SCHREIBZEUG_ARCHIVE_URL,
+            token: value.SCHREIBZEUG_ARCHIVE_TOKEN,
+            name: value.SCHREIBZEUG_ARCHIVE_NAME,
+          }
+        : undefined,
   };
   return { ok: true as const, value: config };
 };

@@ -60,7 +60,7 @@ In development `bun run dev` prepares the engine if needed, starts the server an
 (`SCHREIBZEUG_API_URL`, default `http://localhost:3000`). The E2E run starts its own server on an empty
 database (`e2e/server.ts`, port 3100) and the app on port 5174; beside them the desktop app's local
 server with an app of its own (`e2e/local-server.ts`), and a stand-in for Kontext with a server
-signed in through it (`e2e/fake-kontext.ts`, `e2e/kontext-server.ts`), and a stand-in for an archive that hands over files by a link (`e2e/fake-archive.ts`; `e2e/playwright.config.ts`). Without Playwright's own browser download, an installed
+signed in through it (`e2e/fake-kontext.ts`, `e2e/kontext-server.ts`), and a stand-in for an archive that hands over files by a link and takes documents saved to it (`e2e/fake-archive.ts`; `e2e/playwright.config.ts`). Without Playwright's own browser download, an installed
 Chromium can be used: `PLAYWRIGHT_CHROMIUM_PATH=/path/to/chrome bun run test:e2e`.
 
 ## Interface texts

@@ -9,7 +9,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { m } from "../paraglide/messages";
 
 export type DocumentSave = {
-  save: () => Promise<void>;
+  save: () => Promise<unknown>;
   saving: boolean;
   failure: string | null;
 };
@@ -26,13 +26,16 @@ export const useDocumentSave = <S extends CoreState>(
   state: S,
   store: (bytes: Uint8Array, session?: SavedDocument["session"]) => Promise<unknown>,
   readOnly = false,
-): DocumentSave => {
+): DocumentSave & {
+  /** Resolves with whether the document was stored; a failure shows as `failure`. */
+  save: () => Promise<boolean>;
+} => {
   const [saving, setSaving] = useState(false);
   const [failure, setFailure] = useState<string | null>(null);
-  const running = useRef<Promise<void> | null>(null);
+  const running = useRef<Promise<boolean> | null>(null);
 
-  const saveOnce = useCallback(async () => {
-    if (!editor) return;
+  const saveOnce = useCallback(async (): Promise<boolean> => {
+    if (!editor) return false;
     setFailure(null);
     try {
       const saved = await editor.save();
@@ -40,24 +43,27 @@ export const useDocumentSave = <S extends CoreState>(
       // `stored`): in the order the versions are stored, also when the connection dropped meanwhile.
       await store(saved.bytes, saved.session);
       editor.markSaved(saved);
+      return true;
     } catch (error) {
       setFailure(
         m.use_document_save_not_saved({ reason: error instanceof Error ? error.message : String(error) }),
       );
+      return false;
     }
   }, [editor, store]);
 
   // A save asked for while one runs follows it, so it holds what was typed meanwhile.
   const save = useCallback(async () => {
     const previous = running.current;
-    const next = (previous ?? Promise.resolve()).then(saveOnce);
+    const next = (previous ?? Promise.resolve(true)).then(saveOnce);
     running.current = next;
     setSaving(true);
-    await next;
+    const stored = await next;
     if (running.current === next) {
       running.current = null;
       setSaving(false);
     }
+    return stored;
   }, [saveOnce]);
 
   const ready = !readOnly && state.status === "ready" && state.document.connected;

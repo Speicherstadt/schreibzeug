@@ -1,4 +1,4 @@
-import { initialSlideState, openPresentation } from "@schreibzeug/editor-core";
+import { hasUnsavedChanges, initialSlideState, openPresentation } from "@schreibzeug/editor-core";
 import { Presentation } from "lucide-react";
 import { useRef } from "react";
 import { m } from "../paraglide/messages";
@@ -15,6 +15,7 @@ import type { EditorViewProps } from "./props";
 import { documentStatusOf } from "./save-status";
 import { type SlideMenuContext, slideContextMenu, slideMenus } from "./slide-menus";
 import { useAgent } from "./use-agent";
+import { useArchive } from "./use-archive";
 import { useCommentsPanel } from "./use-comments-panel";
 import { useDocumentSave } from "./use-document-save";
 import { useEditorChrome } from "./use-editor-chrome";
@@ -40,6 +41,14 @@ export const SlideView = ({
     initialSlideState,
   );
   const saving = useDocumentSave(editor, state, onSave, file.readOnly);
+  const archive = useArchive({
+    fileId,
+    name,
+    readOnly: file.readOnly,
+    editor,
+    unsaved: hasUnsavedChanges(state),
+    save: saving.save,
+  });
   const agent = useAgent({
     fileId,
     editor,
@@ -86,6 +95,7 @@ export const SlideView = ({
         onRename={onRename}
         onDownload={download}
         pdf={chrome.pdf}
+        archive={archive}
         menus={file.readOnly ? [] : slideMenus(context)}
         shortcuts={SLIDE_SHORTCUTS}
         screenReader={screenReaderSwitch(editor, state)}

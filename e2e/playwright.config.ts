@@ -91,7 +91,7 @@ export default defineConfig({
       timeout: 60_000,
     },
     {
-      // An app that hands over files by a link (fake-archive.ts, open.spec.ts).
+      // An app that hands over files by a link and takes documents (fake-archive.ts, open.spec.ts, save-to-archive.spec.ts).
       command: "bun e2e/fake-archive.ts",
       cwd: "..",
       url: `http://localhost:${E2E_ARCHIVE_PORT}/health`,

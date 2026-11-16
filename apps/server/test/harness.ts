@@ -32,6 +32,9 @@ export const startServer = async ({
   trustedOrigins,
   importOrigins,
   importTimeoutMs,
+  archive,
+  archiveTimeoutMs,
+  log = () => {},
 }: {
   /** Gets what closes a person's sockets when it signs them out everywhere, as main.ts wires it. */
   bearer?: (db: Database, onSessionsEnded: (userId: string) => void) => Bearer;
@@ -45,6 +48,11 @@ export const startServer = async ({
   /** Origins whose links `POST /files/import` may fetch. */
   importOrigins?: string[];
   importTimeoutMs?: number;
+  /** The archive documents are saved to (POST /files/:id/archive). */
+  archive?: AppDeps["archive"];
+  archiveTimeoutMs?: number;
+  /** What the server logs; absent: nothing. */
+  log?: AppDeps["log"];
 } = {}) => {
   const dataDir = await mkdtemp(join(tmpdir(), "schreibzeug-test-"));
   const connection = connect(join(dataDir, "schreibzeug.db"));
@@ -72,7 +80,9 @@ export const startServer = async ({
     ...(trustedOrigins ? { trustedOrigins } : {}),
     ...(importOrigins ? { importOrigins } : {}),
     ...(importTimeoutMs === undefined ? {} : { importTimeoutMs }),
-    log: () => {},
+    ...(archive ? { archive } : {}),
+    ...(archiveTimeoutMs === undefined ? {} : { archiveTimeoutMs }),
+    log,
   });
 
   // The MCP endpoint beside the API, as main.ts mounts it.

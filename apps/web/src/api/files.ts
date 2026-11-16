@@ -1,4 +1,5 @@
 import {
+  archivedSchema,
   type BlankFormat,
   type CreateInvite,
   type FileNode,
@@ -104,6 +105,25 @@ export const fileCommands = (api: ApiClient) => ({
   /** A copy of the file behind another app's link, as a new file (POST /files/import). */
   importFile: (url: string, name?: string) =>
     expectJson(api.files.import.$post({ json: { url, ...(name ? { name } : {}) } }), nodeSchema),
+  /**
+   * Saves `version` to the archive (POST /files/:id/archive): the PDF/A made of it and, with
+   * `original`, the file itself. The version is kept from then on.
+   */
+  archive: (
+    id: string,
+    { pdf, original, version }: { pdf: Uint8Array | null; original: boolean; version: number },
+  ) =>
+    expectJson(
+      api.files[":id"].archive.$post({
+        param: { id },
+        form: {
+          ...(pdf ? { pdf: new File([pdf as BlobPart], "archiv.pdf", { type: "application/pdf" }) } : {}),
+          ...(original ? { original: "true" as const } : {}),
+          version: String(version),
+        },
+      }),
+      archivedSchema,
+    ),
   update: (id: string, update: UpdateNode) =>
     expectJson(api.nodes[":id"].$patch({ param: { id }, json: update }), nodeSchema),
   trash: (id: string) => expectJson(api.nodes[":id"].trash.$post({ param: { id } }), nodeSchema),

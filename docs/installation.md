@@ -125,6 +125,9 @@ All settings are environment variables (`apps/server/src/config.ts`); the image 
 | `OIDC_ISSUER`, `OIDC_CLIENT_ID`, `OIDC_CLIENT_SECRET` | – | Sign-in through an OpenID Connect provider, all three together ([Kontext](kontext.md)) |
 | `OIDC_NAME` | `Kontext` | The name on the sign-in button |
 | `SCHREIBZEUG_IMPORT_ORIGINS` | – | The origins of other apps whose links may hand over a file, e.g. `https://archive.example.org`, separated by commas; Schreibzeug fetches only from these ([opening a file from another app](files.md#opening-a-file-from-another-app)) |
+| `SCHREIBZEUG_ARCHIVE_URL` | – | The origin of an archive documents can be saved to, e.g. `https://archive.example.org` (no path); together with `SCHREIBZEUG_ARCHIVE_TOKEN` ([saving to an archive](files.md#saving-to-an-archive)) |
+| `SCHREIBZEUG_ARCHIVE_TOKEN` | – | The archive's API token, with the right to write documents there (with [Belegt](https://github.com/firsttris/belegt): a token with the right "schreiben" under "Quellen und Schnittstellen"); a secret, kept on the server |
+| `SCHREIBZEUG_ARCHIVE_NAME` | – | What the interface calls the archive (`In <name> ablegen …`); without it, "Archiv" |
 | `SCHREIBZEUG_VERSIONS` | `thin` | `thin`: older versions are thinned out with age, kept ones stay ([versions](files.md#versions)); `all`: every save stays as a version |
 
 ## Behind a reverse proxy

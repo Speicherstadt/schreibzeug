@@ -70,8 +70,8 @@ die App auf Port 5173 aus, der `/api`, mit WebSockets, und `/mcp` an den Server 
 Server auf einer leeren Datenbank (`e2e/server.ts`, Port 3100) und die App auf Port 5174; daneben
 den lokalen Server der Desktop-App mit einer eigenen App (`e2e/local-server.ts`) und einen Ersatz
 für Kontext mit einem Server, der sich darüber anmeldet (`e2e/fake-kontext.ts`,
-`e2e/kontext-server.ts`), und einen Ersatz für ein Archiv, das Dateien per Link übergibt
-(`e2e/fake-archive.ts`; `e2e/playwright.config.ts`). Ohne den eigenen Browser-Download von
+`e2e/kontext-server.ts`), und einen Ersatz für ein Archiv, das Dateien per Link übergibt und
+abgelegte Dokumente annimmt (`e2e/fake-archive.ts`; `e2e/playwright.config.ts`). Ohne den eigenen Browser-Download von
 Playwright lässt sich ein installiertes Chromium verwenden:
 `PLAYWRIGHT_CHROMIUM_PATH=/path/to/chrome bun run test:e2e`.
 

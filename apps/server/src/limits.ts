@@ -22,11 +22,12 @@ const tooLarge = (maxSize: number) =>
 
 export const authBodyLimit = tooLarge(AUTH_BODY_BYTES);
 
-/** The routes that take a file's bytes; files/routes.ts bounds them by `maxUploadBytes`. */
+/** The routes that take a file's bytes; files/routes.ts and files/archive-routes.ts bound them by `maxUploadBytes`. */
 const UPLOADS: readonly (readonly [method: string, path: RegExp])[] = [
   ["POST", /^\/api\/files$/],
   ["PUT", /^\/api\/files\/[^/]+\/content$/],
   ["POST", /^\/api\/files\/[^/]+\/media$/],
+  ["POST", /^\/api\/files\/[^/]+\/archive$/],
 ];
 
 const isUpload = (method: string, path: string) =>

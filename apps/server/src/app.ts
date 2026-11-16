@@ -10,6 +10,8 @@ import { requireTrustedOrigin } from "./auth/origin";
 import { tokenRoutes } from "./auth/token-routes";
 import type { Hub } from "./collab/hub";
 import { collabRoutes } from "./collab/routes";
+import type { ArchiveConfig } from "./config";
+import { archiveRoutes } from "./files/archive-routes";
 import { importRoutes } from "./files/import-routes";
 import { type FilesDeps, filesRoutes, invitationRoutes } from "./files/routes";
 import { authBodyLimit, defaultBodyLimit } from "./limits";
@@ -32,7 +34,15 @@ export type AppDeps = FilesDeps & {
   importOrigins?: readonly string[];
   /** How long fetching a linked file may take; absent: files/import.ts IMPORT_TIMEOUT_MS. */
   importTimeoutMs?: number;
+  /** The archive documents can be saved to (SCHREIBZEUG_ARCHIVE_*); absent: not offered. */
+  archive?: ArchiveConfig | undefined;
+  /** How long the archive may take for a document; absent: files/archive.ts ARCHIVE_TIMEOUT_MS. */
+  archiveTimeoutMs?: number;
 };
+
+/** Whether there is an archive, and its name; its address and its token stay on the server. */
+export const withArchive = (info: ServerInfo, archive: ArchiveConfig | undefined): ServerInfo =>
+  archive && info.mode === "server" ? { ...info, archive: archive.name ? { name: archive.name } : {} } : info;
 
 /**
  * The whole HTTP surface under /api. Built from its dependencies, so the tests run it against a
@@ -56,6 +66,8 @@ export const createApp = ({
   trustedOrigins = [],
   importOrigins = [],
   importTimeoutMs,
+  archive,
+  archiveTimeoutMs,
   ...deps
 }: AppDeps) => {
   // A socket is checked when it opens; after a change to who may open what, the open ones again.
@@ -63,7 +75,7 @@ export const createApp = ({
   return new Hono<AuthEnv>()
     .basePath("/api")
     .get("/health", (c) => c.json({ ok: true }))
-    .get("/info", (c) => c.json(info))
+    .get("/info", (c) => c.json(withArchive(info, archive)))
     .on(["GET", "POST"], "/auth/*", authBodyLimit, (c) => auth.handler(c.req.raw))
     .use(defaultBodyLimit)
     .route("/", invitationRoutes(deps))
@@ -81,6 +93,15 @@ export const createApp = ({
     .route(
       "/",
       importRoutes({ ...deps, importOrigins, ...(importTimeoutMs === undefined ? {} : { importTimeoutMs }) }),
+    )
+    .route(
+      "/",
+      archiveRoutes({
+        ...deps,
+        archive,
+        log,
+        ...(archiveTimeoutMs === undefined ? {} : { archiveTimeoutMs }),
+      }),
     )
     .route("/", agentRoutes({ db: deps.db, hub: agent }))
     .use("/collab/*", requireSession, bindSignInSession(auth))

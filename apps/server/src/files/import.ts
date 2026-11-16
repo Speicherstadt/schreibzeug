@@ -31,7 +31,7 @@ export const checkLink = (link: string, origins: readonly string[]): Result<URL>
 export type Fetched = { bytes: Uint8Array; contentType: string | null; disposition: string | null };
 
 /** The body, or null as soon as it grows past `maxBytes`; a Content-Length alone is not trusted. */
-const readAtMost = async (
+export const readAtMost = async (
   body: ReadableStream<Uint8Array> | null,
   maxBytes: number,
 ): Promise<Uint8Array | null> => {

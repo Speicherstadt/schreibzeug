@@ -1,4 +1,4 @@
-import { initialEditorState, openWordDocument } from "@schreibzeug/editor-core";
+import { hasUnsavedChanges, initialEditorState, openWordDocument } from "@schreibzeug/editor-core";
 import { useRef, useState } from "react";
 import { m } from "../paraglide/messages";
 import { SizeGrid } from "../toolbar/table-menu";
@@ -18,6 +18,7 @@ import { RecipientsDialog } from "./recipients-dialog";
 import { RevisionBalloon } from "./revision-balloon";
 import { documentStatusOf } from "./save-status";
 import { useAgent } from "./use-agent";
+import { useArchive } from "./use-archive";
 import { useCommentsPanel } from "./use-comments-panel";
 import { useDocumentSave } from "./use-document-save";
 import { useEInvoice } from "./use-e-invoice";
@@ -48,6 +49,14 @@ export const WordView = ({
     initialEditorState,
   );
   const saving = useDocumentSave(editor, state, onSave, file.readOnly);
+  const archive = useArchive({
+    fileId,
+    name,
+    readOnly: file.readOnly,
+    editor,
+    unsaved: hasUnsavedChanges(state),
+    save: saving.save,
+  });
   const agent = useAgent({
     fileId,
     editor,
@@ -121,6 +130,7 @@ export const WordView = ({
         onRename={onRename}
         onDownload={download}
         pdf={chrome.pdf}
+        archive={archive}
         downloads={chrome.pdf ? [eInvoice.item] : []}
         menus={file.readOnly ? [] : wordMenus(context)}
         shortcuts={WORD_SHORTCUTS}

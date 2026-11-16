@@ -128,6 +128,9 @@ Alle Einstellungen sind Umgebungsvariablen (`apps/server/src/config.ts`); das Im
 | `OIDC_ISSUER`, `OIDC_CLIENT_ID`, `OIDC_CLIENT_SECRET` | – | Anmeldung über einen OpenID-Connect-Anbieter, alle drei zusammen ([Kontext](kontext.md)) |
 | `OIDC_NAME` | `Kontext` | Der Name auf dem Anmeldeknopf |
 | `SCHREIBZEUG_IMPORT_ORIGINS` | – | Die Origins anderer Apps, deren Links eine Datei übergeben dürfen, z. B. `https://archive.example.org`, durch Kommas getrennt; Schreibzeug holt nur von diesen ([Eine Datei aus einer anderen App öffnen](files.md#opening-a-file-from-another-app)) |
+| `SCHREIBZEUG_ARCHIVE_URL` | – | Der Origin eines Archivs, in dem sich Dokumente ablegen lassen, z. B. `https://archive.example.org` (ohne Pfad); zusammen mit `SCHREIBZEUG_ARCHIVE_TOKEN` ([In einem Archiv ablegen](files.md#saving-to-an-archive)) |
+| `SCHREIBZEUG_ARCHIVE_TOKEN` | – | Der API-Schlüssel des Archivs mit dem Recht, dort Dokumente zu schreiben (bei [Belegt](https://github.com/firsttris/belegt): ein Token mit dem Recht „schreiben“ unter „Quellen und Schnittstellen“); ein Geheimnis, das auf dem Server bleibt |
+| `SCHREIBZEUG_ARCHIVE_NAME` | – | Wie die Oberfläche das Archiv nennt (`In <Name> ablegen …`); ohne die Variable „Archiv“ |
 | `SCHREIBZEUG_VERSIONS` | `thin` | `thin`: Ältere Versionen werden mit dem Alter ausgedünnt, behaltene bleiben ([Versionen](files.md#versions)); `all`: Jede Speicherung bleibt als Version erhalten |
 
 ## Hinter einem Reverse Proxy { #behind-a-reverse-proxy }

@@ -1,4 +1,4 @@
-import { initialSheetState, isOnSheet, openSheetDocument } from "@schreibzeug/editor-core";
+import { hasUnsavedChanges, initialSheetState, isOnSheet, openSheetDocument } from "@schreibzeug/editor-core";
 import { useEffect, useRef, useState } from "react";
 import { m } from "../paraglide/messages";
 import { ColumnFilter, useColumnFilter } from "../sheets/column-filter";
@@ -24,6 +24,7 @@ import {
   sheetMenus,
 } from "./sheet-menus";
 import { useAgent } from "./use-agent";
+import { useArchive } from "./use-archive";
 import { useCommentsPanel } from "./use-comments-panel";
 import { useDocumentSave } from "./use-document-save";
 import { useEditorChrome } from "./use-editor-chrome";
@@ -48,6 +49,14 @@ export const SheetView = ({
     initialSheetState,
   );
   const saving = useDocumentSave(editor, state, onSave, file.readOnly);
+  const archive = useArchive({
+    fileId,
+    name,
+    readOnly: file.readOnly,
+    editor,
+    unsaved: hasUnsavedChanges(state),
+    save: saving.save,
+  });
   const agent = useAgent({
     fileId,
     editor,
@@ -124,6 +133,7 @@ export const SheetView = ({
         onRename={onRename}
         onDownload={download}
         pdf={chrome.pdf}
+        archive={archive}
         downloads={
           format !== "csv" ? [{ label: m.sheet_view_download_csv(), onSelect: () => void downloadCsv() }] : []
         }

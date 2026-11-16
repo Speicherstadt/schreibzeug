@@ -27,7 +27,7 @@ export type AgentDeps = {
   state: Pick<CoreState, "status">;
   readOnly: boolean;
   /** Saves the document as a new version, as the save button does. */
-  save: () => Promise<void>;
+  save: () => Promise<unknown>;
   /** Stores a new file beside the document (a PDF made from it); resolves with its name. */
   onCreateFile?: ((name: string, bytes: Uint8Array, type: string) => Promise<string>) | undefined;
   name: string;

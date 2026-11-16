@@ -21,6 +21,7 @@ export const statusOf = (kind: ApiErrorKind) =>
       too_large: 413,
       link_expired: 410,
       upstream_failed: 502,
+      upstream_refused: 502,
       unauthorized: 401,
       forbidden: 403,
       internal: 500,

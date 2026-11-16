@@ -2,8 +2,11 @@ import { mkdtemp, readdir, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
+import { withArchive } from "../src/app";
 import { createBlobStore, sha256Of } from "../src/blobs";
 import { readConfig } from "../src/config";
+import { checkPdf, documentPage, isPdf, requireArchive } from "../src/files/archive";
+import { pdfNameOf } from "../src/files/archive-routes";
 import { mimeOf } from "../src/files/mime";
 import { contentDisposition } from "../src/files/serialize";
 
@@ -177,9 +180,98 @@ describe("readConfig", () => {
     expect(config.ok ? "" : config.error).toContain("SCHREIBZEUG_URL");
   });
 
+  it("reads the archive's address, token and name, all or nothing", () => {
+    expect(
+      readConfig({
+        SCHREIBZEUG_ARCHIVE_URL: "https://archive.example.org/",
+        SCHREIBZEUG_ARCHIVE_TOKEN: "belegt_abc123",
+        SCHREIBZEUG_ARCHIVE_NAME: " Belegablage ",
+      }),
+    ).toMatchObject({
+      ok: true,
+      value: {
+        archive: { url: "https://archive.example.org", token: "belegt_abc123", name: "Belegablage" },
+      },
+    });
+    // Empty variables count as unset, as a compose file leaves them.
+    expect(
+      readConfig({
+        SCHREIBZEUG_ARCHIVE_URL: "",
+        SCHREIBZEUG_ARCHIVE_TOKEN: "",
+        SCHREIBZEUG_ARCHIVE_NAME: "",
+      }),
+    ).toMatchObject({ ok: true, value: { archive: undefined } });
+    expect(
+      readConfig({ SCHREIBZEUG_ARCHIVE_URL: "https://archive.example.org", SCHREIBZEUG_ARCHIVE_TOKEN: "t" }),
+    ).toMatchObject({ ok: true, value: { archive: { name: undefined } } });
+  });
+
+  it("refuses half an archive setup and a wrong address or token, never naming the token", () => {
+    const urlOnly = readConfig({ SCHREIBZEUG_ARCHIVE_URL: "https://archive.example.org" });
+    expect(urlOnly.ok ? "" : urlOnly.error).toContain("SCHREIBZEUG_ARCHIVE_TOKEN");
+    const tokenOnly = readConfig({ SCHREIBZEUG_ARCHIVE_TOKEN: "belegt_secret-value" });
+    expect(tokenOnly.ok ? "" : tokenOnly.error).toContain("SCHREIBZEUG_ARCHIVE_URL");
+    expect(tokenOnly.ok ? "" : tokenOnly.error).not.toContain("belegt_secret-value");
+    const withPath = readConfig({
+      SCHREIBZEUG_ARCHIVE_URL: "https://archive.example.org/api",
+      SCHREIBZEUG_ARCHIVE_TOKEN: "t",
+    });
+    expect(withPath.ok ? "" : withPath.error).toContain("SCHREIBZEUG_ARCHIVE_URL");
+    for (const token of ["belegt_two words", "belegt_line\nbreak"]) {
+      const config = readConfig({
+        SCHREIBZEUG_ARCHIVE_URL: "https://archive.example.org",
+        SCHREIBZEUG_ARCHIVE_TOKEN: token,
+      });
+      expect(config.ok ? "" : config.error).toContain("SCHREIBZEUG_ARCHIVE_TOKEN");
+      expect(config.ok ? "" : config.error).not.toContain("belegt_");
+    }
+  });
+
   it("reports what is wrong", () => {
     const config = readConfig({ PORT: "kein Port" });
     expect(config.ok).toBe(false);
     expect(config.ok ? "" : config.error).toContain("PORT");
+  });
+});
+
+describe("archive helpers", () => {
+  it("knows a PDF by its first bytes", () => {
+    const encode = (text: string) => new TextEncoder().encode(text);
+    expect(isPdf(encode("%PDF-2.0\n…"))).toBe(true);
+    for (const other of ["PK\u0003\u0004", "%PDF", " %PDF-1.7", ""]) expect(isPdf(encode(other))).toBe(false);
+    expect(checkPdf(encode("<html>"))).toMatchObject({ ok: false, error: { kind: "invalid" } });
+  });
+
+  it("links to the archive's page of a document, its id encoded", () => {
+    expect(documentPage("https://archive.example.org", "0c6f-11")).toBe(
+      "https://archive.example.org/dokumente/0c6f-11",
+    );
+    expect(documentPage("https://archive.example.org", "../a?b")).toBe(
+      "https://archive.example.org/dokumente/..%2Fa%3Fb",
+    );
+  });
+
+  it("names the PDF after the file", () => {
+    expect(pdfNameOf("Angebot 2026.docx")).toBe("Angebot 2026.pdf");
+    expect(pdfNameOf("Vertrag.pdf")).toBe("Vertrag.pdf");
+    expect(pdfNameOf("Notiz")).toBe("Notiz.pdf");
+  });
+
+  it("is not set up without the settings", () => {
+    expect(requireArchive(undefined)).toMatchObject({ ok: false, error: { kind: "not_found" } });
+  });
+
+  it("tells the web app only whether there is an archive and its name", () => {
+    const archive = { url: "https://archive.example.org", token: "belegt_secret", name: "Belegablage" };
+    expect(withArchive({ mode: "server" }, archive)).toEqual({
+      mode: "server",
+      archive: { name: "Belegablage" },
+    });
+    expect(withArchive({ mode: "server" }, { ...archive, name: undefined })).toEqual({
+      mode: "server",
+      archive: {},
+    });
+    expect(withArchive({ mode: "server" }, undefined)).toEqual({ mode: "server" });
+    expect(JSON.stringify(withArchive({ mode: "server" }, archive))).not.toMatch(/secret|example/);
   });
 });

@@ -54,7 +54,7 @@ Nextcloud does:
 
 The newest version always stays, and so does every version someone chose to keep ("Version
 behalten" in the versions dialog, `PATCH /files/:id/versions/:number` with `{ "kept": true }`, for
-those who may edit): the sent invoice, the signed contract. With `SCHREIBZEUG_VERSIONS=all` every
+those who may edit), and every version [saved to an archive](#saving-to-an-archive): the sent invoice, the signed contract. With `SCHREIBZEUG_VERSIONS=all` every
 version stays ([installation](installation.md#settings)).
 
 A thinned-out version's row goes at once; its bytes stay in the blob store until the collection
@@ -79,9 +79,10 @@ All under `/api`; bodies are JSON unless noted. Every route but `/health`, `/inf
 [MCP server](mcp.md#access-tokens)). Errors are
 `{ "error": { "kind", "message" } }`, with `kind` one of `not_found` (404), `invalid` (400),
 `unauthorized` (401), `forbidden` (403: the role is too weak), `not_a_folder` (422), `name_taken` and `conflict` (409), `too_large` (413),
-`internal` (500), and from `POST /files/import` also `link_expired` (410) and `upstream_failed` (502).
+`internal` (500), from `POST /files/import` also `link_expired` (410) and `upstream_failed` (502), and from
+`POST /files/:id/archive` also `upstream_failed` and `upstream_refused` (502).
 
-Only the uploads (`POST /files`, `PUT /files/:id/content`, `POST /files/:id/media`) take bodies up to
+Only the uploads (`POST /files`, `PUT /files/:id/content`, `POST /files/:id/media`, `POST /files/:id/archive`) take bodies up to
 `SCHREIBZEUG_MAX_UPLOAD_MB`. Better Auth's `/auth/*` answers a body over 64 KB with `413` before it
 reads it, and every other route one over 16 MB (`src/limits.ts`): Bun's own limit is sized for the
 uploads, and Better Auth reads a JSON body whole before it checks who is asking.
@@ -119,8 +120,9 @@ Every node in an answer carries `role`, what the user may do with it: `owner`, `
 | `POST /files/:id/copy` | A copy of the newest version, named "… (Kopie).docx", next to the original when the user may add there, otherwise in their own files |
 | `POST /files/:id/versions/:number/restore` | Make an older version the newest again (as a new version; the ones in between stay) |
 | `PATCH /files/:id/versions/:number` | `{ "kept": true }` keeps a version from being [thinned out](#versions), `false` lets it go again (edit) |
+| `POST /files/:id/archive` | Sends the newest version to the archive as PDF/A and/or the file itself, and keeps it (edit), [below](#saving-to-an-archive) |
 | `GET /health` | `{ "ok": true }` |
-| `GET /info` | `{ "mode": "server" }`, with `oidc: { name }` when a sign-in provider is set and `embedOrigin` when a site may frame the app ([Kontext](kontext.md)); the desktop app's local server answers `{ "mode": "local", "rootName" }` ([desktop app](desktop.md#files-on-this-computer)). **No session needed** |
+| `GET /info` | `{ "mode": "server" }`, with `oidc: { name }` when a sign-in provider is set `embedOrigin` when a site may frame the app ([Kontext](kontext.md)) and `archive: { name? }` when documents can be [saved to an archive](#saving-to-an-archive); the desktop app's local server answers `{ "mode": "local", "rootName" }` ([desktop app](desktop.md#files-on-this-computer)). **No session needed** |
 
 More routes, described where they belong:
 
@@ -185,6 +187,47 @@ taken in the folder, the file becomes "Name (2).ext", "Name (3).ext" and so on.
 | `413 too_large` | Larger than `SCHREIBZEUG_MAX_UPLOAD_MB` |
 | `502 upstream_failed` | Not reachable, too slow, a redirect or another error |
 
+## Saving to an archive
+
+A server can be set up with an archive that keeps finished documents as unalterable originals,
+such as a sent offer or a signed contract, e.g. [Belegt](https://github.com/firsttris/belegt), a
+self-hosted archive for GoBD. Then the "Datei" menu of every editor that can make a PDF (documents,
+spreadsheets, presentations, PDFs) has "Im Archiv ablegen …" (`In <name> ablegen …` with
+`SCHREIBZEUG_ARCHIVE_NAME`) for those who may edit the file. The dialog sends the saved version as
+PDF/A, the same the "Als PDF/A herunterladen" item makes
+([PDF and printing](engine.md#pdf-and-printing)), and on request the Office file itself;
+afterwards it links to each new document in the archive. Changes not saved yet are saved first,
+so the archive gets a stored version, and that version is then [kept](#versions): thinning never
+removes what the archive holds.
+
+The browser renders the PDF/A and sends it with the version's number to
+`POST /api/files/:id/archive` (multipart: `pdf`, `original=true`, `version`). The server checks the
+PDF lightly (it starts with `%PDF-`, at most `SCHREIBZEUG_MAX_UPLOAD_MB`), takes the original from
+the blob store, and sends each file as a document of its own to `<archive>/api/dokumente`
+(multipart field `datei`, `Authorization: Bearer <SCHREIBZEUG_ARCHIVE_TOKEN>`, 60 seconds each;
+`src/files/archive.ts`). Redirects are not followed, so the token only reaches
+`SCHREIBZEUG_ARCHIVE_URL`; it never goes to the browser, into an answer or into the log. The
+archive answers each document with JSON holding its `id`; its page is
+`<archive>/dokumente/<id>`. The answer to the browser is
+`{ "version", "documents": [{ "kind": "pdf" | "original", "name", "id", "url" }] }`. Each upload is
+a new document in the archive, also when the same version goes twice.
+
+Edit is needed rather than view, as the version gets kept. In the archive the token needs the
+right "schreiben" (write); one that may only read is refused.
+
+| Answer | When |
+|---|---|
+| `201` | In the archive; the version is kept |
+| `400 invalid` | Nothing chosen, or the body is no PDF |
+| `403 forbidden`, `404 not_found` | The user may only look at the file, or not at all; `404` also without `SCHREIBZEUG_ARCHIVE_URL` and `_TOKEN` |
+| `409 conflict` | Someone saved a newer version in between; archiving again sends that one |
+| `413 too_large` | Larger than `SCHREIBZEUG_MAX_UPLOAD_MB`, or the archive answered `413` |
+| `502 upstream_refused` | The archive answered `401` or `403`: the admin must check the token |
+| `502 upstream_failed` | Not reachable, too slow, a redirect, an answer without `id` or another error |
+
+When the PDF went and the original then fails, the message says the PDF is in the archive, and the
+version is kept.
+
 ## Templates
 
 "Neu → Aus Vorlage …" (`apps/web/src/files/template-dialog.tsx`) starts a file from a template:
@@ -207,6 +250,7 @@ needs nothing of its own for it and an own template stays as it is.
 | `PORT` | `3000` |
 | `SCHREIBZEUG_MAX_UPLOAD_MB` | `512` |
 | `SCHREIBZEUG_IMPORT_ORIGINS` | unset: no file is fetched from a link, [above](#opening-a-file-from-another-app) |
+| `SCHREIBZEUG_ARCHIVE_URL`, `SCHREIBZEUG_ARCHIVE_TOKEN`, `SCHREIBZEUG_ARCHIVE_NAME` | unset: nothing is saved to an archive, [above](#saving-to-an-archive) |
 | `SCHREIBZEUG_OPEN_SIGNUP`, `SCHREIBZEUG_AUTH_SECRET`, `SCHREIBZEUG_TRUSTED_ORIGINS`, `SCHREIBZEUG_TRUSTED_PROXIES` | see [accounts](accounts.md) |
 | `SCHREIBZEUG_URL`, `SCHREIBZEUG_EMBED_ORIGIN`, `OIDC_ISSUER`, `OIDC_CLIENT_ID`, `OIDC_CLIENT_SECRET`, `OIDC_NAME` | see [Schreibzeug in Kontext](kontext.md#settings) |
 | `SCHREIBZEUG_WEB_DIR` | unset: the API only. The built web app (`apps/web/dist`, after `bun run build`) to serve beside it, so one address serves the app and the API (every file with `X-Content-Type-Options: nosniff`, so a browser never takes it for another type); the [desktop app](desktop.md) opens that address |
@@ -236,4 +280,9 @@ names) and `e2e/templates.spec.ts` (a file from a built-in and from an own templ
 editor). `e2e/files.spec.ts` goes through the file list as a person does.
 Opening from a link: `apps/server/test/import.test.ts` against a Bun server on a free port as the
 other app (allowed origins, redirects, limits, expired links, names), and `e2e/open.spec.ts` with
-a stand-in archive (`e2e/fake-archive.ts`), signing in first included.
+a stand-in archive (`e2e/fake-archive.ts`), signing in first included. Saving to an archive:
+`apps/server/test/archive.test.ts` against a stand-in archive on a free port (the token only in the
+Authorization header and never in an answer or the log, redirects, refused tokens, limits, the
+original, the kept version), `apps/web/src/editor/archive.test.ts` (save first, the steps, the
+texts) and `e2e/save-to-archive.spec.ts` with the same stand-in archive as above (a PDF/A and the
+original in the archive, a refused token).

@@ -22,6 +22,7 @@ import { type FileActions, fileMenu, helpMenu, type PdfActions, type ScreenReade
 import { FileTitle } from "./file-title";
 import { AboutDialog, type Shortcut, ShortcutsDialog } from "./help-dialogs";
 import { type DocumentStatus, SaveStatus } from "./save-status";
+import type { ArchiveHandle } from "./use-archive";
 import type { DocumentSave } from "./use-document-save";
 
 export type EditorHeaderProps = {
@@ -43,6 +44,8 @@ export type EditorHeaderProps = {
   pdf?: PdfActions;
   /** Further formats to download in ("Datei" menu). */
   downloads?: MenuItem[];
+  /** Saving to the server's archive ("Datei" menu), where it has one. */
+  archive?: ArchiveHandle;
   /** The editor's own menus between "Datei" and "Hilfe": Bearbeiten, Ansicht, Einfügen, Format. */
   menus: Menu[];
   shortcuts: Shortcut[];
@@ -121,6 +124,7 @@ export const EditorHeader = ({
   onDownload,
   pdf = null,
   downloads = [],
+  archive,
   menus,
   shortcuts,
   screenReader = null,
@@ -138,7 +142,11 @@ export const EditorHeader = ({
   const menuBar = (
     <MenuBar
       label={m.editor_header_menu()}
-      menus={[fileMenu(file, onDownload, pdf, ready, downloads), ...menus, helpMenu(setDialog, screenReader)]}
+      menus={[
+        fileMenu(file, onDownload, pdf, ready, downloads, archive?.item ?? null),
+        ...menus,
+        helpMenu(setDialog, screenReader),
+      ]}
     />
   );
 
@@ -203,6 +211,7 @@ export const EditorHeader = ({
       {!readOnly && <div className={toolsOpen ? "" : "hidden sm:block"}>{toolbar}</div>}
       <ShortcutsDialog open={dialog === "shortcuts"} shortcuts={shortcuts} onClose={() => setDialog(null)} />
       <AboutDialog open={dialog === "about"} onClose={() => setDialog(null)} />
+      {archive?.dialog}
     </header>
   );
 };

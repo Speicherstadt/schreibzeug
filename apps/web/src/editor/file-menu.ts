@@ -37,6 +37,8 @@ export const fileMenu = (
   ready: boolean,
   /** Further formats to download in, e.g. a spreadsheet as CSV. */
   downloads: MenuItem[] = [],
+  /** "Im Archiv ablegen …", where the server has an archive (use-archive.tsx). */
+  archive: MenuItem | null = null,
 ): Menu => ({
   label: m.common_file(),
   groups: [
@@ -54,6 +56,7 @@ export const fileMenu = (
       ...(pdf
         ? [{ label: m.common_print(), shortcut: keys("Ctrl+P"), onSelect: pdf.print, disabled: !ready }]
         : []),
+      ...(archive ? [{ ...archive, disabled: archive.disabled || !ready }] : []),
     ],
     [
       ...(actions.onShare ? [{ label: m.file_menu_share(), onSelect: actions.onShare }] : []),

@@ -58,7 +58,7 @@ Versionen. Nach jedem Speichern und Wiederherstellen dünnt der Server die älte
 
 Die neueste Version bleibt immer, und ebenso jede Version, die jemand behalten wollte („Version
 behalten“ im Versionen-Dialog, `PATCH /files/:id/versions/:number` mit `{ "kept": true }`, für
-alle, die bearbeiten dürfen): die verschickte Rechnung, der unterschriebene Vertrag. Mit
+alle, die bearbeiten dürfen), und jede Version, die [in einem Archiv abgelegt](#saving-to-an-archive) wurde: die verschickte Rechnung, der unterschriebene Vertrag. Mit
 `SCHREIBZEUG_VERSIONS=all` bleibt jede Version ([Installation](installation.md#settings)).
 
 Die Zeile einer ausgedünnten Version verschwindet sofort; ihre Bytes bleiben im Blob-Speicher bis
@@ -85,10 +85,11 @@ persönlichen Zugangsschlüssel und handelt für dessen Benutzer ([Konten](accou
 [MCP-Server](mcp.md#access-tokens)). Fehler sind
 `{ "error": { "kind", "message" } }`, wobei `kind` eines ist von `not_found` (404), `invalid`
 (400), `unauthorized` (401), `forbidden` (403: die Rolle reicht nicht), `not_a_folder` (422),
-`name_taken` und `conflict` (409), `too_large` (413), `internal` (500), und von
-`POST /files/import` auch `link_expired` (410) und `upstream_failed` (502).
+`name_taken` und `conflict` (409), `too_large` (413), `internal` (500), von
+`POST /files/import` auch `link_expired` (410) und `upstream_failed` (502) und von
+`POST /files/:id/archive` auch `upstream_failed` und `upstream_refused` (502).
 
-Nur die Uploads (`POST /files`, `PUT /files/:id/content`, `POST /files/:id/media`) nehmen Bodys bis
+Nur die Uploads (`POST /files`, `PUT /files/:id/content`, `POST /files/:id/media`, `POST /files/:id/archive`) nehmen Bodys bis
 `SCHREIBZEUG_MAX_UPLOAD_MB`. Better Auths `/auth/*` beantwortet einen Body über 64 KB mit `413`,
 bevor es ihn liest, und jede andere Route einen über 16 MB (`src/limits.ts`): Buns eigenes Limit
 ist auf die Uploads ausgelegt, und Better Auth liest einen JSON-Body ganz, bevor es prüft, wer
@@ -128,8 +129,9 @@ Jeder Knoten in einer Antwort trägt `role`, was der Benutzer damit darf: `owner
 | `POST /files/:id/copy` | Eine Kopie der neuesten Version, benannt „… (Kopie).docx“, neben dem Original, wenn der Benutzer dort etwas hinzufügen darf, sonst in seinen eigenen Dateien |
 | `POST /files/:id/versions/:number/restore` | Eine ältere Version wieder zur neuesten machen (als neue Version; die dazwischen bleiben) |
 | `PATCH /files/:id/versions/:number` | `{ "kept": true }` bewahrt eine Version vor dem [Ausdünnen](#versions), `false` gibt sie wieder frei (Bearbeiten) |
+| `POST /files/:id/archive` | Sendet die neueste Version als PDF/A und/oder die Datei selbst an das Archiv und behält sie (Bearbeiten), [unten](#saving-to-an-archive) |
 | `GET /health` | `{ "ok": true }` |
-| `GET /info` | `{ "mode": "server" }`, mit `oidc: { name }`, wenn ein Anmeldeanbieter eingestellt ist, und `embedOrigin`, wenn eine Website die App in einem Frame zeigen darf ([Kontext](kontext.md)); der lokale Server der Desktop-App antwortet `{ "mode": "local", "rootName" }` ([Desktop-App](desktop.md#files-on-this-computer)). **Keine Sitzung nötig** |
+| `GET /info` | `{ "mode": "server" }`, mit `oidc: { name }`, wenn ein Anmeldeanbieter eingestellt ist, `embedOrigin`, wenn eine Website die App in einem Frame zeigen darf ([Kontext](kontext.md)), und `archive: { name? }`, wenn sich Dokumente [in einem Archiv ablegen](#saving-to-an-archive) lassen; der lokale Server der Desktop-App antwortet `{ "mode": "local", "rootName" }` ([Desktop-App](desktop.md#files-on-this-computer)). **Keine Sitzung nötig** |
 
 Weitere Routen, beschrieben dort, wo sie hingehören:
 
@@ -198,6 +200,48 @@ Ordner vergeben, wird die Datei zu „Name (2).ext“, „Name (3).ext“ und so
 | `413 too_large` | Größer als `SCHREIBZEUG_MAX_UPLOAD_MB` |
 | `502 upstream_failed` | Nicht erreichbar, zu langsam, eine Weiterleitung oder ein anderer Fehler |
 
+## In einem Archiv ablegen { #saving-to-an-archive }
+
+Ein Server kann mit einem Archiv eingerichtet sein, das fertige Dokumente als unveränderbare
+Originale aufbewahrt, etwa ein verschicktes Angebot oder einen unterschriebenen Vertrag, z. B.
+[Belegt](https://github.com/firsttris/belegt), ein selbst gehostetes Archiv für die GoBD. Dann hat
+das Menü „Datei“ jedes Editors, der ein PDF erstellen kann (Dokumente, Tabellen, Präsentationen,
+PDFs), den Eintrag „Im Archiv ablegen …“ (`In <Name> ablegen …` mit `SCHREIBZEUG_ARCHIVE_NAME`) für
+alle, die die Datei bearbeiten dürfen. Der Dialog sendet die gespeicherte Version als PDF/A, dasselbe,
+das „Als PDF/A herunterladen“ erstellt ([PDF und Drucken](engine.md#pdf-and-printing)), und auf
+Wunsch die Office-Datei selbst;
+danach verlinkt er jedes neue Dokument im Archiv. Noch nicht gespeicherte Änderungen werden vorher
+gespeichert, damit das Archiv eine gespeicherte Version bekommt, und diese Version wird dann
+[behalten](#versions): Das Ausdünnen entfernt nie, was im Archiv liegt.
+
+Der Browser erstellt das PDF/A und sendet es mit der Nummer der Version an
+`POST /api/files/:id/archive` (multipart: `pdf`, `original=true`, `version`). Der Server prüft das
+PDF knapp (es beginnt mit `%PDF-`, höchstens `SCHREIBZEUG_MAX_UPLOAD_MB`), nimmt das Original aus
+dem Blob-Speicher und sendet jede Datei als eigenes Dokument an `<Archiv>/api/dokumente`
+(Multipart-Feld `datei`, `Authorization: Bearer <SCHREIBZEUG_ARCHIVE_TOKEN>`, je 60 Sekunden;
+`src/files/archive.ts`). Weiterleitungen werden nicht verfolgt, damit der Schlüssel nur
+`SCHREIBZEUG_ARCHIVE_URL` erreicht; er geht nie an den Browser, in eine Antwort oder ins Log. Das
+Archiv beantwortet jedes Dokument mit JSON, das seine `id` enthält; seine Seite ist
+`<Archiv>/dokumente/<id>`. Die Antwort an den Browser ist
+`{ "version", "documents": [{ "kind": "pdf" | "original", "name", "id", "url" }] }`. Jeder Upload
+ist ein neues Dokument im Archiv, auch wenn dieselbe Version zweimal geht.
+
+Nötig ist Bearbeiten statt Ansehen, weil die Version behalten wird. Im Archiv braucht der Schlüssel
+das Recht „schreiben“; einer, der nur lesen darf, wird abgelehnt.
+
+| Antwort | Wann |
+|---|---|
+| `201` | Im Archiv; die Version ist behalten |
+| `400 invalid` | Nichts ausgewählt, oder der Body ist kein PDF |
+| `403 forbidden`, `404 not_found` | Der Benutzer darf die Datei nur ansehen oder gar nicht; `404` auch ohne `SCHREIBZEUG_ARCHIVE_URL` und `_TOKEN` |
+| `409 conflict` | Jemand hat inzwischen eine neuere Version gespeichert; erneutes Ablegen sendet diese |
+| `413 too_large` | Größer als `SCHREIBZEUG_MAX_UPLOAD_MB`, oder das Archiv antwortete `413` |
+| `502 upstream_refused` | Das Archiv antwortete `401` oder `403`: Wer den Server verwaltet, muss den Schlüssel prüfen |
+| `502 upstream_failed` | Nicht erreichbar, zu langsam, eine Weiterleitung, eine Antwort ohne `id` oder ein anderer Fehler |
+
+Ging das PDF und scheitert danach das Original, sagt die Meldung, dass das PDF im Archiv liegt, und
+die Version ist behalten.
+
 ## Vorlagen { #templates }
 
 „Neu → Aus Vorlage …“ (`apps/web/src/files/template-dialog.tsx`) beginnt eine Datei aus einer
@@ -223,6 +267,7 @@ ist.
 | `PORT` | `3000` |
 | `SCHREIBZEUG_MAX_UPLOAD_MB` | `512` |
 | `SCHREIBZEUG_IMPORT_ORIGINS` | nicht gesetzt: Aus Links wird keine Datei geholt, [oben](#opening-a-file-from-another-app) |
+| `SCHREIBZEUG_ARCHIVE_URL`, `SCHREIBZEUG_ARCHIVE_TOKEN`, `SCHREIBZEUG_ARCHIVE_NAME` | nicht gesetzt: Nichts wird in einem Archiv abgelegt, [oben](#saving-to-an-archive) |
 | `SCHREIBZEUG_OPEN_SIGNUP`, `SCHREIBZEUG_AUTH_SECRET`, `SCHREIBZEUG_TRUSTED_ORIGINS`, `SCHREIBZEUG_TRUSTED_PROXIES` | siehe [Konten](accounts.md) |
 | `SCHREIBZEUG_URL`, `SCHREIBZEUG_EMBED_ORIGIN`, `OIDC_ISSUER`, `OIDC_CLIENT_ID`, `OIDC_CLIENT_SECRET`, `OIDC_NAME` | siehe [Schreibzeug in Kontext](kontext.md#settings) |
 | `SCHREIBZEUG_WEB_DIR` | nicht gesetzt: nur die API. Die gebaute Web-App (`apps/web/dist`, nach `bun run build`), die daneben ausgeliefert wird, sodass eine Adresse App und API ausliefert (jede Datei mit `X-Content-Type-Options: nosniff`, damit ein Browser sie nie für einen anderen Typ hält); die [Desktop-App](desktop.md) öffnet diese Adresse |
@@ -255,4 +300,9 @@ Editor geöffnet). `e2e/files.spec.ts` geht die Dateiliste durch, wie ein Mensch
 Öffnen aus einem Link: `apps/server/test/import.test.ts` gegen einen Bun-Server auf einem freien
 Port als andere App (erlaubte Origins, Weiterleitungen, Grenzen, abgelaufene Links, Namen) und
 `e2e/open.spec.ts` mit einem Ersatz-Archiv (`e2e/fake-archive.ts`), einschließlich der Anmeldung
-vorher.
+vorher. In einem Archiv ablegen: `apps/server/test/archive.test.ts` gegen ein Ersatz-Archiv auf
+einem freien Port (der Schlüssel nur in der Kopfzeile Authorization und nie in einer Antwort oder
+im Log, Weiterleitungen, abgelehnte Schlüssel, Grenzen, das Original, die behaltene Version),
+`apps/web/src/editor/archive.test.ts` (vorher speichern, die Schritte, die Texte) und
+`e2e/save-to-archive.spec.ts` mit demselben Ersatz-Archiv (ein PDF/A und das Original im Archiv,
+ein abgelehnter Schlüssel).
