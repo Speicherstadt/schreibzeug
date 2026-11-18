@@ -1,6 +1,6 @@
 # Schreibzeug in Kontext
 
-[Kontext](https://github.com/firsttris/kontext) (mail, calendar, contacts, tasks and chat on
+[Kontext](https://github.com/Speicherstadt/kontext) (mail, calendar, contacts, tasks and chat on
 Stalwart) shows Schreibzeug as its module "Dokumente". Both stay services of their own, each with
 its own sessions, data and releases; they meet only through standards: OpenID Connect for the
 sign-in, HTTP with bearer tokens between the servers, and `postMessage` between the two pages.

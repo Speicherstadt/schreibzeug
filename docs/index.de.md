@@ -211,7 +211,7 @@ Claude und andere Assistenten finden, lesen und schreiben deine Dateien mit dein
 <div markdown>
 **✉️ Passt zu Kontext**
 
-Zusammen mit [Kontext](https://firsttris.github.io/kontext/) die Dokumente neben
+Zusammen mit [Kontext](https://kontext.email/) die Dokumente neben
 Mail, Kalender und Chat – mit einer Anmeldung.
 </div>
 <div markdown>
@@ -228,6 +228,6 @@ Offener Quellcode, gebaut auf der europäischen Euro-Office-Engine.
 <p class="showcase-claim">Handwerk · Kanzleien und Praxen · Selbstständige · kleine und mittlere
 Betriebe. Made in Europe.</p>
 
-[Alle Funktionen im Detail](overview.md){ .md-button .md-button--primary } [Mail, Kalender und Chat mit Kontext](https://firsttris.github.io/kontext/){ .md-button }
+[Alle Funktionen im Detail](overview.md){ .md-button .md-button--primary } [Mail, Kalender und Chat mit Kontext](https://kontext.email/){ .md-button }
 
 </div>

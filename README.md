@@ -99,7 +99,7 @@ Then:
 3. Open `https://<your domain>`. More accounts come through sharing links, or by anyone with
    `SCHREIBZEUG_OPEN_SIGNUP=true` in `deploy/.env`.
 
-With [Kontext](https://github.com/firsttris/kontext) Schreibzeug needs no install of its own: it
+With [Kontext](https://github.com/Speicherstadt/kontext) Schreibzeug needs no install of its own: it
 comes with Kontext as its documents. Only trying it on your own computer:
 `docker run -d -p 127.0.0.1:3000:3000 -v schreibzeug-data:/data tristanteu/schreibzeug`, then
 http://localhost:3000. Settings, your own reverse proxy, backups and updates are in the
@@ -116,7 +116,7 @@ The desktop app is described under [Desktop app](https://schreibzeug.app/desktop
 | 📄 **PDFs** | **Fill in forms and sign**, by hand or **digitally** with your certificate (not qualified), notes and highlighting, **black out**, add and remove pages, **OCR** for scans · [more →](https://schreibzeug.app/pdf.html) |
 | 🗒️ **Markdown & text** (.md, .txt) | A **live view** that keeps the text Markdown, or source and preview side by side; encoding and line endings kept byte for byte · [more →](https://schreibzeug.app/text.html) |
 | 📁 **Files & teamwork** | Folders, upload, recent files and trash, **versions** to go back to, **sharing** with accounts or by link, **real-time co-editing** with live cursors, opening a copy of a file **another app hands over** by a link, **saving to an archive** as PDF/A · [more →](https://schreibzeug.app/files.html) |
-| 🤖 **AI & Kontext** | **MCP server** for Claude Code and other MCP clients, with your rights, asking before it edits a document you have open; **sign in with [Kontext](https://github.com/firsttris/kontext)** and use Schreibzeug as its documents module · [more →](https://schreibzeug.app/mcp.html) |
+| 🤖 **AI & Kontext** | **MCP server** for Claude Code and other MCP clients, with your rights, asking before it edits a document you have open; **sign in with [Kontext](https://github.com/Speicherstadt/kontext)** and use Schreibzeug as its documents module · [more →](https://schreibzeug.app/mcp.html) |
 | 🖥️ **Desktop app** | **Windows, macOS and Linux** (Tauri): the files in your documents folder without any server, or a window onto a Schreibzeug server (builds not signed yet) · [more →](https://schreibzeug.app/desktop.html) |
 | 🌐 **German and English** | The interface in **German or English**, as the browser asks for it or as chosen in the settings · [more →](https://schreibzeug.app/architecture.html#interface-texts) |
 | ♿ **Accessibility** | Menus and toolbars by **keyboard**, **screen reader support** in documents, spreadsheets and presentations (off unless switched on, Strg+Alt+Z), checked automatically against WCAG 2.2 AA · [more →](https://schreibzeug.app/accessibility.html) |
@@ -229,7 +229,7 @@ app. Checks, tests and architecture: [Development](https://schreibzeug.app/devel
 
 ## 🧩 More from us
 
-- Looking for a replacement for Gmail or Google Workspace? **[Kontext](https://github.com/firsttris/kontext)**: mail, calendar, contacts, chat and calls for your team, on your own server.
+- Looking for a replacement for Gmail or Google Workspace? **[Kontext](https://github.com/Speicherstadt/kontext)**: mail, calendar, contacts, chat and calls for your team, on your own server.
 - Doing your own books in Germany? **[Haben](https://github.com/firsttris/haben)**: invoices with e-invoicing, receipts, bank reconciliation and VAT returns via ELSTER.
 
 ## 🤝 Contributing

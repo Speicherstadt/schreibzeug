@@ -18,7 +18,7 @@ RUN bun engine/scripts/prepare.ts && rm -rf engine/.cache && bun engine/scripts/
 COPY . .
 RUN bun install --frozen-lockfile && bun run build
 
-# The runtime on Wolfi instead of Debian, as in Haben and Kontext (firsttris/kontext#248): current
+# The runtime on Wolfi instead of Debian, as in Haben and Kontext (Speicherstadt/kontext#248): current
 # system packages and few known vulnerabilities. Wolfi is rolling; the digest keeps the build
 # reproducible and Renovate raises it (group "Wolfi"). Nothing but Bun runs here, and Bun needs only
 # glibc (its NEEDED entries: libc, ld-linux, libpthread, libdl, libm), which wolfi-base has.

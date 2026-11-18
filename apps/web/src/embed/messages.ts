@@ -4,7 +4,7 @@ import { z } from "zod";
  * Schreibzeug inside Kontext: Kontext shows it in a frame, as its module "Dokumente". Both talk
  * with `postMessage`, and only with each other: a message counts only from the parent window at the
  * origin the server names (`embedOrigin` in /api/info), and goes only to that origin. Kontext keeps
- * the same shapes on its side (src/features/documents/messages.ts in firsttris/kontext).
+ * the same shapes on its side (src/features/documents/messages.ts in Speicherstadt/kontext).
  */
 
 /** The query parameter Kontext opens the frame with: `?embedded=kontext`. */

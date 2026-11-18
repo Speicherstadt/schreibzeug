@@ -210,7 +210,7 @@ document need your approval.
 <div markdown>
 **✉️ Goes with Kontext**
 
-Together with [Kontext](https://firsttris.github.io/kontext/en/), your documents sit next to
+Together with [Kontext](https://kontext.email/en/), your documents sit next to
 mail, calendar and chat – with one sign-in.
 </div>
 <div markdown>
@@ -227,6 +227,6 @@ Open source code, built on the European Euro-Office engine.
 <p class="showcase-claim">Trades · law firms and practices · freelancers · small and mid-sized
 businesses. Made in Europe.</p>
 
-[Every feature in detail](overview.md){ .md-button .md-button--primary } [Mail, calendar and chat with Kontext](https://firsttris.github.io/kontext/en/){ .md-button }
+[Every feature in detail](overview.md){ .md-button .md-button--primary } [Mail, calendar and chat with Kontext](https://kontext.email/en/){ .md-button }
 
 </div>
