@@ -103,7 +103,7 @@ Danach:
 3. `https://<deine Domain>` öffnen. Weitere Konten entstehen über Freigabe-Links oder, mit
    `SCHREIBZEUG_OPEN_SIGNUP=true` in `deploy/.env`, durch jeden.
 
-Mit [Kontext](https://github.com/firsttris/kontext) braucht Schreibzeug keine eigene Installation:
+Mit [Kontext](https://github.com/Speicherstadt/kontext) braucht Schreibzeug keine eigene Installation:
 Es kommt mit Kontext als dessen Dokumente. Nur auf dem eigenen Rechner ausprobieren:
 `docker run -d -p 127.0.0.1:3000:3000 -v schreibzeug-data:/data tristanteu/schreibzeug`, dann
 http://localhost:3000. Einstellungen, ein eigener Reverse Proxy, Backups und Updates stehen in der
@@ -120,7 +120,7 @@ Die Desktop-App beschreibt [Desktop-App](https://schreibzeug.app/de/desktop.html
 | 📄 **PDFs** | **Formulare ausfüllen und unterschreiben**, von Hand oder **digital** mit deinem Zertifikat (nicht qualifiziert), Notizen und Markieren, **Schwärzen**, Seiten einfügen und entfernen, **Texterkennung (OCR)** für Scans · [mehr →](https://schreibzeug.app/de/pdf.html) |
 | 🗒️ **Markdown & Text** (.md, .txt) | Eine **Live-Ansicht**, in der der Text Markdown bleibt, oder Quelle und Vorschau nebeneinander; Zeichenkodierung und Zeilenenden bleiben Byte für Byte · [mehr →](https://schreibzeug.app/de/text.html) |
 | 📁 **Dateien & Teamarbeit** | Ordner, Hochladen, zuletzt geöffnete Dateien und Papierkorb, **Versionen** zum Zurückholen, **Teilen** mit Konten oder per Link, **gemeinsam in Echtzeit** mit Cursorn, eine Kopie einer Datei öffnen, die **eine andere App** per Link übergibt, **im Archiv ablegen** als PDF/A · [mehr →](https://schreibzeug.app/de/files.html) |
-| 🤖 **KI & Kontext** | **MCP-Server** für Claude Code und andere MCP-Clients, mit deinen Rechten und mit Rückfrage, bevor er ein offenes Dokument ändert; **Anmeldung über [Kontext](https://github.com/firsttris/kontext)** und Schreibzeug als dessen Dokumente-Modul · [mehr →](https://schreibzeug.app/de/mcp.html) |
+| 🤖 **KI & Kontext** | **MCP-Server** für Claude Code und andere MCP-Clients, mit deinen Rechten und mit Rückfrage, bevor er ein offenes Dokument ändert; **Anmeldung über [Kontext](https://github.com/Speicherstadt/kontext)** und Schreibzeug als dessen Dokumente-Modul · [mehr →](https://schreibzeug.app/de/mcp.html) |
 | 🖥️ **Desktop-App** | **Windows, macOS und Linux** (Tauri): die Dateien in deinem Dokumente-Ordner ganz ohne Server, oder ein Fenster auf einen Schreibzeug-Server (noch nicht signiert) · [mehr →](https://schreibzeug.app/de/desktop.html) |
 | 🌐 **Deutsch und Englisch** | Die Oberfläche auf **Deutsch oder Englisch**, wie der Browser es wünscht oder in den Einstellungen gewählt · [mehr →](https://schreibzeug.app/de/architecture.html#interface-texts) |
 | ♿ **Barrierefreiheit** | Menüs und Werkzeugleisten per **Tastatur**, **Unterstützung für Screenreader** in Dokumenten, Tabellen und Präsentationen (nur wenn eingeschaltet, Strg+Alt+Z), automatisch gegen WCAG 2.2 AA geprüft · [mehr →](https://schreibzeug.app/de/accessibility.html) |
@@ -233,7 +233,7 @@ Prüfungen, Tests und Architektur: [Entwicklung](https://schreibzeug.app/de/deve
 
 ## 🧩 Mehr von uns
 
-- Suchst du einen Ersatz für Gmail oder Google Workspace? **[Kontext](https://github.com/firsttris/kontext)**: Mail, Kalender, Kontakte, Chat und Telefonie für dein Team, auf deinem eigenen Server.
+- Suchst du einen Ersatz für Gmail oder Google Workspace? **[Kontext](https://github.com/Speicherstadt/kontext)**: Mail, Kalender, Kontakte, Chat und Telefonie für dein Team, auf deinem eigenen Server.
 - Machst du deine Buchhaltung selbst? **[Haben](https://github.com/firsttris/haben)**: Rechnungen mit E-Rechnung, Belege, Bankabgleich und die Umsatzsteuer-Voranmeldung an ELSTER.
 
 ## 🤝 Mitmachen

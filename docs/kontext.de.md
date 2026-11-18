@@ -1,6 +1,6 @@
 # Schreibzeug in Kontext { #schreibzeug-in-kontext }
 
-[Kontext](https://github.com/firsttris/kontext) (Mail, Kalender, Kontakte, Aufgaben und Chat auf
+[Kontext](https://github.com/Speicherstadt/kontext) (Mail, Kalender, Kontakte, Aufgaben und Chat auf
 Stalwart) zeigt Schreibzeug als sein Modul „Dokumente“. Beide bleiben eigene Dienste, jeder mit
 eigenen Sitzungen, Daten und Releases; sie treffen sich nur über Standards: OpenID Connect für die
 Anmeldung, HTTP mit Bearer-Tokens zwischen den Servern und `postMessage` zwischen den beiden Seiten.
