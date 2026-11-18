@@ -122,7 +122,7 @@ GitHub release. The shared workflows come from
 | `desktop.yml` | **Actions → Desktop app** builds the desktop app for Windows, macOS and Linux, unsigned for now; also part of every release |
 | `screenshots.yml` | **Actions → Update screenshots** takes the README and documentation pictures and the format-fidelity references |
 | `engine-pin.yml` | On a Renovate branch that moves the engine or the converter: sets `asset` and `sha256` of the new release in `engine/engine.json` and starts CI on that commit |
-| `docs.yml` | Publishes this documentation and the [demo](#the-demo) on GitHub Pages on every push to `main` (a pull request that changes `docs/` only builds the documentation): English at `/`, German at `/de/` (mkdocs-static-i18n). A page is translated by a file next to it (`index.de.md` for `index.md`); without one the German site shows the English text. The start page is the tour in pictures, `overview.md` the overview |
+| `docs.yml` | Publishes this documentation and the [demo](#the-demo) on GitHub Pages on every push to `main` (a pull request that changes `docs/` only builds the documentation): English at `/`, German at `/de/` (mkdocs-static-i18n). A page is translated by a file next to it (`index.de.md` for `index.md`); without one the German site shows the English text. The start page is the tour in pictures, `overview.md` the overview. MkDocs Material's `privacy` plugin downloads the fonts and other external assets at build time, so the site loads nothing from Google Fonts or a CDN; the footer links to the legal notice and the privacy policy (`copyright` in `mkdocs.yml`, per language) |
 
 ## Dependency updates
 

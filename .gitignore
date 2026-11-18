@@ -29,3 +29,6 @@ site/
 # The settings of a deployment (deploy/.env for Compose)
 deploy/.env
 **/project.inlang/cache/
+
+# MkDocs Material privacy plugin: external assets downloaded at build time
+.cache/
