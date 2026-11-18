@@ -51,8 +51,6 @@ describe("underBase", () => {
   it("puts a path of the app under Vite's base, as the demo on GitHub Pages is served", () => {
     expect(underBase("/", "/engine/1d401c83dd0c")).toBe("/engine/1d401c83dd0c");
     expect(underBase(undefined, "/engine")).toBe("/engine");
-    expect(underBase("/schreibzeug/demo/", "/engine/1d401c83dd0c")).toBe(
-      "/schreibzeug/demo/engine/1d401c83dd0c",
-    );
+    expect(underBase("/demo/", "/engine/1d401c83dd0c")).toBe("/demo/engine/1d401c83dd0c");
   });
 });

@@ -7,7 +7,7 @@ Server, und es lässt deine Dateien, was sie sind: .docx, .xlsx, .pptx, .odt, .o
 dazu Markdown-Notizen und Textdateien (.md, .txt).
 
 Einen Rundgang in Bildern für Kunden und Kollegen bietet die [Startseite](index.md); die
-[Demo](https://firsttris.github.io/schreibzeug/demo/) führt die Editoren mit Beispieldateien im
+[Demo](https://schreibzeug.app/demo/) führt die Editoren mit Beispieldateien im
 Browser aus, ohne Server ([wie](development.md#the-demo)).
 
 ![Der Schreibzeug-Editor mit einem geöffneten Word-Dokument, die Werkzeugleiste über der Seite](screenshots/editor-light.png)

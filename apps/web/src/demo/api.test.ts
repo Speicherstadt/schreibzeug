@@ -5,7 +5,7 @@ import { createMemoryFolder } from "./folder";
 import { createMemoryMedia } from "./media";
 import type { PageSocket } from "./page-socket";
 
-const ORIGIN = "https://firsttris.github.io";
+const ORIGIN = "https://schreibzeug.app";
 
 const start = async () => {
   const folder = createMemoryFolder();
@@ -78,7 +78,7 @@ describe("the demo's server in the page", () => {
 
   it("opens a file's editing session over a WebSocket in the page", async () => {
     const { api, fileId } = await start();
-    const socket = api.connect(`wss://firsttris.github.io/api/collab/${fileId}`);
+    const socket = api.connect(`wss://schreibzeug.app/api/collab/${fileId}`);
     const { heard, events } = listen(socket);
     await until(() => heard.some((message) => message.type === "license"));
     expect(events).toEqual(["open"]);
@@ -97,7 +97,7 @@ describe("the demo's server in the page", () => {
 
   it("tells the session about a save made from it", async () => {
     const { api, request, fileId } = await start();
-    const socket = api.connect(`wss://firsttris.github.io/api/collab/${fileId}`);
+    const socket = api.connect(`wss://schreibzeug.app/api/collab/${fileId}`);
     const { heard } = listen(socket);
     await until(() => heard.some((message) => message.type === "license"));
     socket.send(JSON.stringify({ type: "auth", user: { id: "demo" } }));
@@ -117,7 +117,7 @@ describe("the demo's server in the page", () => {
 
   it("closes a socket to a file that is not there, as the server does", async () => {
     const { api } = await start();
-    const socket = api.connect(`wss://firsttris.github.io/api/collab/${crypto.randomUUID()}`);
+    const socket = api.connect(`wss://schreibzeug.app/api/collab/${crypto.randomUUID()}`);
     const { events } = listen(socket);
     await until(() => events.length === 2);
     // 4404: SOCKET_CLOSE.notFound (apps/server src/collab/limits.ts).
@@ -126,7 +126,7 @@ describe("the demo's server in the page", () => {
 
   it("closes a socket no route takes, as a browser does one the server did not upgrade", async () => {
     const { api } = await start();
-    const { events } = listen(api.connect("wss://firsttris.github.io/api/nowhere"));
+    const { events } = listen(api.connect("wss://schreibzeug.app/api/nowhere"));
     await until(() => events.length > 0);
     expect(events).toEqual(["close 1006"]);
   });

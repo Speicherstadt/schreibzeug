@@ -99,7 +99,7 @@ export const ShortcutsDialog = ({
 );
 
 /** The running source, as the AGPL asks of a program used over a network. */
-export const SOURCE_URL = "https://github.com/firsttris/schreibzeug";
+export const SOURCE_URL = "https://github.com/Speicherstadt/schreibzeug";
 
 export const AboutDialog = ({ open, onClose }: { open: boolean; onClose: () => void }) => (
   <Dialog open={open} title={m.help_dialogs_about_title()} onClose={onClose}>

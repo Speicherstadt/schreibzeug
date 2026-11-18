@@ -1,4 +1,4 @@
-# The documentation as a website: https://firsttris.github.io/schreibzeug/
+# The documentation as a website: https://schreibzeug.app/
 # Source is docs/, built with MkDocs Material (.github/workflows/docs.yml).
 # Locally: pip install -r requirements-docs.txt && mkdocs serve
 site_name: Schreibzeug
@@ -6,9 +6,9 @@ site_description: >-
   Schreibzeug, the self-hosted open-source office suite: edit Word, Excel, PowerPoint and PDF files
   together in the browser or as a desktop app, without a document server. An alternative to Microsoft
   365 on your own server.
-site_url: https://firsttris.github.io/schreibzeug/
-repo_url: https://github.com/firsttris/schreibzeug
-repo_name: firsttris/schreibzeug
+site_url: https://schreibzeug.app/
+repo_url: https://github.com/Speicherstadt/schreibzeug
+repo_name: Speicherstadt/schreibzeug
 edit_uri: edit/main/docs/
 copyright: >-
   License AGPL-3.0 · © Tristan Teufel and contributors · Schreibzeug builds on the open-source

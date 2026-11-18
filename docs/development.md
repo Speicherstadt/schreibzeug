@@ -7,7 +7,7 @@ font generator, a Linux x86_64 binary. `bun run dev` runs that step first, so on
 work in a Linux VM or container. The database is a SQLite file; nothing else needs installing.
 
 ```bash
-git clone https://github.com/firsttris/schreibzeug && cd schreibzeug
+git clone https://github.com/Speicherstadt/schreibzeug && cd schreibzeug
 bun install
 bun run dev              # http://localhost:5173, with the API on http://localhost:3000
 ```
@@ -54,7 +54,7 @@ All scripts of the root `package.json`:
 | `server` | The server alone, restarting on changes |
 | `engine:prepare` | The engine in `engine/dist` (`--force` to prepare it again) |
 | `build` | The web app in `apps/web/dist`, the prepared engine copied in |
-| `build:demo` | The [demo](#the-demo) in `apps/web/dist-demo`, for GitHub Pages under `/schreibzeug/demo/` |
+| `build:demo` | The [demo](#the-demo) in `apps/web/dist-demo`, for GitHub Pages under `/demo/` |
 | `preview` | The built web app on http://localhost:4173, with `/api` and `/mcp` forwarded like `dev` |
 | `typecheck`, `lint` | The interface texts compiled, then `tsc -b`; Biome |
 | `i18n`, `i18n:check` | Compiles the interface texts (`apps/web/messages`) with Paraglide; the same, then checks that every text is in German and English and none is left in the code (a step of its own in CI) ([interface texts](architecture.md#interface-texts)) |
@@ -67,7 +67,7 @@ All scripts of the root `package.json`:
 
 ## The demo
 
-The [demo](https://firsttris.github.io/schreibzeug/demo/) is the web app without a server: a build
+The [demo](https://schreibzeug.app/demo/) is the web app without a server: a build
 of its own (`bun run build:demo`, Vite mode `demo`, into `apps/web/dist-demo`) answers the app's
 requests to `/api` in the page itself (`apps/web/src/demo/`). The engine runs in the browser anyway;
 the server only stores the files and relays the editing sessions, and both run in the page here:
@@ -92,7 +92,7 @@ the server only stores the files and relays the editing sessions, and both run i
   editing session; uploads and new files live in the same memory.
 - **Paths:** the routes live after the `#` (`createHashHistory`), as GitHub Pages has no fallback to
   `index.html`; the app, the engine (`engine-plugin.ts` `underBase`) and the text recognition sit
-  under Vite's `base`, `/schreibzeug/demo/` (another one with `DEMO_BASE=/ bun run build:demo`). The
+  under Vite's `base`, `/demo/` (another one with `DEMO_BASE=/ bun run build:demo`). The
   build carries the whole engine, about 350 MB, of which the browser loads what it opens.
 - **Publishing:** `docs.yml` builds it on every push to `main` with the engine from CI's cache and
   puts it into the site at `/demo/`.

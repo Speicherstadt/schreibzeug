@@ -12,7 +12,7 @@ const apiUrl = process.env.SCHREIBZEUG_API_URL ?? "http://localhost:3000";
 
 export default defineConfig(({ mode }) => ({
   // The demo (src/demo) is served from GitHub Pages next to the docs; DEMO_BASE=/ serves it at the root.
-  base: mode === "demo" ? (process.env.DEMO_BASE ?? "/schreibzeug/demo/") : "/",
+  base: mode === "demo" ? (process.env.DEMO_BASE ?? "/demo/") : "/",
   plugins: [
     react(),
     tailwindcss(),

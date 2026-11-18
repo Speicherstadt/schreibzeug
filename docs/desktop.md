@@ -156,7 +156,7 @@ for a somewhat larger file.
 
 ### Patched Tauri CLI
 
-Temporary, until Tauri fixes it ([#12](https://github.com/firsttris/schreibzeug/issues/12)): the
+Temporary, until Tauri fixes it ([#12](https://github.com/Speicherstadt/schreibzeug/issues/12)): the
 bundler of Tauri 3 alpha copies `libEGL.so` and `libGLESv2.so` from CEF into every Linux package,
 and CEF 154 no longer ships them, so every Linux package fails. On Linux,
 `apps/desktop/scripts/tauri.ts` therefore builds the Tauri CLI of the version in `package.json` from

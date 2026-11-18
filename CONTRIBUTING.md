@@ -1,7 +1,7 @@
 # Contributing
 
 Issues and pull requests are welcome. For a bug, please use the
-[bug form](https://github.com/firsttris/schreibzeug/issues/new?template=bug_report.yml); for a
+[bug form](https://github.com/Speicherstadt/schreibzeug/issues/new?template=bug_report.yml); for a
 rendering or compatibility problem, attach the file that shows it (or a small one that reproduces
 it) and say which program made it. For a larger change, open an issue first, so we can agree on the
 way before you spend time on it. Security problems go privately, see [SECURITY.md](SECURITY.md).
@@ -13,8 +13,8 @@ You need [Bun](https://bun.sh) 1.4 or newer and **Linux x86_64**: preparing the 
 (about 630 MB) and runs its font generator, a Linux x86_64 binary. The preparation unpacks the
 release with `ar`, `tar -xJ` and `unzip`; on Debian or Ubuntu they come with `binutils`, `xz-utils`
 and `unzip`. On macOS or Windows, work in a Linux VM or container. How to run it, the scripts and
-the stack are in [Development](https://firsttris.github.io/schreibzeug/development.html); how the
-pieces fit in [Architecture](https://firsttris.github.io/schreibzeug/architecture.html).
+the stack are in [Development](https://schreibzeug.app/development.html); how the
+pieces fit in [Architecture](https://schreibzeug.app/architecture.html).
 
 ## Before a pull request
 

@@ -8,7 +8,7 @@ erledigt diesen Schritt zuerst, also arbeite auf macOS oder Windows in einer Lin
 Container. Die Datenbank ist eine SQLite-Datei; sonst muss nichts installiert werden.
 
 ```bash
-git clone https://github.com/firsttris/schreibzeug && cd schreibzeug
+git clone https://github.com/Speicherstadt/schreibzeug && cd schreibzeug
 bun install
 bun run dev              # http://localhost:5173, mit der API auf http://localhost:3000
 ```
@@ -57,7 +57,7 @@ Alle Skripte der `package.json` in der Wurzel:
 | `server` | Den Server allein, mit Neustart bei Änderungen |
 | `engine:prepare` | Die Engine in `engine/dist` (`--force`, um sie erneut vorzubereiten) |
 | `build` | Die Web-App in `apps/web/dist`, mit der vorbereiteten Engine hineinkopiert |
-| `build:demo` | Die [Demo](#the-demo) in `apps/web/dist-demo`, für GitHub Pages unter `/schreibzeug/demo/` |
+| `build:demo` | Die [Demo](#the-demo) in `apps/web/dist-demo`, für GitHub Pages unter `/demo/` |
 | `preview` | Die gebaute Web-App auf http://localhost:4173, mit `/api` und `/mcp` weitergeleitet wie bei `dev` |
 | `typecheck`, `lint` | Die Oberflächentexte kompiliert, dann `tsc -b`; Biome |
 | `i18n`, `i18n:check` | Kompiliert die Oberflächentexte (`apps/web/messages`) mit Paraglide; dasselbe, dann die Prüfung, dass jeder Text auf Deutsch und Englisch vorliegt und keiner im Code steht (ein eigener Schritt in der CI) ([Oberflächentexte](architecture.md#interface-texts)) |
@@ -70,7 +70,7 @@ Alle Skripte der `package.json` in der Wurzel:
 
 ## Die Demo { #the-demo }
 
-Die [Demo](https://firsttris.github.io/schreibzeug/demo/) ist die Web-App ohne Server: Ein eigener
+Die [Demo](https://schreibzeug.app/demo/) ist die Web-App ohne Server: Ein eigener
 Build (`bun run build:demo`, Vite-Modus `demo`, nach `apps/web/dist-demo`) beantwortet die Anfragen
 der App an `/api` in der Seite selbst (`apps/web/src/demo/`). Die Engine läuft ohnehin im Browser;
 der Server speichert nur die Dateien und leitet die Bearbeitungssitzungen weiter, und beides läuft
@@ -98,7 +98,7 @@ hier in der Seite:
   einer Bearbeitungssitzung beitreten; Uploads und neue Dateien leben im selben Speicher.
 - **Pfade:** Die Routen stehen nach dem `#` (`createHashHistory`), da GitHub Pages keinen Fallback
   auf `index.html` hat; die App, die Engine (`engine-plugin.ts` `underBase`) und die Texterkennung
-  liegen unter der `base` von Vite, `/schreibzeug/demo/` (eine andere mit
+  liegen unter der `base` von Vite, `/demo/` (eine andere mit
   `DEMO_BASE=/ bun run build:demo`). Der Build enthält die ganze Engine, etwa 350 MB, von denen der
   Browser lädt, was er öffnet.
 - **Veröffentlichen:** `docs.yml` baut sie bei jedem Push auf `main` mit der Engine aus dem Cache

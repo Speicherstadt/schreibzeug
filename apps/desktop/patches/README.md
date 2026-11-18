@@ -29,7 +29,7 @@ Remove each once Tauri's quick-sharun no longer needs it.
 ## Remove it again
 
 Once a Tauri release copies the two only when they exist (issue
-[#12](https://github.com/firsttris/schreibzeug/issues/12)):
+[#12](https://github.com/Speicherstadt/schreibzeug/issues/12)):
 
 - delete this folder and `scripts/tauri.ts`;
 - in `package.json`, call `tauri` directly again;

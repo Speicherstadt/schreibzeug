@@ -204,7 +204,7 @@ Ordner vergeben, wird die Datei zu „Name (2).ext“, „Name (3).ext“ und so
 
 Ein Server kann mit einem Archiv eingerichtet sein, das fertige Dokumente als unveränderbare
 Originale aufbewahrt, etwa ein verschicktes Angebot oder einen unterschriebenen Vertrag, z. B.
-[Belegt](https://github.com/firsttris/belegt), ein selbst gehostetes Archiv für die GoBD. Dann hat
+[Belegt](https://github.com/Speicherstadt/belegt), ein selbst gehostetes Archiv für die GoBD. Dann hat
 das Menü „Datei“ jedes Editors, der ein PDF erstellen kann (Dokumente, Tabellen, Präsentationen,
 PDFs), den Eintrag „Im Archiv ablegen …“ (`In <Name> ablegen …` mit `SCHREIBZEUG_ARCHIVE_NAME`) für
 alle, die die Datei bearbeiten dürfen. Der Dialog sendet die gespeicherte Version als PDF/A, dasselbe,
@@ -274,7 +274,7 @@ ist.
 
 Das Image `tristanteu/schreibzeug` (`docker/Dockerfile`) enthält den Server und die gebaute Web-App
 mit ihrer Engine, mit den Daten in `/data` (`SCHREIBZEUG_WEB_DIR=/app/web`, Port 3000). **Actions →
-Release** veröffentlicht es auf Docker Hub und als `ghcr.io/firsttris/schreibzeug`, wenn ein
+Release** veröffentlicht es auf Docker Hub und als `ghcr.io/speicherstadt/schreibzeug`, wenn ein
 `v*`-Tag gepusht wird; zum Selberbauen `docker build -f docker/Dockerfile .`
 ([Installation](installation.md)).
 

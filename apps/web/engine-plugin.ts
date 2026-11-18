@@ -49,7 +49,7 @@ const serve =
     createReadStream(file).pipe(res);
   };
 
-/** A path of the app under Vite's `base` ("/" or "/schreibzeug/demo/"): "/engine" → "/schreibzeug/demo/engine". */
+/** A path of the app under Vite's `base` ("/" or "/demo/"): "/engine" → "/demo/engine". */
 export const underBase = (viteBase: string | undefined, path: string): string =>
   `${(viteBase ?? "/").replace(/\/$/, "")}${path}`;
 

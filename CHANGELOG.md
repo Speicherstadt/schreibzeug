@@ -1,9 +1,9 @@
 # Changelog
 
 What changed for people who use or run Schreibzeug, newest first. Images:
-`tristanteu/schreibzeug:<version>` on Docker Hub (also `ghcr.io/firsttris/schreibzeug`);
-installers: the [releases](https://github.com/firsttris/schreibzeug/releases). How to update:
-[installation](https://firsttris.github.io/schreibzeug/installation.html#updates).
+`tristanteu/schreibzeug:<version>` on Docker Hub (also `ghcr.io/speicherstadt/schreibzeug`);
+installers: the [releases](https://github.com/Speicherstadt/schreibzeug/releases). How to update:
+[installation](https://schreibzeug.app/installation.html#updates).
 
 ## Unreleased
 
@@ -12,40 +12,40 @@ installers: the [releases](https://github.com/firsttris/schreibzeug/releases). H
   ablegen …" sends the saved version of a document as PDF/A, and on request the Office file too, to
   an archive such as Belegt, links to the new documents there and keeps that version. The token
   stays on the server; without the settings nothing changes
-  ([files](https://firsttris.github.io/schreibzeug/files.html#saving-to-an-archive)).
+  ([files](https://schreibzeug.app/files.html#saving-to-an-archive)).
 - **Opening a file from another app**: an app such as an archive can open
   `https://<schreibzeug>/open?url={url}&name={name}`; Schreibzeug fetches a copy of the file behind
   the link into your files and opens it in its editor, after signing in if needed. Only links on the
   origins in the new setting `SCHREIBZEUG_IMPORT_ORIGINS` are fetched; without it nothing changes
-  ([files](https://firsttris.github.io/schreibzeug/files.html#opening-a-file-from-another-app)).
+  ([files](https://schreibzeug.app/files.html#opening-a-file-from-another-app)).
 - **Container hardening**: `deploy/compose.yaml` and the `docker run` examples start the server
   read-only except `/data` and `/tmp`, without capabilities and with `no-new-privileges`. The image
   leaves out the peer dependencies and with them the build tools (vite, vitest, drizzle-kit,
   esbuild): `node_modules` 314 instead of 432 MB. Your own `docker run` or compose file keeps
   working; take over the new flags to harden it
-  ([installation](https://firsttris.github.io/schreibzeug/installation.html#hardening)).
+  ([installation](https://schreibzeug.app/installation.html#hardening)).
 - **Image on Wolfi** instead of Debian, as Kontext: current system packages and few known
   vulnerabilities. The user `bun` keeps uid 1000; nothing to do on update.
 - **Keyboard**: F6 and Umschalt+F6 lead out of the document to the menu bar and the toolbar and
   back, as in Word and LibreOffice (Tab stays a tab in the document); each toolbar is one stop for
   Tab, with the arrow keys along its buttons
-  ([accessibility](https://firsttris.github.io/schreibzeug/accessibility.html)).
+  ([accessibility](https://schreibzeug.app/accessibility.html)).
 - **Screen reader support**: *Hilfe → Unterstützung für Screenreader*, or Strg+Alt+Z in the
   document, lets the engine read out the text the cursor passes, a selection, a cell with its
   address, a slide's number and a picture's alternative text, in German. Off unless switched on,
   and then it costs nothing; remembered in the browser
-  ([accessibility](https://firsttris.github.io/schreibzeug/accessibility.html)).
+  ([accessibility](https://schreibzeug.app/accessibility.html)).
 - The menu bar works with the arrow keys, Home, End and Escape, as the ARIA menu bar pattern has
   it. Every page and editor is checked against WCAG 2.2 AA with axe-core.
 - **Installing with Docker Compose**: `deploy/` holds `compose.yaml` (Schreibzeug and Caddy for
   HTTPS), `.env.example` and the `Caddyfile`; `git clone`, fill in `deploy/.env`, `docker compose
   up -d`, as with Kontext
-  ([installation](https://firsttris.github.io/schreibzeug/installation.html#with-docker-compose)).
+  ([installation](https://schreibzeug.app/installation.html#with-docker-compose)).
   A server started with `docker run` keeps working as before.
 - **Versions are thinned out with age**: every version of the last day stays, then the newest per
   hour up to 30 days, per day up to a year, per week after that. "Version behalten" in the
   versions dialog keeps a version for good, and the newest always stays
-  ([versions](https://firsttris.github.io/schreibzeug/files.html#versions)). The bytes of dropped
+  ([versions](https://schreibzeug.app/files.html#versions)). The bytes of dropped
   versions are removed every six hours.
 
 **Upgrading:** the thinning applies to a file's older versions at its next save or restore, also
@@ -93,7 +93,7 @@ Tagged only; no image or release was published. Its change came out with 0.1.6.
 
 - The server in the image now runs as the unprivileged user `bun` (uid 1000) instead of root. A
   data volume from an older image belongs to root; hand it over once with the container stopped
-  ([installation](https://firsttris.github.io/schreibzeug/installation.html#updates)), else the
+  ([installation](https://schreibzeug.app/installation.html#updates)), else the
   server stops at start with "attempt to write a readonly database".
 - Behind an HTTPS proxy, set `SCHREIBZEUG_URL` to the address people open; without it sign-in and
   changes are refused (403).

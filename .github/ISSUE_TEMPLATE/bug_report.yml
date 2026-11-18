@@ -5,7 +5,7 @@ body:
   - type: markdown
     attributes:
       value: |
-        Thanks for reporting! For a security problem, please do not open an issue: see [SECURITY.md](https://github.com/firsttris/schreibzeug/blob/main/SECURITY.md).
+        Thanks for reporting! For a security problem, please do not open an issue: see [SECURITY.md](https://github.com/Speicherstadt/schreibzeug/blob/main/SECURITY.md).
   - type: textarea
     id: what
     attributes:

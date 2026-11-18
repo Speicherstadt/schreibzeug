@@ -13,7 +13,7 @@ Docker (or Podman), a DNS record for the address and the ports 80 and 443 open:
 
 ```bash
 # The configuration (compose.yaml, .env.example, Caddyfile); the programs come from Docker Hub
-git clone https://github.com/firsttris/schreibzeug /opt/schreibzeug && cd /opt/schreibzeug
+git clone https://github.com/Speicherstadt/schreibzeug /opt/schreibzeug && cd /opt/schreibzeug
 cp deploy/.env.example deploy/.env
 nano deploy/.env                                          # domain, mail for Let's Encrypt, version
 docker compose -f deploy/compose.yaml up -d schreibzeug   # Schreibzeug alone, on 127.0.0.1:3000
@@ -42,14 +42,16 @@ Schreibzeug as its "documents", signed in through Kontext.
 
 ### The image
 
-The image `tristanteu/schreibzeug` (Docker Hub, also `ghcr.io/firsttris/schreibzeug`) is published
+The image `tristanteu/schreibzeug` (Docker Hub, also `ghcr.io/speicherstadt/schreibzeug`) is published
 for amd64 with every release (`.github/workflows/release.yml`, from `docker/Dockerfile`).
+Releases from before the move to the Speicherstadt organization stay at
+`ghcr.io/firsttris/schreibzeug`, which gets no new versions; switch to Docker Hub or the new name.
 Each release is published under three tags (`firsttris/workflows` `docker-release.yml`): its
 version (`:0.1.7`), its minor version (`:0.1`, moved to the newest patch release) and `:latest`; a
 pre-release such as `0.2.0-rc.1` gets its version and `:next` instead. Pin a version, as
 `SCHREIBZEUG_VERSION` in `deploy/.env` does, rather than `:latest`: an update then happens when
 you choose it, after a look at the
-[changelog](https://github.com/firsttris/schreibzeug/blob/main/CHANGELOG.md), and a backup
+[changelog](https://github.com/Speicherstadt/schreibzeug/blob/main/CHANGELOG.md), and a backup
 ([updates](#updates)).
 
 The server in the image runs as the unprivileged user `bun` (uid 1000) and writes only `/data`.
@@ -73,7 +75,7 @@ existing volumes stay readable.
 To build the image yourself from the repository:
 
 ```bash
-git clone https://github.com/firsttris/schreibzeug && cd schreibzeug
+git clone https://github.com/Speicherstadt/schreibzeug && cd schreibzeug
 docker build -f docker/Dockerfile -t tristanteu/schreibzeug .
 ```
 
@@ -126,7 +128,7 @@ All settings are environment variables (`apps/server/src/config.ts`); the image 
 | `OIDC_NAME` | `Kontext` | The name on the sign-in button |
 | `SCHREIBZEUG_IMPORT_ORIGINS` | – | The origins of other apps whose links may hand over a file, e.g. `https://archive.example.org`, separated by commas; Schreibzeug fetches only from these ([opening a file from another app](files.md#opening-a-file-from-another-app)) |
 | `SCHREIBZEUG_ARCHIVE_URL` | – | The origin of an archive documents can be saved to, e.g. `https://archive.example.org` (no path); together with `SCHREIBZEUG_ARCHIVE_TOKEN` ([saving to an archive](files.md#saving-to-an-archive)) |
-| `SCHREIBZEUG_ARCHIVE_TOKEN` | – | The archive's API token, with the right to write documents there (with [Belegt](https://github.com/firsttris/belegt): a token with the right "schreiben" under "Quellen und Schnittstellen"); a secret, kept on the server |
+| `SCHREIBZEUG_ARCHIVE_TOKEN` | – | The archive's API token, with the right to write documents there (with [Belegt](https://github.com/Speicherstadt/belegt): a token with the right "schreiben" under "Quellen und Schnittstellen"); a secret, kept on the server |
 | `SCHREIBZEUG_ARCHIVE_NAME` | – | What the interface calls the archive (`In <name> ablegen …`); without it, "Archiv" |
 | `SCHREIBZEUG_VERSIONS` | `thin` | `thin`: older versions are thinned out with age, kept ones stay ([versions](files.md#versions)); `all`: every save stays as a version |
 
@@ -233,7 +235,7 @@ back).
 ## Updates
 
 What changed and which updates need a step of their own is in the
-[changelog](https://github.com/firsttris/schreibzeug/blob/main/CHANGELOG.md). Make a
+[changelog](https://github.com/Speicherstadt/schreibzeug/blob/main/CHANGELOG.md). Make a
 [backup](#backups) first: the database schema is brought up to date at start
 (`apps/server/drizzle`) and never back, so the backup is the way back to the older version.
 

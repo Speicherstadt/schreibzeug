@@ -7,7 +7,7 @@ it keeps your files as what they are: .docx, .xlsx, .pptx, .odt, .ods, .odp and 
 notes and text files (.md, .txt).
 
 A tour in pictures for customers and colleagues is the [start page](index.md); the
-[demo](https://firsttris.github.io/schreibzeug/demo/) runs the editors in the browser with sample
+[demo](https://schreibzeug.app/demo/) runs the editors in the browser with sample
 files, without a server ([how](development.md#the-demo)).
 
 ![The Schreibzeug editor with a Word document open, toolbar above the page](screenshots/editor-light.png)

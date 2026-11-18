@@ -190,7 +190,7 @@ taken in the folder, the file becomes "Name (2).ext", "Name (3).ext" and so on.
 ## Saving to an archive
 
 A server can be set up with an archive that keeps finished documents as unalterable originals,
-such as a sent offer or a signed contract, e.g. [Belegt](https://github.com/firsttris/belegt), a
+such as a sent offer or a signed contract, e.g. [Belegt](https://github.com/Speicherstadt/belegt), a
 self-hosted archive for GoBD. Then the "Datei" menu of every editor that can make a PDF (documents,
 spreadsheets, presentations, PDFs) has "Im Archiv ablegen …" (`In <name> ablegen …` with
 `SCHREIBZEUG_ARCHIVE_NAME`) for those who may edit the file. The dialog sends the saved version as
@@ -257,7 +257,7 @@ needs nothing of its own for it and an own template stays as it is.
 
 The image `tristanteu/schreibzeug` (`docker/Dockerfile`) has the server and the built web app with
 its engine, with the data in `/data` (`SCHREIBZEUG_WEB_DIR=/app/web`, port 3000). **Actions →
-Release** publishes it on Docker Hub and as `ghcr.io/firsttris/schreibzeug` when a `v*` tag is
+Release** publishes it on Docker Hub and as `ghcr.io/speicherstadt/schreibzeug` when a `v*` tag is
 pushed; to build it yourself, `docker build -f docker/Dockerfile .`
 ([installation](installation.md)).
 

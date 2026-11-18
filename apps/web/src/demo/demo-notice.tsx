@@ -2,7 +2,7 @@ import { FlaskConical } from "lucide-react";
 import { m } from "../paraglide/messages";
 
 /** The installation guide, for whoever wants Schreibzeug with its server after trying the demo. */
-const INSTALLATION_URL = "https://firsttris.github.io/schreibzeug/installation.html";
+const INSTALLATION_URL = "https://schreibzeug.app/installation.html";
 
 /** Says what the demo is: the files live in this tab only, and what needs a server is missing. */
 export const DemoNotice = () => (

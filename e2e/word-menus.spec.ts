@@ -252,7 +252,7 @@ test.describe("menus of the text editor", () => {
     await pick(page, "Hilfe", "Über Schreibzeug");
     await expect(page.getByRole("dialog").getByRole("link")).toHaveAttribute(
       "href",
-      "https://github.com/firsttris/schreibzeug",
+      "https://github.com/Speicherstadt/schreibzeug",
     );
   });
 

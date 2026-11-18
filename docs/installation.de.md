@@ -14,7 +14,7 @@ Server mit Docker (oder Podman), einem DNS-Eintrag für die Adresse und offenen 
 
 ```bash
 # Die Konfiguration (compose.yaml, .env.example, Caddyfile); die Programme kommen von Docker Hub
-git clone https://github.com/firsttris/schreibzeug /opt/schreibzeug && cd /opt/schreibzeug
+git clone https://github.com/Speicherstadt/schreibzeug /opt/schreibzeug && cd /opt/schreibzeug
 cp deploy/.env.example deploy/.env
 nano deploy/.env                                          # Domain, Mail für Let's Encrypt, Version
 docker compose -f deploy/compose.yaml up -d schreibzeug   # nur Schreibzeug, auf 127.0.0.1:3000
@@ -44,14 +44,16 @@ Schreibzeug als seine „Dokumente“ mit, angemeldet über Kontext.
 
 ### Das Image { #the-image }
 
-Das Image `tristanteu/schreibzeug` (Docker Hub, auch `ghcr.io/firsttris/schreibzeug`) wird mit
+Das Image `tristanteu/schreibzeug` (Docker Hub, auch `ghcr.io/speicherstadt/schreibzeug`) wird mit
 jedem Release für amd64 veröffentlicht (`.github/workflows/release.yml`, aus `docker/Dockerfile`).
+Releases von vor dem Umzug in die Organisation Speicherstadt bleiben unter
+`ghcr.io/firsttris/schreibzeug`, das keine neuen Versionen mehr bekommt; stell auf Docker Hub oder den neuen Namen um.
 Jedes Release erscheint unter drei Tags (`firsttris/workflows` `docker-release.yml`): seiner
 Version (`:0.1.7`), seiner Minor-Version (`:0.1`, die mit dem neuesten Patch-Release mitwandert)
 und `:latest`; eine Vorabversion wie `0.2.0-rc.1` bekommt stattdessen ihre Version und `:next`.
 Leg eine Version fest, wie es `SCHREIBZEUG_VERSION` in `deploy/.env` tut, statt `:latest` zu
 nehmen: Ein Update passiert dann, wenn du es willst, nach einem Blick ins
-[Changelog](https://github.com/firsttris/schreibzeug/blob/main/CHANGELOG.md) und einem Backup
+[Changelog](https://github.com/Speicherstadt/schreibzeug/blob/main/CHANGELOG.md) und einem Backup
 ([Updates](#updates)).
 
 Der Server im Image läuft als unprivilegierter Benutzer `bun` (uid 1000) und schreibt nur nach
@@ -75,7 +77,7 @@ bestehende Volumes bleiben lesbar.
 So baust du das Image selbst aus dem Repository:
 
 ```bash
-git clone https://github.com/firsttris/schreibzeug && cd schreibzeug
+git clone https://github.com/Speicherstadt/schreibzeug && cd schreibzeug
 docker build -f docker/Dockerfile -t tristanteu/schreibzeug .
 ```
 
@@ -129,7 +131,7 @@ Alle Einstellungen sind Umgebungsvariablen (`apps/server/src/config.ts`); das Im
 | `OIDC_NAME` | `Kontext` | Der Name auf dem Anmeldeknopf |
 | `SCHREIBZEUG_IMPORT_ORIGINS` | – | Die Origins anderer Apps, deren Links eine Datei übergeben dürfen, z. B. `https://archive.example.org`, durch Kommas getrennt; Schreibzeug holt nur von diesen ([Eine Datei aus einer anderen App öffnen](files.md#opening-a-file-from-another-app)) |
 | `SCHREIBZEUG_ARCHIVE_URL` | – | Der Origin eines Archivs, in dem sich Dokumente ablegen lassen, z. B. `https://archive.example.org` (ohne Pfad); zusammen mit `SCHREIBZEUG_ARCHIVE_TOKEN` ([In einem Archiv ablegen](files.md#saving-to-an-archive)) |
-| `SCHREIBZEUG_ARCHIVE_TOKEN` | – | Der API-Schlüssel des Archivs mit dem Recht, dort Dokumente zu schreiben (bei [Belegt](https://github.com/firsttris/belegt): ein Token mit dem Recht „schreiben“ unter „Quellen und Schnittstellen“); ein Geheimnis, das auf dem Server bleibt |
+| `SCHREIBZEUG_ARCHIVE_TOKEN` | – | Der API-Schlüssel des Archivs mit dem Recht, dort Dokumente zu schreiben (bei [Belegt](https://github.com/Speicherstadt/belegt): ein Token mit dem Recht „schreiben“ unter „Quellen und Schnittstellen“); ein Geheimnis, das auf dem Server bleibt |
 | `SCHREIBZEUG_ARCHIVE_NAME` | – | Wie die Oberfläche das Archiv nennt (`In <Name> ablegen …`); ohne die Variable „Archiv“ |
 | `SCHREIBZEUG_VERSIONS` | `thin` | `thin`: Ältere Versionen werden mit dem Alter ausgedünnt, behaltene bleiben ([Versionen](files.md#versions)); `all`: Jede Speicherung bleibt als Version erhalten |
 
@@ -240,7 +242,7 @@ In beiden Fällen: Nimm dieselbe Image-Version, mit der das Backup gemacht wurde
 ## Updates { #updates }
 
 Was sich geändert hat und welche Updates einen eigenen Schritt brauchen, steht im
-[Changelog](https://github.com/firsttris/schreibzeug/blob/main/CHANGELOG.md). Mach zuerst ein
+[Changelog](https://github.com/Speicherstadt/schreibzeug/blob/main/CHANGELOG.md). Mach zuerst ein
 [Backup](#backups): Das Datenbankschema wird beim Start auf den neuesten Stand gebracht
 (`apps/server/drizzle`) und nie zurück, das Backup ist also der Weg zurück zur älteren Version.
 
