@@ -1,10 +1,10 @@
 import { createHash, randomBytes } from "node:crypto";
-import type { AccessToken, CreateAccessToken, TokenScope } from "@schreibzeug/files-api";
+import type { AccessToken, CreateAccessToken } from "@schreibzeug/files-api";
 import { and, desc, eq } from "drizzle-orm";
 import type { Queryable } from "../db/database";
 import { type AccessTokenRow, accessTokens, user } from "../db/schema";
 import { fail, ok, type Result } from "../result";
-import type { SessionUser } from "./auth";
+import type { TokenAccess } from "../session/context";
 
 /** Every token starts like this, so a leaked one is recognisable (e.g. by secret scanners). */
 export const TOKEN_PREFIX = "sz_";
@@ -67,9 +67,6 @@ export const revokeToken = (db: Queryable, userId: string, id: string): Result<n
     .get();
   return removed ? ok(null) : fail("not_found", "Diesen Schlüssel gibt es nicht.");
 };
-
-/** Who a request with this token acts for, and how far; the token's name says through what. */
-export type TokenAccess = { user: SessionUser; tokenId: string; tokenName: string; scope: TokenScope };
 
 /** The user behind a token that holds, noting that it was used; null for anything else. */
 export const verifyToken = (db: Queryable, token: string, now = Date.now()): TokenAccess | null => {

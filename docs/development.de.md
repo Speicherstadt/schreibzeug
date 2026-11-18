@@ -31,7 +31,7 @@ Der Vite-Server leitet `/api` (mit WebSockets) und `/mcp` an den API-Server weit
 ```bash
 bun run engine:prepare   # einmal und nach einer Änderung in engine/: Build und E2E brauchen die Engine
 bunx playwright install chromium   # einmal: der Browser von Playwright für die E2E-Tests
-bun run lint             # Biome, dann checks (Dateigröße, Oberflächentexte)
+bun run lint             # Biome, dann checks (Dateigröße, Oberflächentexte, Ringe)
 bun run typecheck        # tsc in jedem Workspace
 bun run i18n:check       # jeder Oberflächentext auf Deutsch und Englisch
 bun run test             # Vitest auf Bun: Unit- und Integrationstests (SQLite)
@@ -51,7 +51,8 @@ review“ schon.
 
 `checks` ([firsttris/workflows](https://github.com/firsttris/workflows#checks), eingestellt in `checks.json`)
 schlägt bei einer Quelldatei über 400 Zeilen fehl, die nicht in `.checks/large-files.txt` steht; diese
-älteren Dateien werden in einer eigenen Änderung geteilt. Biome weist auf Funktionen über 80 Zeilen hin, und
+älteren Dateien werden in einer eigenen Änderung geteilt. Ebenso schlägt es bei einem Ring von Importen
+zwischen Modulen fehl (den Ordnern unter `packages/` und `apps/*/src/`). Biome weist auf Funktionen über 80 Zeilen hin, und
 in einem Pull Request nennt `bun checks pr` eine Funktion, die neu oder darüber gewachsen ist, dazu Code ohne
 Doku und einen Fix ohne Test.
 

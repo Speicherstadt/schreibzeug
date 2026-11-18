@@ -16,7 +16,7 @@
     "./files/media": "./src/files/media.ts",
     "./files/mime": "./src/files/mime.ts",
     "./files/serialize": "./src/files/serialize.ts",
-    "./auth/middleware": "./src/auth/middleware.ts",
+    "./session/context": "./src/session/context.ts",
     "./mcp": "./src/mcp.ts"
   },
   "scripts": {

@@ -1,7 +1,7 @@
 import type { FilterRequest, SheetEditor, SortOrder } from "@schreibzeug/editor-core";
 import { ArrowDownAZ, ArrowDownZA } from "lucide-react";
 import { type RefObject, useEffect, useLayoutEffect, useRef, useState } from "react";
-import { frameToWindow } from "../editor/use-editor-chrome";
+import { frameToWindow } from "../lib/frame-to-window";
 import { m } from "../paraglide/messages";
 import { Button } from "../ui/button";
 

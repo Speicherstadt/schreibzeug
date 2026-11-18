@@ -5,6 +5,7 @@ import type {
   ContextMenuRequest,
 } from "@schreibzeug/editor-core";
 import { type RefObject, useEffect, useState } from "react";
+import { frameToWindow } from "../lib/frame-to-window";
 import { useNotice } from "../ui/use-notice";
 import { moveRegion } from "./regions";
 import { useInsertImage } from "./use-insert-image";
@@ -19,12 +20,6 @@ export type ChromeSource = {
   onContextMenu: (listener: ContextMenuListener) => () => void;
   insertImage: ((bytes: Uint8Array) => Promise<void>) | null;
   focus: () => void;
-};
-
-/** Where the engine's frame sits in the window: the engine's points come in frame coordinates. */
-export const frameToWindow = (container: HTMLElement | null, point: { x: number; y: number }) => {
-  const frame = container?.querySelector("iframe")?.getBoundingClientRect();
-  return { x: (frame?.left ?? 0) + point.x, y: (frame?.top ?? 0) + point.y };
 };
 
 const toWindow = (container: HTMLElement | null, request: ContextMenuRequest) => ({

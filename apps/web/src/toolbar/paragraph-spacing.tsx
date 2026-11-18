@@ -1,8 +1,8 @@
 import type { LayoutCommands } from "@schreibzeug/editor-core";
 import { LineHeight } from "lucide-react";
-import { formatSpacing, lineSpacingItems } from "../editor/layout-menus";
 import { m } from "../paraglide/messages";
 import { MenuButton } from "../ui/menu";
+import { formatSpacing, lineSpacingItems } from "./line-spacing";
 
 type ParagraphSpacingProps = {
   lineSpacing: number | null;

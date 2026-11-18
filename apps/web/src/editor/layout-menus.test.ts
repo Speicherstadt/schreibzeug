@@ -1,6 +1,7 @@
 import type { LayoutCommands, PageLayout } from "@schreibzeug/editor-core";
 import { describe, expect, it } from "vitest";
-import { formatSpacing, layoutMenu, lineSpacingItems } from "./layout-menus";
+import { formatSpacing, lineSpacingItems } from "../toolbar/line-spacing";
+import { layoutMenu } from "./layout-menus";
 
 const landscapeA5: PageLayout = {
   width: 210,

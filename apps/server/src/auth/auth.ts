@@ -10,6 +10,7 @@ import * as schema from "../db/schema";
 import { acceptInvite, findInvitation } from "../files/invites";
 import { adoptOwnerless } from "../files/repository";
 import { claimPendingShares } from "../files/shares";
+import type { SessionUser } from "../session/context";
 import { CLIENT_IP_HEADER } from "./client-ip";
 
 export type AuthDeps = {
@@ -203,9 +204,6 @@ export const createAuth = ({
   });
 
 export type Auth = ReturnType<typeof createAuth>;
-
-/** The signed-in person as the API sees them. */
-export type SessionUser = { id: string; name: string; email: string };
 
 /** The user of the session the request's cookies carry, or null. */
 export const sessionUser = async (auth: Auth, headers: Headers): Promise<SessionUser | null> => {

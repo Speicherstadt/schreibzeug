@@ -4,7 +4,8 @@ import { Hono } from "hono";
 import { z } from "zod";
 import type { Database } from "../db/database";
 import { statusOf } from "../result";
-import { type AuthEnv, requireSession } from "./middleware";
+import type { AuthEnv } from "../session/context";
+import { requireSession } from "./middleware";
 import { createToken, listTokens, revokeToken, toAccessToken } from "./tokens";
 
 const invalid = zValidator("json", createAccessTokenSchema, (result, c) => {

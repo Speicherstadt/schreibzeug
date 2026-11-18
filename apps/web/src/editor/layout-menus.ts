@@ -1,6 +1,5 @@
 import {
   type LayoutCommands,
-  LINE_SPACINGS,
   MARGIN_PRESETS,
   type MarginPreset,
   marginPresetOf,
@@ -9,7 +8,7 @@ import {
   paperSizeOf,
 } from "@schreibzeug/editor-core";
 import { m } from "../paraglide/messages";
-import { getLocale } from "../paraglide/runtime";
+import { lineSpacingItems } from "../toolbar/line-spacing";
 import type { MenuItem } from "../ui/menu";
 import type { Menu } from "../ui/menu-bar";
 
@@ -19,10 +18,6 @@ const MARGIN_LABELS: Record<MarginPreset["id"], () => string> = {
   moderate: m.layout_menus_margins_moderate,
   wide: m.layout_menus_margins_wide,
 };
-
-/** 1.15 → "1,15" in German, "1.15" in English: the decimals of the interface language. */
-export const formatSpacing = (multiple: number): string =>
-  multiple.toLocaleString(getLocale(), { minimumFractionDigits: 1, maximumFractionDigits: 2 });
 
 /**
  * "Layout": orientation, paper size and margins of the section at the cursor, as web-apps' layout
@@ -64,21 +59,6 @@ export const layoutMenu = (page: PageLayout | null, layout: LayoutCommands | nul
     ],
   };
 };
-
-/** One entry per line spacing; the label says what it is where the context does not. */
-export const lineSpacingItems = (
-  lineSpacing: number | null,
-  layout: LayoutCommands | null,
-  disabled: boolean,
-  label: (multiple: number) => string = (multiple) =>
-    m.layout_menus_line_spacing({ spacing: formatSpacing(multiple) }),
-): MenuItem[] =>
-  LINE_SPACINGS.map((multiple) => ({
-    label: label(multiple),
-    checked: lineSpacing === multiple,
-    disabled,
-    onSelect: () => layout?.setLineSpacing(multiple),
-  }));
 
 /** Line spacing and indents, for the "Format" menu. */
 export const paragraphSpacingGroups = (

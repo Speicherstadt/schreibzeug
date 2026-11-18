@@ -1,7 +1,7 @@
 import { nodeIdSchema } from "@schreibzeug/files-api";
 import { Hono } from "hono";
 import type { UpgradeWebSocket, WSContext } from "hono/ws";
-import type { AuthEnv } from "../auth/middleware";
+import type { AuthEnv } from "../session/context";
 import type { Hub } from "./hub";
 import { SOCKET_CLOSE as CLOSE } from "./limits";
 import type { Incoming } from "./session";

@@ -1,21 +1,9 @@
-import type { Context } from "hono";
 import { createMiddleware } from "hono/factory";
 import type { Database } from "../db/database";
-import { type Auth, type SessionUser, sessionUser } from "./auth";
+import { type AuthEnv, refuse } from "../session/context";
+import { type Auth, sessionUser } from "./auth";
 import type { Bearer } from "./bearer";
-import { TOKEN_PREFIX, type TokenAccess, verifyToken } from "./tokens";
-
-/** How a request was signed in: a session cookie, a personal access token, or the sign-in provider. */
-export type SignedInBy = "session" | "token" | "provider";
-
-/**
- * What routes behind `requireUser` find on the context: the user, how they signed in, and the
- * personal access token the request came with, if it came with one; on a WebSocket upgrade the id
- * of the session it came with (app.ts), whose end closes the socket.
- */
-export type AuthEnv = {
-  Variables: { user: SessionUser; via?: SignedInBy; token?: TokenAccess; signInSession?: string };
-};
+import { TOKEN_PREFIX, verifyToken } from "./tokens";
 
 const BEARER = /^Bearer\s+(\S+)$/i;
 
@@ -24,13 +12,6 @@ export const bearerToken = (headers: Headers): string | undefined =>
   headers.get("authorization")?.match(BEARER)?.[1];
 
 const READING = new Set(["GET", "HEAD", "OPTIONS"]);
-
-const refuse = (c: Context, status: 401 | 403, message: string) =>
-  c.json(
-    { error: { kind: status === 401 ? ("unauthorized" as const) : ("forbidden" as const), message } },
-    status,
-    status === 401 ? { "www-authenticate": 'Bearer realm="schreibzeug"' } : {},
-  );
 
 /**
  * Lets a request through with a session, a personal access token (tokens.ts, "sz_…"), or a token
@@ -69,14 +50,5 @@ export const requireUser = (auth: Auth, db: Database, bearer?: Bearer) =>
 export const requireSession = createMiddleware<AuthEnv>(async (c, next) => {
   if (c.var.via !== "session")
     return refuse(c, 403, "Das geht nur angemeldet in der App, nicht mit einem Zugangsschlüssel.");
-  await next();
-});
-
-/**
- * For what a "read" token must not reach although it only reads: the secrets of links, which would
- * let another account edit what the token may only look at.
- */
-export const refuseReadToken = createMiddleware<AuthEnv>(async (c, next) => {
-  if (c.var.token?.scope === "read") return refuse(c, 403, "Dieser Zugangsschlüssel darf nur lesen.");
   await next();
 });

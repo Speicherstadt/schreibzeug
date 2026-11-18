@@ -1,9 +1,9 @@
 import { createMiddleware } from "hono/factory";
 import type { AgentHub } from "./agent/hub";
 import type { Auth } from "./auth/auth";
-import type { AuthEnv } from "./auth/middleware";
 import type { Database } from "./db/database";
 import { requireFile } from "./files/repository";
+import type { AuthEnv } from "./session/context";
 
 /** The hubs whose WebSockets stay open: the collaboration relay and the jobs for open editors. */
 export type SocketHubs = {

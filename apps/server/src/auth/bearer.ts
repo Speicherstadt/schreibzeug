@@ -4,7 +4,7 @@ import type { Database } from "../db/database";
 import { accessTokens, account, session, user } from "../db/schema";
 import { adoptOwnerless } from "../files/repository";
 import { claimPendingShares } from "../files/shares";
-import type { SessionUser } from "./auth";
+import type { SessionUser } from "../session/context";
 
 /**
  * Requests from another service on someone's behalf (Kontext putting a mail's attachment into

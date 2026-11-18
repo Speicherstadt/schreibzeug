@@ -1,5 +1,5 @@
 import { createMiddleware } from "hono/factory";
-import type { AuthEnv } from "./middleware";
+import type { AuthEnv } from "../session/context";
 
 const READING = new Set(["GET", "HEAD", "OPTIONS"]);
 
