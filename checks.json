@@ -6,5 +6,11 @@
       "apps/desktop/src-tauri/src/**/*.rs"
     ]
   },
-  "i18n": { "project": "apps/web/project.inlang", "include": ["apps/web/src/**/*.{ts,tsx}"] }
+  "i18n": {
+    "project": "apps/web/project.inlang",
+    "include": ["apps/web/src/**/*.{ts,tsx}"]
+  },
+  "cycles": {
+    "modules": ["packages/*", "apps/*/src/*"]
+  }
 }

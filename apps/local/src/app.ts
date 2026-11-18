@@ -13,7 +13,6 @@ import {
   updateNodeSchema,
 } from "@schreibzeug/files-api";
 import { blankDocx, blankPptx, blankXlsx } from "@schreibzeug/ooxml";
-import type { AuthEnv } from "@schreibzeug/server/auth/middleware";
 import type { BlobStore } from "@schreibzeug/server/blobs";
 import type { Hub, HubDeps } from "@schreibzeug/server/collab/hub";
 import { collabRoutes } from "@schreibzeug/server/collab/routes";
@@ -21,6 +20,7 @@ import type { Disk } from "@schreibzeug/server/disk";
 import { imageTypeOf, mediaNameOf, parseMediaName } from "@schreibzeug/server/files/media";
 import { contentDisposition } from "@schreibzeug/server/files/serialize";
 import { fail, type Result, statusOf } from "@schreibzeug/server/result";
+import type { AuthEnv } from "@schreibzeug/server/session/context";
 import { type Context, type Handler, Hono, type MiddlewareHandler } from "hono";
 import { bodyLimit } from "hono/body-limit";
 import { createMiddleware } from "hono/factory";

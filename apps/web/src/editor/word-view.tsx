@@ -1,5 +1,6 @@
 import { hasUnsavedChanges, initialEditorState, openWordDocument } from "@schreibzeug/editor-core";
 import { useRef, useState } from "react";
+import { frameToWindow } from "../lib/frame-to-window";
 import { m } from "../paraglide/messages";
 import { SizeGrid } from "../toolbar/table-menu";
 import { Toolbar } from "../toolbar/toolbar";
@@ -22,7 +23,7 @@ import { useArchive } from "./use-archive";
 import { useCommentsPanel } from "./use-comments-panel";
 import { useDocumentSave } from "./use-document-save";
 import { useEInvoice } from "./use-e-invoice";
-import { frameToWindow, useEditorChrome } from "./use-editor-chrome";
+import { useEditorChrome } from "./use-editor-chrome";
 import { useEngineEditor } from "./use-engine-editor";
 import { openLink, useLinks } from "./use-links";
 import { useMailMerge } from "./use-mail-merge";

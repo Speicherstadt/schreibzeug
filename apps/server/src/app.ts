@@ -5,7 +5,7 @@ import { type AgentHub, createAgentHub } from "./agent/hub";
 import { agentRoutes, agentSocketRoutes } from "./agent/routes";
 import type { Auth } from "./auth/auth";
 import type { Bearer } from "./auth/bearer";
-import { type AuthEnv, bearerToken, requireSession, requireUser } from "./auth/middleware";
+import { bearerToken, requireSession, requireUser } from "./auth/middleware";
 import { requireTrustedOrigin } from "./auth/origin";
 import { tokenRoutes } from "./auth/token-routes";
 import type { Hub } from "./collab/hub";
@@ -15,6 +15,7 @@ import { archiveRoutes } from "./files/archive-routes";
 import { importRoutes } from "./files/import-routes";
 import { type FilesDeps, filesRoutes, invitationRoutes } from "./files/routes";
 import { authBodyLimit, defaultBodyLimit } from "./limits";
+import type { AuthEnv } from "./session/context";
 import { bindSignInSession, openSockets } from "./sockets";
 
 export type AppDeps = FilesDeps & {

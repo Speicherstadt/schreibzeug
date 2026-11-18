@@ -3,11 +3,11 @@ import { agentCommandSchema, agentReplySchema, nodeIdSchema } from "@schreibzeug
 import { Hono } from "hono";
 import type { UpgradeWebSocket } from "hono/ws";
 import { z } from "zod";
-import type { AuthEnv } from "../auth/middleware";
 import { SOCKET_CLOSE } from "../collab/limits";
 import type { Database } from "../db/database";
 import { requireFile } from "../files/repository";
 import { statusOf } from "../result";
+import type { AuthEnv } from "../session/context";
 import type { AgentHub } from "./hub";
 
 const idParam = z.object({ id: nodeIdSchema });

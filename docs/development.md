@@ -29,7 +29,7 @@ terminal, `bun run dev:server` (or `bun run server`) in another. The Vite server
 ```bash
 bun run engine:prepare   # once, and after a change in engine/: build and E2E need the engine
 bunx playwright install chromium   # once: Playwright's browser for the E2E tests
-bun run lint             # Biome, then checks (file size, interface texts)
+bun run lint             # Biome, then checks (file size, interface texts, rings)
 bun run typecheck        # tsc in every workspace
 bun run i18n:check       # every interface text in German and English
 bun run test             # Vitest on Bun: unit and integration tests (SQLite)
@@ -48,7 +48,8 @@ of the e-invoices against EN 16931 and PDF/A-3. Draft pull requests and changes 
 
 `checks` ([firsttris/workflows](https://github.com/firsttris/workflows#checks), set up in `checks.json`)
 fails on a source file past 400 lines that is not in `.checks/large-files.txt`; those older files are
-split in a change of their own. Biome notes functions past 80 lines, and in a pull request `bun checks pr`
+split in a change of their own. It also fails on a ring of imports between modules (the folders under
+`packages/` and `apps/*/src/`). Biome notes functions past 80 lines, and in a pull request `bun checks pr`
 points out a function that is new or grew past that, along with code changed without docs and a fix
 without a test.
 

@@ -1,6 +1,6 @@
 import { importFileSchema } from "@schreibzeug/files-api";
 import { Hono } from "hono";
-import type { AuthEnv } from "../auth/middleware";
+import type { AuthEnv } from "../session/context";
 import { checkLink, fetchLinked, importName } from "./import";
 import * as repository from "./repository";
 import { respond, validate } from "./routes";
