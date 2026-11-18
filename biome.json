@@ -11,6 +11,23 @@
     "lineWidth": 110
   },
   "css": { "parser": { "tailwindDirectives": true } },
-  "linter": { "enabled": true },
-  "assist": { "actions": { "source": { "organizeImports": "on" } } }
+  "linter": {
+    "enabled": true,
+    "rules": {
+      "preset": "recommended",
+      "complexity": {
+        "noExcessiveLinesPerFunction": {
+          "level": "info",
+          "options": { "maxLines": 80, "skipBlankLines": true }
+        }
+      }
+    }
+  },
+  "assist": { "actions": { "source": { "organizeImports": "on" } } },
+  "overrides": [
+    {
+      "includes": ["**/*.test.ts", "**/*.test.tsx", "**/*.spec.ts", "e2e/**", "**/test/**"],
+      "linter": { "rules": { "complexity": { "noExcessiveLinesPerFunction": "off" } } }
+    }
+  ]
 }

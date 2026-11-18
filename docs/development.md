@@ -29,7 +29,7 @@ terminal, `bun run dev:server` (or `bun run server`) in another. The Vite server
 ```bash
 bun run engine:prepare   # once, and after a change in engine/: build and E2E need the engine
 bunx playwright install chromium   # once: Playwright's browser for the E2E tests
-bun run lint             # Biome
+bun run lint             # Biome, then checks (file size, interface texts)
 bun run typecheck        # tsc in every workspace
 bun run i18n:check       # every interface text in German and English
 bun run test             # Vitest on Bun: unit and integration tests (SQLite)
@@ -46,6 +46,12 @@ runs all of it, the E2E suite in three shards, plus the desktop app's Rust check
 of the e-invoices against EN 16931 and PDF/A-3. Draft pull requests and changes to Markdown or
 `docs/` alone do not start it; "Ready for review" does.
 
+`checks` ([firsttris/workflows](https://github.com/firsttris/workflows#checks), set up in `checks.json`)
+fails on a source file past 400 lines that is not in `.checks/large-files.txt`; those older files are
+split in a change of their own. Biome notes functions past 80 lines, and in a pull request `bun checks pr`
+points out a function that is new or grew past that, along with code changed without docs and a fix
+without a test.
+
 All scripts of the root `package.json`:
 
 | Script | What it does |
@@ -56,7 +62,7 @@ All scripts of the root `package.json`:
 | `build` | The web app in `apps/web/dist`, the prepared engine copied in |
 | `build:demo` | The [demo](#the-demo) in `apps/web/dist-demo`, for GitHub Pages under `/demo/` |
 | `preview` | The built web app on http://localhost:4173, with `/api` and `/mcp` forwarded like `dev` |
-| `typecheck`, `lint` | The interface texts compiled, then `tsc -b`; Biome |
+| `typecheck`, `lint` | The interface texts compiled, then `tsc -b`; Biome, then `checks` |
 | `i18n`, `i18n:check` | Compiles the interface texts (`apps/web/messages`) with Paraglide; the same, then checks that every text is in German and English and none is left in the code (a step of its own in CI) ([interface texts](architecture.md#interface-texts)) |
 | `format` | Biome with `--write`: fixes formatting and what else it can |
 | `test`, `test:watch` | Vitest once, including the check that every interface text is in German and English; Vitest watching the files |

@@ -1,0 +1,7 @@
+# Files with more than 400 lines from before the check (checks file-size, firsttris/workflows).
+# They may grow; split them in a pull request of their own. `checks file-size --clean` removes the
+# ones that are gone or small again.
+apps/server/src/collab/session.ts
+apps/server/src/files/repository.ts
+packages/editor-core/src/document.ts
+packages/editor-core/src/engine-types.ts

@@ -1,0 +1,10 @@
+{
+  "fileSize": {
+    "include": [
+      "apps/*/src/**/*.{ts,tsx}",
+      "packages/*/src/**/*.{ts,tsx}",
+      "apps/desktop/src-tauri/src/**/*.rs"
+    ]
+  },
+  "i18n": { "project": "apps/web/project.inlang", "include": ["apps/web/src/**/*.{ts,tsx}"] }
+}
