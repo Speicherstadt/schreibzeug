@@ -10,9 +10,12 @@ site_url: https://schreibzeug.app/
 repo_url: https://github.com/Speicherstadt/schreibzeug
 repo_name: Speicherstadt/schreibzeug
 edit_uri: edit/main/docs/
+# The German pages have their own (plugins → i18n → languages → de → copyright).
 copyright: >-
   License AGPL-3.0 · © Tristan Teufel and contributors · Schreibzeug builds on the open-source
   Euro-Office engine and is not affiliated with Euro-Office, ONLYOFFICE, Microsoft or Google.
+  · <a href="https://teufel-it.de/de/impressum/">Legal notice</a>
+  · <a href="https://speicherstadt.app/en/privacy/">Privacy</a>
 
 docs_dir: docs
 # Pages as installation.html rather than installation/: the README links to them so, and relative
@@ -69,6 +72,9 @@ theme:
 
 plugins:
   - search
+  # Fonts (Google Fonts) and other external assets are downloaded at build time and served from
+  # this site, so a reader's browser contacts no third party. Cache in .cache/ (git-ignored).
+  - privacy
   # English at /, German at /de/. Every page has its translation next to it with .de.md
   # (index.de.md), headings with the same anchor ids. A first visit opens the browser's language
   # (overrides/partials/language-redirect.html).
@@ -81,6 +87,12 @@ plugins:
           default: true
         - locale: de
           name: Deutsch
+          copyright: >-
+            Lizenz AGPL-3.0 · © Tristan Teufel und Mitwirkende · Schreibzeug baut auf der
+            Open-Source-Engine Euro-Office auf und steht in keiner Verbindung zu Euro-Office,
+            ONLYOFFICE, Microsoft oder Google.
+            · <a href="https://teufel-it.de/de/impressum/">Impressum</a>
+            · <a href="https://speicherstadt.app/datenschutz/">Datenschutz</a>
           site_description: >-
             Schreibzeug, das selbst gehostete Open-Source-Office: Word-, Excel-, PowerPoint- und
             PDF-Dateien gemeinsam im Browser oder als Desktop-App bearbeiten, ohne
