@@ -31,7 +31,7 @@ Der Vite-Server leitet `/api` (mit WebSockets) und `/mcp` an den API-Server weit
 ```bash
 bun run engine:prepare   # einmal und nach einer Änderung in engine/: Build und E2E brauchen die Engine
 bunx playwright install chromium   # einmal: der Browser von Playwright für die E2E-Tests
-bun run lint             # Biome
+bun run lint             # Biome, dann checks (Dateigröße, Oberflächentexte)
 bun run typecheck        # tsc in jedem Workspace
 bun run i18n:check       # jeder Oberflächentext auf Deutsch und Englisch
 bun run test             # Vitest auf Bun: Unit- und Integrationstests (SQLite)
@@ -49,6 +49,12 @@ Rust-Prüfungen der Desktop-App und eine Validierung der E-Rechnungen gegen EN 1
 Entwurfs-Pull-Requests und Änderungen nur an Markdown oder `docs/` starten sie nicht; „Ready for
 review“ schon.
 
+`checks` ([firsttris/workflows](https://github.com/firsttris/workflows#checks), eingestellt in `checks.json`)
+schlägt bei einer Quelldatei über 400 Zeilen fehl, die nicht in `.checks/large-files.txt` steht; diese
+älteren Dateien werden in einer eigenen Änderung geteilt. Biome weist auf Funktionen über 80 Zeilen hin, und
+in einem Pull Request nennt `bun checks pr` eine Funktion, die neu oder darüber gewachsen ist, dazu Code ohne
+Doku und einen Fix ohne Test.
+
 Alle Skripte der `package.json` in der Wurzel:
 
 | Skript | Was es tut |
@@ -59,7 +65,7 @@ Alle Skripte der `package.json` in der Wurzel:
 | `build` | Die Web-App in `apps/web/dist`, mit der vorbereiteten Engine hineinkopiert |
 | `build:demo` | Die [Demo](#the-demo) in `apps/web/dist-demo`, für GitHub Pages unter `/demo/` |
 | `preview` | Die gebaute Web-App auf http://localhost:4173, mit `/api` und `/mcp` weitergeleitet wie bei `dev` |
-| `typecheck`, `lint` | Die Oberflächentexte kompiliert, dann `tsc -b`; Biome |
+| `typecheck`, `lint` | Die Oberflächentexte kompiliert, dann `tsc -b`; Biome, dann `checks` |
 | `i18n`, `i18n:check` | Kompiliert die Oberflächentexte (`apps/web/messages`) mit Paraglide; dasselbe, dann die Prüfung, dass jeder Text auf Deutsch und Englisch vorliegt und keiner im Code steht (ein eigener Schritt in der CI) ([Oberflächentexte](architecture.md#interface-texts)) |
 | `format` | Biome mit `--write`: korrigiert die Formatierung und was es sonst kann |
 | `test`, `test:watch` | Vitest einmal, mit der Prüfung, dass jeder Oberflächentext auf Deutsch und Englisch vorliegt; Vitest, das die Dateien beobachtet |

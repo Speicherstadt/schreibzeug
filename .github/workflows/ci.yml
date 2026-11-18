@@ -33,11 +33,16 @@ jobs:
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0 # checks pr compares the branch with its merge base
       - uses: oven-sh/setup-bun@v2
         with:
           bun-version: ${{ env.BUN_VERSION }}
       - run: bun install --frozen-lockfile
       - run: bun run lint
+      # Hints on long functions, grown large files, code without docs, a fix without a test (firsttris/workflows#checks)
+      - if: github.event_name == 'pull_request'
+        run: bun checks pr
       - run: bun run typecheck
       # Every interface text in German and English, none left in the code (docs/architecture.md#interface-texts)
       - name: Interface texts
