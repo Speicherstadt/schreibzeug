@@ -13,22 +13,9 @@ Editing together in real time, in the browser or as a desktop app. No document s
 [![CI](https://github.com/Speicherstadt/schreibzeug/actions/workflows/ci.yml/badge.svg)](https://github.com/Speicherstadt/schreibzeug/actions/workflows/ci.yml)
 [![Release](https://img.shields.io/github/v/release/Speicherstadt/schreibzeug?logo=github&label=release)](https://github.com/Speicherstadt/schreibzeug/releases/latest)
 [![Docker Pulls](https://img.shields.io/docker/pulls/tristanteu/schreibzeug?logo=docker&logoColor=white)](https://hub.docker.com/r/tristanteu/schreibzeug)
-[![Image Size](https://img.shields.io/docker/image-size/tristanteu/schreibzeug/latest?logo=docker&logoColor=white&label=image)](https://hub.docker.com/r/tristanteu/schreibzeug)
 [![Docs](https://img.shields.io/badge/docs-schreibzeug.app-4f46e5?logo=materialformkdocs&logoColor=white)](https://schreibzeug.app/)
 [![License: AGPL-3.0](https://img.shields.io/badge/license-AGPL--3.0-blue)](LICENSE)
 [![Desktop](https://img.shields.io/badge/desktop-Windows%20%7C%20macOS%20%7C%20Linux-lightgrey)](https://github.com/Speicherstadt/schreibzeug/releases/latest)
-[![GDPR](https://img.shields.io/badge/GDPR-files%20on%20your%20server-15803d)](#-why-schreibzeug)
-[![Made in Europe](https://img.shields.io/badge/made%20in-Europe-003399)](https://github.com/Euro-Office)
-[![MCP server](https://img.shields.io/badge/MCP-Claude%20Code-d97757)](https://schreibzeug.app/mcp.html)
-[![TypeScript](https://img.shields.io/badge/TypeScript-3178c6?logo=typescript&logoColor=white)](https://www.typescriptlang.org)
-[![Bun](https://img.shields.io/badge/Bun-000000?logo=bun&logoColor=white)](https://bun.sh)
-[![React](https://img.shields.io/badge/React-149eca?logo=react&logoColor=white)](https://react.dev)
-[![TanStack](https://img.shields.io/badge/TanStack-Router%20%7C%20Query-ff4154?logo=reactquery&logoColor=white)](https://tanstack.com)
-[![Tailwind CSS](https://img.shields.io/badge/Tailwind%20CSS-06b6d4?logo=tailwindcss&logoColor=white)](https://tailwindcss.com)
-[![Vite](https://img.shields.io/badge/Vite-646cff?logo=vite&logoColor=white)](https://vite.dev)
-[![Hono](https://img.shields.io/badge/Hono-e36002?logo=hono&logoColor=white)](https://hono.dev)
-[![SQLite](https://img.shields.io/badge/SQLite-Drizzle-003b57?logo=sqlite&logoColor=white)](https://orm.drizzle.team)
-[![Tauri](https://img.shields.io/badge/Tauri-24c8db?logo=tauri&logoColor=white)](https://tauri.app)
 
 [Why](#-why-schreibzeug) •
 [Install](#-install) •
@@ -43,11 +30,11 @@ Editing together in real time, in the browser or as a desktop app. No document s
 
 </div>
 
-## 💡 Why Schreibzeug?
+## Why Schreibzeug?
 
 Cloud office suites keep your documents on someone else's servers and charge per user.
-Self-hosted office suites usually need a separate document server next to Nextcloud and look like
-the office programs of 2010. Schreibzeug is one small server with a modern interface.
+Self-hosted office suites usually need a separate document server next to Nextcloud. Schreibzeug
+is one small server with its own interface and file management.
 
 - **Made in Europe, for Europe**: developed in Europe, open source, on Euro-Office's European
   engine and your server. No US provider in between, so no access to your files under the US
@@ -69,10 +56,57 @@ the office programs of 2010. Schreibzeug is one small server with a modern inter
 - **Simple to run**: one container with a SQLite database and a data folder; backing up the folder
   backs up everything.
 
-Runs on any Linux server or VPS with Docker or Podman (amd64), on a home server, or without any
-server as the desktop app for Windows, macOS and Linux.
+## Features
 
-## 🚀 Install
+Briefly per area; the details are on the linked page of the [documentation](https://schreibzeug.app/).
+
+| Area | What Schreibzeug does |
+|---|---|
+| 📝 [Documents](https://schreibzeug.app/engine.html#mail-merge) (.docx) | **Comments and tracked changes**, headers, footers and table of contents, spell checking in German and English, templates, **mail merge**, **e-invoices** (ZUGFeRD), PDF and PDF/A |
+| 📊 [Spreadsheets](https://schreibzeug.app/engine.html#spreadsheets) (.xlsx) | Formulas, number formats, sorting and filters, frozen rows, **charts**, **pivot tables**, dropdown lists, conditional formats, CSV |
+| 📽️ [Presentations](https://schreibzeug.app/engine.html#presentations) (.pptx) | Slide layouts, shapes, designs, transitions, speaker notes and a full-screen **slide show** |
+| 📄 [PDFs](https://schreibzeug.app/pdf.html) | **Fill in forms and sign**, by hand or **digitally** with your certificate (not qualified), notes and highlighting, **black out**, add and remove pages, **OCR** for scans |
+| 🗒️ [Markdown & text](https://schreibzeug.app/text.html) (.md, .txt) | A **live view** that keeps the text Markdown, or source and preview side by side; encoding and line endings kept byte for byte |
+| 📁 [Files & teamwork](https://schreibzeug.app/files.html) | Folders, upload, recent files and trash, **versions** to go back to, **sharing** with accounts or by link, **real-time co-editing** with live cursors, opening a copy of a file **another app hands over** by a link, **saving to an archive** as PDF/A |
+| 🤖 [AI & Kontext](https://schreibzeug.app/mcp.html) | **MCP server** for Claude Code and other MCP clients, with your rights, asking before it edits a document you have open; **sign in with [Kontext](https://github.com/Speicherstadt/kontext)** and use Schreibzeug as its documents module |
+| 🖥️ [Desktop app](https://schreibzeug.app/desktop.html) | **Windows, macOS and Linux** (Tauri): the files in your documents folder without any server, or a window onto a Schreibzeug server (builds not signed yet) |
+| 🌐 [German and English](https://schreibzeug.app/architecture.html#interface-texts) | The interface in **German or English**, as the browser asks for it or as chosen in the settings |
+| ♿ [Accessibility](https://schreibzeug.app/accessibility.html) | Menus and toolbars by **keyboard**, **screen reader support** in documents, spreadsheets and presentations (off unless switched on, Strg+Alt+Z), checked automatically against WCAG 2.2 AA |
+
+## Screenshots
+
+<table>
+  <tr>
+    <td width="50%"><picture><source media="(prefers-color-scheme: dark)" srcset="docs/screenshots/files-dark.png"><img src="docs/screenshots/files-light.png" alt="Schreibzeug file browser: folders, Word documents, a spreadsheet and a presentation with last change and size, buttons for new folder, new file and upload"></picture><br><sub><b>Files</b>: folders and files with last change and size</sub></td>
+    <td width="50%"><picture><source media="(prefers-color-scheme: dark)" srcset="docs/screenshots/spreadsheet-dark.png"><img src="docs/screenshots/spreadsheet-light.png" alt="Self-hosted spreadsheet editor for .xlsx files in the browser: toolbar, formula bar and grid with sheet tabs"></picture><br><sub><b>Spreadsheet</b>: .xlsx with formula bar and sheet tabs</sub></td>
+  </tr>
+  <tr>
+    <td width="50%"><picture><source media="(prefers-color-scheme: dark)" srcset="docs/screenshots/presentation-dark.png"><img src="docs/screenshots/presentation-light.png" alt="Presentation editor for .pptx files: slide list on the left, the title slide of a talk and the toolbar above"></picture><br><sub><b>Presentation</b>: slide list, slide and toolbar</sub></td>
+    <td width="50%"><picture><source media="(prefers-color-scheme: dark)" srcset="docs/screenshots/pdf-dark.png"><img src="docs/screenshots/pdf-light.png" alt="PDF editor in the browser: tools for highlighting, drawing, notes, signature and redaction beside a filled-in order form"></picture><br><sub><b>PDF</b>: fill in a form, sign, black out</sub></td>
+  </tr>
+  <tr>
+    <td width="50%"><picture><source media="(prefers-color-scheme: dark)" srcset="docs/screenshots/comments-dark.png"><img src="docs/screenshots/comments-light.png" alt="Comments beside a Word document in Schreibzeug, with replies"></picture><br><sub><b>Comments</b>: beside the document, with replies</sub></td>
+    <td width="50%"><picture><source media="(prefers-color-scheme: dark)" srcset="docs/screenshots/share-dark.png"><img src="docs/screenshots/share-light.png" alt="Sharing a folder with another account or by link, to edit or to view"></picture><br><sub><b>Sharing</b>: with an account or by link, to edit or to view</sub></td>
+  </tr>
+</table>
+
+## Schreibzeug and the alternatives
+
+Schreibzeug is made for people who want the compatibility of a mature office engine with an
+interface that feels like today's web apps, on their own server.
+
+| | What it is | What Schreibzeug does differently |
+|---|---|---|
+| [ONLYOFFICE Docs](https://github.com/ONLYOFFICE/DocumentServer) / [Euro-Office](https://github.com/Euro-Office) | Collaborative office engine with a Microsoft-Office-like interface, usually embedded in Nextcloud | Same engine, a new interface, its own file management, no document server |
+| [Collabora Online](https://github.com/CollaboraOnline/online) | LibreOffice in the browser, with OpenDocument as its default format | Microsoft formats (.docx, .xlsx, .pptx) as the default format |
+| [CryptPad](https://github.com/cryptpad/cryptpad) | End-to-end encrypted collaboration suite | Files stay plain .docx, .xlsx and .pptx on your storage |
+| Microsoft 365 and others | Cloud office suites | Self-hosted, open source, no per-user price |
+
+## Quick start
+
+Schreibzeug runs as two containers: the app (`tristanteu/schreibzeug`, amd64) with a SQLite database and a data
+folder, and Caddy for HTTPS. You need a Linux server or VPS with Docker or Podman; a home server works too. Without
+any server, there is the desktop app for Windows, macOS and Linux.
 
 ### 1. Let an agent set it up
 
@@ -81,7 +115,7 @@ Give Claude Code or another coding agent this repository and SSH access to your 
 
 ### 2. Manually
 
-On a server with Docker (or Podman), a domain pointing to it and open ports 80 and 443:
+With a domain pointing to the server and open ports 80 and 443:
 
 ```bash
 # The configuration (compose.yaml, .env.example, Caddyfile); the programs come from Docker Hub
@@ -106,51 +140,7 @@ http://localhost:3000. Settings, your own reverse proxy, backups and updates are
 [installation guide](https://schreibzeug.app/installation.html).
 The desktop app is described under [Desktop app](https://schreibzeug.app/desktop.html); its installers for Windows, macOS and Linux are attached to every [release](https://github.com/Speicherstadt/schreibzeug/releases).
 
-## ✨ Features
-
-| | |
-|---|---|
-| 📝 **Documents** (.docx) | **Comments and tracked changes**, headers, footers and table of contents, spell checking in German and English, templates, **mail merge**, **e-invoices** (ZUGFeRD), PDF and PDF/A · [more →](https://schreibzeug.app/engine.html#mail-merge) |
-| 📊 **Spreadsheets** (.xlsx) | Formulas, number formats, sorting and filters, frozen rows, **charts**, **pivot tables**, dropdown lists, conditional formats, CSV · [more →](https://schreibzeug.app/engine.html#spreadsheets) |
-| 📽️ **Presentations** (.pptx) | Slide layouts, shapes, designs, transitions, speaker notes and a full-screen **slide show** · [more →](https://schreibzeug.app/engine.html#presentations) |
-| 📄 **PDFs** | **Fill in forms and sign**, by hand or **digitally** with your certificate (not qualified), notes and highlighting, **black out**, add and remove pages, **OCR** for scans · [more →](https://schreibzeug.app/pdf.html) |
-| 🗒️ **Markdown & text** (.md, .txt) | A **live view** that keeps the text Markdown, or source and preview side by side; encoding and line endings kept byte for byte · [more →](https://schreibzeug.app/text.html) |
-| 📁 **Files & teamwork** | Folders, upload, recent files and trash, **versions** to go back to, **sharing** with accounts or by link, **real-time co-editing** with live cursors, opening a copy of a file **another app hands over** by a link, **saving to an archive** as PDF/A · [more →](https://schreibzeug.app/files.html) |
-| 🤖 **AI & Kontext** | **MCP server** for Claude Code and other MCP clients, with your rights, asking before it edits a document you have open; **sign in with [Kontext](https://github.com/Speicherstadt/kontext)** and use Schreibzeug as its documents module · [more →](https://schreibzeug.app/mcp.html) |
-| 🖥️ **Desktop app** | **Windows, macOS and Linux** (Tauri): the files in your documents folder without any server, or a window onto a Schreibzeug server (builds not signed yet) · [more →](https://schreibzeug.app/desktop.html) |
-| 🌐 **German and English** | The interface in **German or English**, as the browser asks for it or as chosen in the settings · [more →](https://schreibzeug.app/architecture.html#interface-texts) |
-| ♿ **Accessibility** | Menus and toolbars by **keyboard**, **screen reader support** in documents, spreadsheets and presentations (off unless switched on, Strg+Alt+Z), checked automatically against WCAG 2.2 AA · [more →](https://schreibzeug.app/accessibility.html) |
-
-## 📸 Screenshots
-
-<table>
-  <tr>
-    <td><img src="docs/screenshots/files-light.png" alt="Schreibzeug file browser: folders, Word documents, a spreadsheet and a presentation with last change and size, buttons for new folder, new file and upload"></td>
-    <td><img src="docs/screenshots/spreadsheet-light.png" alt="Self-hosted spreadsheet editor for .xlsx files in the browser: toolbar, formula bar and grid with sheet tabs"></td>
-  </tr>
-  <tr>
-    <td><img src="docs/screenshots/presentation-light.png" alt="Presentation editor for .pptx files: slide list on the left, the title slide of a talk and the toolbar above"></td>
-    <td><img src="docs/screenshots/pdf-light.png" alt="PDF editor in the browser: tools for highlighting, drawing, notes, signature and redaction beside a filled-in order form"></td>
-  </tr>
-  <tr>
-    <td><img src="docs/screenshots/comments-light.png" alt="Comments beside a Word document in Schreibzeug, with replies"></td>
-    <td><img src="docs/screenshots/share-light.png" alt="Sharing a folder with another account or by link, to edit or to view"></td>
-  </tr>
-</table>
-
-## 🔀 Schreibzeug and the alternatives
-
-Schreibzeug is made for people who want the compatibility of a mature office engine with an
-interface that feels like today's web apps, on their own server.
-
-| | What it is | Where Schreibzeug differs |
-|---|---|---|
-| [ONLYOFFICE Docs](https://github.com/ONLYOFFICE/DocumentServer) / [Euro-Office](https://github.com/Euro-Office) | Collaborative office engine with a Microsoft-Office-like interface, usually embedded in Nextcloud | Same engine, a new interface, its own file management, no document server |
-| [Collabora Online](https://github.com/CollaboraOnline/online) | LibreOffice in the browser, strongest with OpenDocument | Focus on Microsoft formats and a modern interface |
-| [CryptPad](https://github.com/cryptpad/cryptpad) | End-to-end encrypted collaboration suite | Files stay plain .docx, .xlsx and .pptx on your storage |
-| Microsoft 365 and others | Cloud office suites | Self-hosted, open source, no per-user price, your files unconverted |
-
-## ❓ FAQ
+## FAQ
 
 <details>
 <summary><b>Is there a self-hosted alternative to Microsoft 365?</b></summary>
@@ -203,17 +193,28 @@ Claude Code's `/security-review` on this repository.
 Report vulnerabilities privately as described in [SECURITY.md](SECURITY.md).
 </details>
 
-## 📚 Documentation
+## Documentation
 
-The documentation opens with a tour in pictures, made to send to customers: **[in English](https://schreibzeug.app/)** and **[in German](https://schreibzeug.app/de/)**.
+Everything in detail, with search: **[schreibzeug.app](https://schreibzeug.app/)**. Every feature above links its page; in addition:
 
-The full documentation, with search, is at **[schreibzeug.app](https://schreibzeug.app/)**: [every feature
-in detail](https://schreibzeug.app/overview.html), [installation](https://schreibzeug.app/installation.html), [accounts and sharing](https://schreibzeug.app/accounts.html),
-[collaboration](https://schreibzeug.app/collaboration.html), [the engine](https://schreibzeug.app/engine.html) and
-[development](https://schreibzeug.app/development.html). What changed in each release, with the steps an
-update needs: the [changelog](CHANGELOG.md).
+- **Getting started:** the tour in pictures, made to send to customers ([in English](https://schreibzeug.app/), [in German](https://schreibzeug.app/de/)),
+  [every feature in detail](https://schreibzeug.app/overview.html), [installation](https://schreibzeug.app/installation.html) and
+  [accounts and sharing](https://schreibzeug.app/accounts.html)
+- **Background:** [collaboration](https://schreibzeug.app/collaboration.html), [the engine](https://schreibzeug.app/engine.html) and
+  [development](https://schreibzeug.app/development.html)
+- **Releases:** the [changelog](CHANGELOG.md), with the steps an update needs
 
-## 🛠️ Development
+## Development
+
+[![TypeScript](https://img.shields.io/badge/TypeScript-3178c6?logo=typescript&logoColor=white)](https://www.typescriptlang.org)
+[![Bun](https://img.shields.io/badge/Bun-000000?logo=bun&logoColor=white)](https://bun.sh)
+[![React](https://img.shields.io/badge/React-149eca?logo=react&logoColor=white)](https://react.dev)
+[![TanStack](https://img.shields.io/badge/TanStack-Router%20%7C%20Query-ff4154?logo=reactquery&logoColor=white)](https://tanstack.com)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind%20CSS-06b6d4?logo=tailwindcss&logoColor=white)](https://tailwindcss.com)
+[![Vite](https://img.shields.io/badge/Vite-646cff?logo=vite&logoColor=white)](https://vite.dev)
+[![Hono](https://img.shields.io/badge/Hono-e36002?logo=hono&logoColor=white)](https://hono.dev)
+[![SQLite](https://img.shields.io/badge/SQLite-Drizzle-003b57?logo=sqlite&logoColor=white)](https://orm.drizzle.team)
+[![Tauri](https://img.shields.io/badge/Tauri-24c8db?logo=tauri&logoColor=white)](https://tauri.app)
 
 Requires [Bun](https://bun.sh) 1.4 or newer, on Linux x86_64 for preparing the engine; the database is a SQLite file.
 
@@ -227,17 +228,26 @@ A React SPA with TanStack Router and Query, Tailwind and shadcn-style components
 `sdkjs` as the editing engine; a Bun server with Hono, Drizzle and SQLite; Tauri 3 (alpha) for the desktop
 app. Checks, tests and architecture: [Development](https://schreibzeug.app/development.html).
 
-## 🧩 More from us
+## More from us
 
 More open-source apps for your own server, covering email, accounting, a document archive and more: **[speicherstadt.app](https://speicherstadt.app)**
 
-## 🤝 Contributing
+## Contributing
 
-Issues and pull requests are welcome. For a rendering or compatibility bug, please attach a file
+Bugs and ideas are welcome as issues, through the [bug report form](https://github.com/Speicherstadt/schreibzeug/issues/new?template=bug_report.yml), and pull requests too. For a rendering or compatibility bug, please attach a file
 that shows it (or a small one that reproduces it) and say which program made it. Please run
 `bun run lint && bun run typecheck && bun run test` before opening a pull request; the checks,
 conventions and how contributions are licensed are in [CONTRIBUTING.md](CONTRIBUTING.md).
 Security problems please report privately ([SECURITY.md](SECURITY.md)).
+
+## Star history
+
+<a href="https://www.star-history.com/#Speicherstadt/schreibzeug&Date">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=Speicherstadt/schreibzeug&type=Date&theme=dark">
+    <img alt="GitHub star history of Schreibzeug" src="https://api.star-history.com/svg?repos=Speicherstadt/schreibzeug&type=Date">
+  </picture>
+</a>
 
 ---
 
@@ -249,6 +259,6 @@ Security problems please report privately ([SECURITY.md](SECURITY.md)).
 
 <sub>License: <a href="LICENSE">AGPL-3.0</a> · © Tristan Teufel and contributors · <a href="README.de.md">Deutsche Version</a><br>
 Changed versions you pass on or run for others must offer their source code under the AGPL. For IT service providers: partnership with a direct line to the developers, plus setup and support via <a href="https://teufel-it.de">teufel-it.de</a>.<br>
-Schreibzeug builds on the open-source Euro-Office engine and is not affiliated with Euro-Office, ONLYOFFICE, Microsoft or Google.</sub>
+Schreibzeug builds on the open-source Euro-Office engine and is not affiliated with Euro-Office, ONLYOFFICE, Collabora, CryptPad, Microsoft or Google; the names are trademarks of their owners.</sub>
 
 </div>
