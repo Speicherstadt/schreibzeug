@@ -20,9 +20,9 @@ betreuen es.
 
 ## Fragen { #questions }
 
-Fragen zur Nutzung von Schreibzeug gehören in die öffentlichen
-[Issues](https://github.com/Speicherstadt/schreibzeug/issues). Kostenlose Einzelhilfe gibt es nicht;
-die Einrichtung für ein einzelnes Unternehmen übernimmt ein Partner oder die Entwicklung als bezahltes
-Projekt.
+Fragen zur Nutzung beantworten wir öffentlich in den
+[GitHub-Issues](https://github.com/Speicherstadt/schreibzeug/issues), damit alle etwas davon haben.
+Wer Einrichtung oder Betrieb für seine Firma abgeben will, findet einen Partner oder nutzt den
+gehosteten Betrieb; größere Einführungen übernehmen wir auch als bezahltes Projekt.
 
 Mehr auf der Seite zum [Partnerprogramm](https://speicherstadt.app/partner/).
