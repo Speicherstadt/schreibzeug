@@ -33,8 +33,8 @@ Editing together in real time, in the browser or as a desktop app. No document s
 ## Why Schreibzeug?
 
 Cloud office suites keep your documents on someone else's servers and charge per user.
-Self-hosted office suites usually need a separate document server next to Nextcloud and look like
-the office programs of 2010. Schreibzeug is one small server with a modern interface.
+Self-hosted office suites usually need a separate document server next to Nextcloud. Schreibzeug
+is one small server with its own interface and file management.
 
 - **Made in Europe, for Europe**: developed in Europe, open source, on Euro-Office's European
   engine and your server. No US provider in between, so no access to your files under the US
@@ -98,9 +98,9 @@ interface that feels like today's web apps, on their own server.
 | | What it is | What Schreibzeug does differently |
 |---|---|---|
 | [ONLYOFFICE Docs](https://github.com/ONLYOFFICE/DocumentServer) / [Euro-Office](https://github.com/Euro-Office) | Collaborative office engine with a Microsoft-Office-like interface, usually embedded in Nextcloud | Same engine, a new interface, its own file management, no document server |
-| [Collabora Online](https://github.com/CollaboraOnline/online) | LibreOffice in the browser, strongest with OpenDocument | Focus on Microsoft formats and a modern interface |
+| [Collabora Online](https://github.com/CollaboraOnline/online) | LibreOffice in the browser, with OpenDocument as its default format | Microsoft formats (.docx, .xlsx, .pptx) as the default format |
 | [CryptPad](https://github.com/cryptpad/cryptpad) | End-to-end encrypted collaboration suite | Files stay plain .docx, .xlsx and .pptx on your storage |
-| Microsoft 365 and others | Cloud office suites | Self-hosted, open source, no per-user price, your files unconverted |
+| Microsoft 365 and others | Cloud office suites | Self-hosted, open source, no per-user price |
 
 ## Quick start
 
@@ -259,6 +259,6 @@ Security problems please report privately ([SECURITY.md](SECURITY.md)).
 
 <sub>License: <a href="LICENSE">AGPL-3.0</a> · © Tristan Teufel and contributors · <a href="README.de.md">Deutsche Version</a><br>
 Changed versions you pass on or run for others must offer their source code under the AGPL. For IT service providers: partnership with a direct line to the developers, plus setup and support via <a href="https://teufel-it.de">teufel-it.de</a>.<br>
-Schreibzeug builds on the open-source Euro-Office engine and is not affiliated with Euro-Office, ONLYOFFICE, Microsoft or Google.</sub>
+Schreibzeug builds on the open-source Euro-Office engine and is not affiliated with Euro-Office, ONLYOFFICE, Collabora, CryptPad, Microsoft or Google; the names are trademarks of their owners.</sub>
 
 </div>

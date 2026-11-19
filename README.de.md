@@ -32,9 +32,8 @@ Gemeinsam in Echtzeit, im Browser oder als Desktop-App. Ohne Dokumentenserver un
 ## Warum Schreibzeug?
 
 Office-Pakete aus der Cloud halten deine Dokumente auf fremden Servern und kosten pro Benutzer.
-Selbst gehostete Office-Pakete brauchen meist einen eigenen Dokumentenserver neben Nextcloud und
-sehen aus wie die Office-Programme von 2010. Schreibzeug ist ein kleiner Server mit einer modernen
-Oberfläche.
+Selbst gehostete Office-Pakete brauchen meist einen eigenen Dokumentenserver neben Nextcloud.
+Schreibzeug ist ein kleiner Server mit eigener Oberfläche und eigener Dateiverwaltung.
 
 - **Aus Europa, für Europa**: in Europa entwickelt, Open Source, auf der europäischen Engine
   Euro-Office und deinem Server. Kein US-Anbieter dazwischen, also auch kein Zugriff auf deine
@@ -100,9 +99,9 @@ Oberfläche wie bei heutigen Web-Apps wollen, auf dem eigenen Server.
 | | Was es ist | Was Schreibzeug anders macht |
 |---|---|---|
 | [ONLYOFFICE Docs](https://github.com/ONLYOFFICE/DocumentServer) / [Euro-Office](https://github.com/Euro-Office) | Office-Engine fürs gemeinsame Arbeiten mit einer Oberfläche wie Microsoft Office, meist in Nextcloud eingebettet | Dieselbe Engine, eine neue Oberfläche, eigene Dateiverwaltung, kein Dokumentenserver |
-| [Collabora Online](https://github.com/CollaboraOnline/online) | LibreOffice im Browser, am stärksten mit OpenDocument | Schwerpunkt auf den Microsoft-Formaten und einer modernen Oberfläche |
+| [Collabora Online](https://github.com/CollaboraOnline/online) | LibreOffice im Browser, mit OpenDocument als Standardformat | Microsoft-Formate (.docx, .xlsx, .pptx) als Standardformat |
 | [CryptPad](https://github.com/cryptpad/cryptpad) | Ende-zu-Ende verschlüsselte Suite fürs gemeinsame Arbeiten | Dateien bleiben einfache .docx, .xlsx und .pptx auf deinem Speicher |
-| Microsoft 365 und andere | Office-Pakete in der Cloud | Selbst gehostet, Open Source, kein Preis pro Benutzer, deine Dateien unverändert |
+| Microsoft 365 und andere | Office-Pakete in der Cloud | Selbst gehostet, Open Source, kein Preis pro Benutzer |
 
 ## Schnellstart
 
@@ -262,6 +261,6 @@ Sicherheitslücken bitte vertraulich melden ([SECURITY.md](SECURITY.md)).
 
 <sub>Lizenz: <a href="LICENSE">AGPL-3.0</a> · © Tristan Teufel und Mitwirkende · <a href="README.md">English version</a><br>
 Wer eine veränderte Version weitergibt oder für andere betreibt, muss ihren Quellcode unter der AGPL anbieten. Für IT-Dienstleister: Partnerschaft mit direktem Draht zur Entwicklung, dazu Einrichtung und Support über <a href="https://teufel-it.de">teufel-it.de</a>.<br>
-Schreibzeug baut auf der Open-Source-Engine Euro-Office auf und steht in keiner Verbindung zu Euro-Office, ONLYOFFICE, Microsoft oder Google.</sub>
+Schreibzeug baut auf der Open-Source-Engine Euro-Office auf und steht in keiner Verbindung zu Euro-Office, ONLYOFFICE, Collabora, CryptPad, Microsoft oder Google; die Namen sind Marken ihrer Inhaber.</sub>
 
 </div>
