@@ -177,8 +177,8 @@ New, type a name, go. Word, Excel, PowerPoint or a note – right in the right f
 <div markdown>
 **🇪🇺 Your files stay with you**
 
-On your server, or with the desktop app on your own computer. No US cloud, no telemetry.
-GDPR without the headache.
+On your server, or with the desktop app on your own computer. No US cloud, no telemetry. GDPR
+without the headache.
 </div>
 <div markdown>
 **📄 Real Office files**

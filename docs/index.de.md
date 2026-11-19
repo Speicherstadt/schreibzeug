@@ -177,8 +177,8 @@ Ordner.
 <div markdown>
 **🇪🇺 Deine Dateien bleiben bei dir**
 
-Auf deinem Server oder mit der Desktop-App auf deinem eigenen Rechner. Keine US-Cloud,
-keine Telemetrie. DSGVO ohne Bauchschmerzen.
+Auf deinem Server oder mit der Desktop-App auf deinem eigenen Rechner. Keine US-Cloud, keine
+Telemetrie. DSGVO ohne Bauchschmerzen.
 </div>
 <div markdown>
 **📄 Echte Office-Dateien**
