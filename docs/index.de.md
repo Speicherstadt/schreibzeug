@@ -175,9 +175,9 @@ Ordner.
 
 <div class="showcase-cards" markdown>
 <div markdown>
-**🔒 Deine Dateien bleiben bei dir**
+**🇪🇺 Deine Dateien bleiben bei dir**
 
-Auf deinem Server oder mit der Desktop-App auf deinem eigenen Rechner. Kein Cloud-Anbieter,
+Auf deinem Server oder mit der Desktop-App auf deinem eigenen Rechner. Keine US-Cloud,
 keine Telemetrie. DSGVO ohne Bauchschmerzen.
 </div>
 <div markdown>
@@ -226,7 +226,7 @@ Offener Quellcode, gebaut auf der Euro-Office-Engine.
 ## Office für Betriebe, die arbeiten, statt Lizenzen zu zählen
 
 <p class="showcase-claim">Handwerk · Kanzleien und Praxen · Selbstständige · kleine und mittlere
-Betriebe.</p>
+Betriebe. Made in Europe.</p>
 
 [Alle Funktionen im Detail](overview.md){ .md-button .md-button--primary } [Mail, Kalender und Chat mit Kontext](https://kontext.email/){ .md-button }
 

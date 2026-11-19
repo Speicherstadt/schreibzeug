@@ -175,9 +175,9 @@ New, type a name, go. Word, Excel, PowerPoint or a note – right in the right f
 
 <div class="showcase-cards" markdown>
 <div markdown>
-**🔒 Your files stay with you**
+**🇪🇺 Your files stay with you**
 
-On your server, or with the desktop app on your own computer. No cloud provider, no telemetry.
+On your server, or with the desktop app on your own computer. No US cloud, no telemetry.
 GDPR without the headache.
 </div>
 <div markdown>
@@ -225,7 +225,7 @@ Open source code, built on the Euro-Office engine.
 ## Office for businesses that work instead of counting licences
 
 <p class="showcase-claim">Trades · law firms and practices · freelancers · small and mid-sized
-businesses.</p>
+businesses. Made in Europe.</p>
 
 [Every feature in detail](overview.md){ .md-button .md-button--primary } [Mail, calendar and chat with Kontext](https://kontext.email/en/){ .md-button }
 

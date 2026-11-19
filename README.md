@@ -8,7 +8,7 @@
 </picture>
 
 **Edit Word, Excel and PowerPoint files – .docx, .xlsx, .pptx and PDF, open source**<br>
-Editing together in real time, in the browser or as a desktop app. No document server, no tracking.
+Editing together in real time, in the browser or as a desktop app. No document server, no tracking. Made in Europe.
 
 [![CI](https://github.com/Speicherstadt/schreibzeug/actions/workflows/ci.yml/badge.svg)](https://github.com/Speicherstadt/schreibzeug/actions/workflows/ci.yml)
 [![Release](https://img.shields.io/github/v/release/Speicherstadt/schreibzeug?logo=github&label=release)](https://github.com/Speicherstadt/schreibzeug/releases/latest)
@@ -36,8 +36,9 @@ Cloud office suites keep your documents on someone else's servers and charge per
 Self-hosted office suites usually need a separate document server next to Nextcloud. Schreibzeug
 is one small server with its own interface and file management.
 
-- **Your files stay with you**: documents live on your server, or with the desktop app on your own
-  computer. No cloud provider, no third-party document server, no telemetry.
+- **Digital sovereignty (GDPR)**: your documents live on your server, or with the desktop app on
+  your own computer. No US provider in between, so the US CLOUD Act doesn't reach your files; no
+  third-party document server, no telemetry, and open source, so nobody can take it away from you.
 - **Real Office files**: a .docx stays a .docx, an .xlsx an .xlsx, an .odt an .odt – Word, Excel
   and LibreOffice open them as before.
 - **Mature compatibility**: the editing engine is Euro-Office, the open-source fork of ONLYOFFICE,
