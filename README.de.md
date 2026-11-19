@@ -253,7 +253,7 @@ Sicherheitslücken bitte vertraulich melden ([SECURITY.md](SECURITY.md)).
 [Fehler melden](https://github.com/Speicherstadt/schreibzeug/issues/new?template=bug_report.yml) &nbsp;·&nbsp; [Funktion vorschlagen](https://github.com/Speicherstadt/schreibzeug/issues/new?template=feature_request.yml)
 
 <sub>Lizenz: <a href="LICENSE">AGPL-3.0</a> · © Tristan Teufel und Mitwirkende · <a href="README.md">English version</a><br>
-Wer eine veränderte Version weitergibt oder für andere betreibt, muss ihren Quellcode unter der AGPL anbieten; eine kommerzielle Lizenz ohne diese Pflichten gibt es über <a href="https://teufel-it.de">teufel-it.de</a>.<br>
+Wer eine veränderte Version weitergibt oder für andere betreibt, muss ihren Quellcode unter der AGPL anbieten. Für IT-Dienstleister: Partnerschaft mit direktem Draht zur Entwicklung, dazu Einrichtung und Support über <a href="https://teufel-it.de">teufel-it.de</a>.<br>
 Schreibzeug baut auf der Open-Source-Engine Euro-Office auf und steht in keiner Verbindung zu Euro-Office, ONLYOFFICE, Microsoft oder Google.</sub>
 
 </div>
