@@ -17,12 +17,12 @@ Editing together in real time, in the browser or as a desktop app. No document s
 [![License: AGPL-3.0](https://img.shields.io/badge/license-AGPL--3.0-blue)](LICENSE)
 [![Desktop](https://img.shields.io/badge/desktop-Windows%20%7C%20macOS%20%7C%20Linux-lightgrey)](https://github.com/Speicherstadt/schreibzeug/releases/latest)
 
-[Why](#-why-schreibzeug) •
-[Install](#-install) •
-[Features](#-features) •
-[Screenshots](#-screenshots) •
-[Alternatives](#-schreibzeug-and-the-alternatives) •
-[FAQ](#-faq) •
+[Why](#why-schreibzeug) •
+[Install](#quick-start) •
+[Features](#features) •
+[Screenshots](#screenshots) •
+[Alternatives](#schreibzeug-and-the-alternatives) •
+[FAQ](#faq) •
 [Support](#support-and-partnership) •
 [Documentation](https://schreibzeug.app/) •
 [Deutsch](README.de.md)
@@ -209,11 +209,11 @@ Everything in detail, with search: **[schreibzeug.app](https://schreibzeug.app/)
 
 [![TypeScript](https://img.shields.io/badge/TypeScript-3178c6?logo=typescript&logoColor=white)](https://www.typescriptlang.org)
 [![Bun](https://img.shields.io/badge/Bun-000000?logo=bun&logoColor=white)](https://bun.sh)
+[![Hono](https://img.shields.io/badge/Hono-e36002?logo=hono&logoColor=white)](https://hono.dev)
 [![React](https://img.shields.io/badge/React-149eca?logo=react&logoColor=white)](https://react.dev)
 [![TanStack](https://img.shields.io/badge/TanStack-Router%20%7C%20Query-ff4154?logo=reactquery&logoColor=white)](https://tanstack.com)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind%20CSS-06b6d4?logo=tailwindcss&logoColor=white)](https://tailwindcss.com)
 [![Vite](https://img.shields.io/badge/Vite-646cff?logo=vite&logoColor=white)](https://vite.dev)
-[![Hono](https://img.shields.io/badge/Hono-e36002?logo=hono&logoColor=white)](https://hono.dev)
 [![SQLite](https://img.shields.io/badge/SQLite-Drizzle-003b57?logo=sqlite&logoColor=white)](https://orm.drizzle.team)
 [![Tauri](https://img.shields.io/badge/Tauri-24c8db?logo=tauri&logoColor=white)](https://tauri.app)
 
