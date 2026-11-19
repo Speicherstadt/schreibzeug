@@ -44,7 +44,11 @@ jobs:
       platforms: linux/amd64
       # The release job below makes the GitHub release, with the installers.
       github-release: false
-    secrets: inherit
+    # Passed by name: "secrets: inherit" only reaches reusable workflows of the same owner, and since
+    # the move to Speicherstadt firsttris/workflows is another owner (DOCKER_PAT would arrive empty and
+    # "prepare" be refused before it gets a runner).
+    secrets:
+      DOCKER_PAT: ${{ secrets.DOCKER_PAT }}
     # contents: write although it makes no release: a called workflow may not ask for more than its
     # caller grants, and its github-release job asks for it whether or not it runs.
     permissions:
