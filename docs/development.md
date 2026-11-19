@@ -37,7 +37,7 @@ bun run i18n:check       # jeder Oberflächentext auf Deutsch und Englisch
 bun run test             # Vitest auf Bun: Unit- und Integrationstests (SQLite)
 bun run test:e2e         # Playwright mit der echten Engine: E2E und Formattreue
 bun run build            # die Web-App
-mkdocs build --strict    # diese Dokumentation (pip install -r requirements-docs.txt)
+zensical build --strict  # diese Dokumentation (pip install -r requirements-docs.txt)
 ```
 
 `bun run build` und die E2E-Tests bereiten die Engine nicht selbst vor, und der Build lässt sie
@@ -138,7 +138,7 @@ erzeugt kein GitHub-Release. Die geteilten Workflows kommen aus
 | `desktop.yml` | **Actions → Desktop app** baut die Desktop-App für Windows, macOS und Linux, vorerst unsigniert; auch Teil jedes Releases |
 | `screenshots.yml` | **Actions → Update screenshots** nimmt die Bilder für README und Dokumentation sowie die Referenzen für die Formattreue auf |
 | `engine-pin.yml` | Auf einem Renovate-Branch, der die Engine oder den Konverter weiterbewegt: setzt `asset` und `sha256` des neuen Releases in `engine/engine.json` und startet die CI auf diesem Commit |
-| `docs.yml` | Veröffentlicht diese Dokumentation und die [Demo](#the-demo) bei jedem Push auf `main` auf GitHub Pages (ein Pull Request, der `docs/` ändert, baut nur die Dokumentation): auf Deutsch, eine Datei je Seite (`docs/x.md`). Frühere Adressen unter `/de/` leiten auf dieselbe Seite weiter (mkdocs-redirects, `redirect_maps` in `mkdocs.yml`). Die Startseite ist der Rundgang in Bildern, `overview.md` die Übersicht. Das `privacy`-Plugin von MkDocs Material lädt Schriften und andere externe Dateien beim Bauen herunter, sodass die Site nichts von Google Fonts oder einem CDN lädt; die Fußzeile verlinkt Impressum und Datenschutzerklärung (`copyright` in `mkdocs.yml`) |
+| `docs.yml` | Veröffentlicht diese Dokumentation und die [Demo](#the-demo) bei jedem Push auf `main` auf GitHub Pages (ein Pull Request, der `docs/` ändert, baut nur die Dokumentation): auf Deutsch, eine Datei je Seite (`docs/x.md`). Frühere Adressen unter `/de/` leiten auf dieselbe Seite weiter (`redirect_maps` in `mkdocs.yml`). Die Startseite ist der Rundgang in Bildern, `overview.md` die Übersicht. Gebaut wird sie mit [Zensical](https://zensical.org/), dem Nachfolger von MkDocs Material. Das `privacy`-Plugin lädt Schriften und andere externe Dateien beim Bauen herunter, sodass die Site nichts von Google Fonts oder einem CDN lädt; die Fußzeile verlinkt Impressum und Datenschutzerklärung (`copyright` in `mkdocs.yml`) |
 
 ## Abhängigkeits-Updates { #dependency-updates }
 

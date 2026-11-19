@@ -26,7 +26,7 @@ bun run lint             # Biome (bun run format fixes what it can)
 bun run test             # Vitest on Bun: unit and integration tests
 bun run test:e2e e2e/<spec>.ts   # Playwright: the specs your change touches; CI runs all of them
 bun run build
-mkdocs build --strict    # when docs/ or mkdocs.yml changed (pip install -r requirements-docs.txt)
+zensical build --strict  # when docs/ or mkdocs.yml changed (pip install -r requirements-docs.txt)
 ```
 
 When you change the desktop app's Rust code, also run `cargo fmt --check`,

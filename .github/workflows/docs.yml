@@ -1,4 +1,4 @@
-# Builds docs/ with MkDocs Material and the demo (apps/web src/demo, `bun run build:demo`) and
+# Builds docs/ with Zensical and the demo (apps/web src/demo, `bun run build:demo`) and
 # publishes both on GitHub Pages: https://schreibzeug.app/ and …/demo/
 # On a push to main it runs for every change, as the demo is the app; on a pull request it only
 # builds the docs (--strict), so broken links show up before the merge – CI builds the app.
@@ -49,7 +49,7 @@ jobs:
           cache: pip
           cache-dependency-path: requirements-docs.txt
       - run: pip install -r requirements-docs.txt
-      - run: mkdocs build --strict
+      - run: zensical build --strict
       - if: github.event_name != 'pull_request'
         uses: actions/cache/restore@v6
         with:

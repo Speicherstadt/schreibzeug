@@ -1,6 +1,7 @@
 # The documentation as a website: https://schreibzeug.app/
-# Source is docs/, built with MkDocs Material (.github/workflows/docs.yml).
-# Locally: pip install -r requirements-docs.txt && mkdocs serve
+# Source is docs/, built with Zensical, the successor of MkDocs Material, which reads this file as
+# it is (https://zensical.org/docs/setup/basics/; .github/workflows/docs.yml).
+# Locally: pip install -r requirements-docs.txt && zensical serve
 site_name: Schreibzeug
 site_description: >-
   Schreibzeug, das selbst gehostete Open-Source-Office: Word-, Excel-, PowerPoint- und PDF-Dateien
@@ -74,7 +75,10 @@ plugins:
   - search
   # Fonts (Google Fonts) and other external assets are downloaded at build time and served from
   # this site, so a reader's browser contacts no third party. Cache in .cache/ (git-ignored).
-  - privacy
+  # The video player of the image gallery brings an ad SDK; the docs have no videos.
+  - privacy:
+      assets_exclude:
+        - cdn.plyr.io/*
   # The documentation was English at / and German at /de/ until it became German only; links
   # already shared to /de/ and to the old German tour (entdecken.html) keep working.
   - redirects:

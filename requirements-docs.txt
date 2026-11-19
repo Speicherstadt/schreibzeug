@@ -1,3 +1,2 @@
-# Documentation site (mkdocs.yml, .github/workflows/docs.yml)
-mkdocs-material==9.8.0
-mkdocs-redirects==1.2.2
+# Documentation site (mkdocs.yml, .github/workflows/docs.yml), built with Zensical
+zensical==0.1.2
