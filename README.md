@@ -13,7 +13,7 @@ Gemeinsam in Echtzeit, im Browser oder als Desktop-App. Ohne Dokumentenserver un
 [![CI](https://github.com/Speicherstadt/schreibzeug/actions/workflows/ci.yml/badge.svg)](https://github.com/Speicherstadt/schreibzeug/actions/workflows/ci.yml)
 [![Release](https://img.shields.io/github/v/release/Speicherstadt/schreibzeug?logo=github&label=release)](https://github.com/Speicherstadt/schreibzeug/releases/latest)
 [![License: AGPL-3.0](https://img.shields.io/badge/license-AGPL--3.0-blue)](LICENSE)
-[![Docs](https://img.shields.io/badge/docs-schreibzeug.app-4f46e5?logo=materialformkdocs&logoColor=white)](https://schreibzeug.app/de/)
+[![Docs](https://img.shields.io/badge/docs-schreibzeug.app-4f46e5?logo=materialformkdocs&logoColor=white)](https://schreibzeug.app/)
 [![Desktop](https://img.shields.io/badge/desktop-Windows%20%7C%20macOS%20%7C%20Linux-lightgrey)](https://github.com/Speicherstadt/schreibzeug/releases/latest)
 [![Docker Pulls](https://img.shields.io/docker/pulls/tristanteu/schreibzeug?logo=docker&logoColor=white)](https://hub.docker.com/r/tristanteu/schreibzeug)
 
@@ -21,9 +21,8 @@ Gemeinsam in Echtzeit, im Browser oder als Desktop-App. Ohne Dokumentenserver un
 [Funktionen](#funktionen) •
 [Schnellstart](#schnellstart) •
 [FAQ](#faq) •
-[Dokumentation](https://schreibzeug.app/de/) •
-[Entwicklung](#entwicklung) •
-[English](README.en.md)
+[Dokumentation](https://schreibzeug.app/) •
+[Entwicklung](#entwicklung)
 
 🖱️ **[Demo ausprobieren](https://schreibzeug.app/demo/)** – die Editoren mit Beispieldateien, im Browser, ohne Installation
 
@@ -48,7 +47,7 @@ Schreibzeug ist ein kleiner Server mit eigener Oberfläche und eigener Dateiverw
 - **E-Rechnungen**: ZUGFeRD-Rechnungen direkt aus einem Rechnungsdokument, E-Rechnungen in PDFs
   werden gelesen und angezeigt.
 - **Mit der Tastatur bedienbar**: Menüs und Werkzeugleisten gehen ohne Maus –
-  [mehr zur Barrierefreiheit](https://schreibzeug.app/de/accessibility.html).
+  [mehr zur Barrierefreiheit](https://schreibzeug.app/accessibility.html).
 - **KI, wenn du willst**: Claude Code und andere Assistenten finden, lesen und schreiben deine
   Dateien mit deinen Rechten; Änderungen an einem offenen Dokument brauchen deine Zustimmung und
   lassen sich rückgängig machen.
@@ -57,20 +56,20 @@ Schreibzeug ist ein kleiner Server mit eigener Oberfläche und eigener Dateiverw
 
 ## Funktionen
 
-Kurz je Bereich; die Details stehen auf der verlinkten Seite der [Dokumentation](https://schreibzeug.app/de/).
+Kurz je Bereich; die Details stehen auf der verlinkten Seite der [Dokumentation](https://schreibzeug.app/).
 
 | Bereich | Was Schreibzeug kann |
 |---|---|
-| 📝 [Dokumente](https://schreibzeug.app/de/engine.html#mail-merge) (.docx) | **Kommentare und Änderungsverfolgung**, Kopf- und Fußzeilen und Inhaltsverzeichnis, Rechtschreibprüfung auf Deutsch und Englisch, Vorlagen, **Serienbrief**, **E-Rechnungen** (ZUGFeRD), PDF und PDF/A |
-| 📊 [Tabellen](https://schreibzeug.app/de/engine.html#spreadsheets) (.xlsx) | Formeln, Zahlenformate, Sortieren und Filter, fixierte Zeilen, **Diagramme**, **Pivot-Tabellen**, Auswahllisten, bedingte Formatierung, CSV |
-| 📽️ [Präsentationen](https://schreibzeug.app/de/engine.html#presentations) (.pptx) | Folienlayouts, Formen, Designs, Übergänge, Sprechernotizen und eine **Bildschirmpräsentation** |
-| 📄 [PDFs](https://schreibzeug.app/de/pdf.html) | **Formulare ausfüllen und unterschreiben**, von Hand oder **digital** mit deinem Zertifikat (nicht qualifiziert), Notizen und Markieren, **Schwärzen**, Seiten einfügen und entfernen, **Texterkennung (OCR)** für Scans |
-| 🗒️ [Markdown & Text](https://schreibzeug.app/de/text.html) (.md, .txt) | Eine **Live-Ansicht**, in der der Text Markdown bleibt, oder Quelle und Vorschau nebeneinander; Zeichenkodierung und Zeilenenden bleiben Byte für Byte |
-| 📁 [Dateien & Teamarbeit](https://schreibzeug.app/de/files.html) | Ordner, Hochladen, zuletzt geöffnete Dateien und Papierkorb, **Versionen** zum Zurückholen, **Teilen** mit Konten oder per Link, **gemeinsam in Echtzeit** mit Cursorn, eine Kopie einer Datei öffnen, die **eine andere App** per Link übergibt, **im Archiv ablegen** als PDF/A |
-| 🤖 [KI & Kontext](https://schreibzeug.app/de/mcp.html) | **MCP-Server** für Claude Code und andere MCP-Clients, mit deinen Rechten und mit Rückfrage, bevor er ein offenes Dokument ändert; **Anmeldung über [Kontext](https://github.com/Speicherstadt/kontext)** und Schreibzeug als dessen Dokumente-Modul |
-| 🖥️ [Desktop-App](https://schreibzeug.app/de/desktop.html) | **Windows, macOS und Linux** (Tauri): die Dateien in deinem Dokumente-Ordner ganz ohne Server, oder ein Fenster auf einen Schreibzeug-Server (noch nicht signiert) |
-| 🌐 [Deutsch und Englisch](https://schreibzeug.app/de/architecture.html#interface-texts) | Die Oberfläche auf **Deutsch oder Englisch**, wie der Browser es wünscht oder in den Einstellungen gewählt |
-| ♿ [Barrierefreiheit](https://schreibzeug.app/de/accessibility.html) | Menüs und Werkzeugleisten per **Tastatur**, **Unterstützung für Screenreader** in Dokumenten, Tabellen und Präsentationen (nur wenn eingeschaltet, Strg+Alt+Z), automatisch gegen WCAG 2.2 AA geprüft |
+| 📝 [Dokumente](https://schreibzeug.app/engine.html#mail-merge) (.docx) | **Kommentare und Änderungsverfolgung**, Kopf- und Fußzeilen und Inhaltsverzeichnis, Rechtschreibprüfung auf Deutsch und Englisch, Vorlagen, **Serienbrief**, **E-Rechnungen** (ZUGFeRD), PDF und PDF/A |
+| 📊 [Tabellen](https://schreibzeug.app/engine.html#spreadsheets) (.xlsx) | Formeln, Zahlenformate, Sortieren und Filter, fixierte Zeilen, **Diagramme**, **Pivot-Tabellen**, Auswahllisten, bedingte Formatierung, CSV |
+| 📽️ [Präsentationen](https://schreibzeug.app/engine.html#presentations) (.pptx) | Folienlayouts, Formen, Designs, Übergänge, Sprechernotizen und eine **Bildschirmpräsentation** |
+| 📄 [PDFs](https://schreibzeug.app/pdf.html) | **Formulare ausfüllen und unterschreiben**, von Hand oder **digital** mit deinem Zertifikat (nicht qualifiziert), Notizen und Markieren, **Schwärzen**, Seiten einfügen und entfernen, **Texterkennung (OCR)** für Scans |
+| 🗒️ [Markdown & Text](https://schreibzeug.app/text.html) (.md, .txt) | Eine **Live-Ansicht**, in der der Text Markdown bleibt, oder Quelle und Vorschau nebeneinander; Zeichenkodierung und Zeilenenden bleiben Byte für Byte |
+| 📁 [Dateien & Teamarbeit](https://schreibzeug.app/files.html) | Ordner, Hochladen, zuletzt geöffnete Dateien und Papierkorb, **Versionen** zum Zurückholen, **Teilen** mit Konten oder per Link, **gemeinsam in Echtzeit** mit Cursorn, eine Kopie einer Datei öffnen, die **eine andere App** per Link übergibt, **im Archiv ablegen** als PDF/A |
+| 🤖 [KI & Kontext](https://schreibzeug.app/mcp.html) | **MCP-Server** für Claude Code und andere MCP-Clients, mit deinen Rechten und mit Rückfrage, bevor er ein offenes Dokument ändert; **Anmeldung über [Kontext](https://github.com/Speicherstadt/kontext)** und Schreibzeug als dessen Dokumente-Modul |
+| 🖥️ [Desktop-App](https://schreibzeug.app/desktop.html) | **Windows, macOS und Linux** (Tauri): die Dateien in deinem Dokumente-Ordner ganz ohne Server, oder ein Fenster auf einen Schreibzeug-Server (noch nicht signiert) |
+| 🌐 [Deutsch und Englisch](https://schreibzeug.app/architecture.html#interface-texts) | Die Oberfläche auf **Deutsch oder Englisch**, wie der Browser es wünscht oder in den Einstellungen gewählt |
+| ♿ [Barrierefreiheit](https://schreibzeug.app/accessibility.html) | Menüs und Werkzeugleisten per **Tastatur**, **Unterstützung für Screenreader** in Dokumenten, Tabellen und Präsentationen (nur wenn eingeschaltet, Strg+Alt+Z), automatisch gegen WCAG 2.2 AA geprüft |
 
 ## Screenshots
 
@@ -110,7 +109,7 @@ auch. Ganz ohne Server gibt es die Desktop-App für Windows, macOS und Linux.
 ### 1. Von einem Agenten aufsetzen lassen
 
 Gib Claude Code oder einem anderen Coding-Agenten dieses Repository und SSH-Zugang zu deinem Server und sag:
-„Setz Schreibzeug auf meinem Server auf, nach der [Installationsanleitung](https://schreibzeug.app/de/installation.html).“
+„Setz Schreibzeug auf meinem Server auf, nach der [Installationsanleitung](https://schreibzeug.app/installation.html).“
 
 ### 2. Manuell
 
@@ -136,8 +135,8 @@ Mit [Kontext](https://github.com/Speicherstadt/kontext) braucht Schreibzeug kein
 Es kommt mit Kontext als dessen Dokumente. Nur auf dem eigenen Rechner ausprobieren:
 `docker run -d -p 127.0.0.1:3000:3000 -v schreibzeug-data:/data tristanteu/schreibzeug`, dann
 http://localhost:3000. Einstellungen, ein eigener Reverse Proxy, Backups und Updates stehen in der
-[Installationsanleitung](https://schreibzeug.app/de/installation.html).
-Die Desktop-App beschreibt [Desktop-App](https://schreibzeug.app/de/desktop.html); ihre Installer für Windows, macOS und Linux hängen an jedem [Release](https://github.com/Speicherstadt/schreibzeug/releases).
+[Installationsanleitung](https://schreibzeug.app/installation.html).
+Die Desktop-App beschreibt [Desktop-App](https://schreibzeug.app/desktop.html); ihre Installer für Windows, macOS und Linux hängen an jedem [Release](https://github.com/Speicherstadt/schreibzeug/releases).
 
 Keinen eigenen Server oder keine eigene IT? Schreibzeug gibt es auf Anfrage gehostet oder über einen IT-Dienstleister aus dem [Partnerprogramm](https://speicherstadt.app/partner/).
 
@@ -147,14 +146,14 @@ Keinen eigenen Server oder keine eigene IT? Schreibzeug gibt es auf Anfrage geho
 <summary><b>Gibt es eine selbst gehostete Alternative zu Microsoft 365?</b></summary>
 
 Ja. Schreibzeug läuft mit Docker auf deinem eigenen Server und bearbeitet Word-, Excel-, PowerPoint-
-und PDF-Dateien im Browser, mehrere Leute gleichzeitig. Siehe [Installationsanleitung](https://schreibzeug.app/de/installation.html).
+und PDF-Dateien im Browser, mehrere Leute gleichzeitig. Siehe [Installationsanleitung](https://schreibzeug.app/installation.html).
 </details>
 
 <details>
 <summary><b>Braucht es einen ONLYOFFICE Document Server oder Nextcloud?</b></summary>
 
 Nein. Die Euro-Office-Engine läuft im Browser, der Schreibzeug-Server speichert die Dateien und
-reicht die Änderungen weiter; sonst ist nichts zu installieren. Wie das geht, steht unter [Engine](https://schreibzeug.app/de/engine.html).
+reicht die Änderungen weiter; sonst ist nichts zu installieren. Wie das geht, steht unter [Engine](https://schreibzeug.app/engine.html).
 </details>
 
 <details>
@@ -168,7 +167,7 @@ eine neue Version derselben Datei.
 <summary><b>Kann ich Schreibzeug offline nutzen, ohne Server?</b></summary>
 
 Ja, mit der Desktop-App für Windows, macOS und Linux: Sie öffnet die Dateien in deinem
-Dokumente-Ordner direkt. Siehe [Desktop-App](https://schreibzeug.app/de/desktop.html).
+Dokumente-Ordner direkt. Siehe [Desktop-App](https://schreibzeug.app/desktop.html).
 </details>
 
 <details>
@@ -176,14 +175,14 @@ Dokumente-Ordner direkt. Siehe [Desktop-App](https://schreibzeug.app/de/desktop.
 
 Ja, über den eingebauten MCP-Server und einen persönlichen Zugangsschlüssel, den du in den
 Einstellungen anlegst. Ein Schlüssel lässt sich auf „Nur lesen“ beschränken; Änderungen an einem
-offenen Dokument brauchen deine Zustimmung und lassen sich rückgängig machen. Siehe [MCP-Server](https://schreibzeug.app/de/mcp.html).
+offenen Dokument brauchen deine Zustimmung und lassen sich rückgängig machen. Siehe [MCP-Server](https://schreibzeug.app/mcp.html).
 </details>
 
 <details>
 <summary><b>Kann ich E-Rechnungen mit ZUGFeRD oder XRechnung erstellen?</b></summary>
 
 ZUGFeRD ja: Eine Rechnung aus dem Texteditor wird ein ZUGFeRD-PDF/A-3 mit Factur-X-XML (EN 16931).
-XRechnung wird gelesen und angezeigt, aber noch nicht erstellt. Siehe [E-Rechnungen](https://schreibzeug.app/de/e-invoice.html).
+XRechnung wird gelesen und angezeigt, aber noch nicht erstellt. Siehe [E-Rechnungen](https://schreibzeug.app/e-invoice.html).
 </details>
 
 <details>
@@ -196,13 +195,13 @@ Sicherheitslücken meldest du vertraulich, wie in [SECURITY.md](SECURITY.md) bes
 
 ## Dokumentation
 
-Alles im Detail, auf Deutsch und Englisch, mit Suche: **[schreibzeug.app](https://schreibzeug.app/de/)**. Jede Funktion oben verlinkt ihre Seite; dazu kommen:
+Alles im Detail, mit Suche: **[schreibzeug.app](https://schreibzeug.app/)**. Jede Funktion oben verlinkt ihre Seite; dazu kommen:
 
-- **Einstieg:** der Rundgang in Bildern, gemacht zum Weiterschicken an Kunden ([auf Deutsch](https://schreibzeug.app/de/), [auf Englisch](https://schreibzeug.app/)),
-  [jede Funktion im Detail](https://schreibzeug.app/de/overview.html), [Installation](https://schreibzeug.app/de/installation.html) und
-  [Konten und Teilen](https://schreibzeug.app/de/accounts.html)
-- **Hintergrund:** [gemeinsames Bearbeiten](https://schreibzeug.app/de/collaboration.html), [die Engine](https://schreibzeug.app/de/engine.html) und
-  [Entwicklung](https://schreibzeug.app/de/development.html)
+- **Einstieg:** der [Rundgang in Bildern](https://schreibzeug.app/), gemacht zum Weiterschicken an Kunden,
+  [jede Funktion im Detail](https://schreibzeug.app/overview.html), [Installation](https://schreibzeug.app/installation.html) und
+  [Konten und Teilen](https://schreibzeug.app/accounts.html)
+- **Hintergrund:** [gemeinsames Bearbeiten](https://schreibzeug.app/collaboration.html), [die Engine](https://schreibzeug.app/engine.html) und
+  [Entwicklung](https://schreibzeug.app/development.html)
 - **Releases:** das [Changelog](CHANGELOG.md) (Englisch), mit den Schritten, die ein Update braucht
 
 ## Entwicklung
@@ -227,7 +226,7 @@ bun run dev              # http://localhost:5173, mit der API auf http://localho
 
 Eine React-SPA mit TanStack Router und Query, Tailwind und Komponenten im Stil von shadcn; Euro-Office
 `sdkjs` als Engine; ein Bun-Server mit Hono, Drizzle und SQLite; Tauri 3 (Alpha) für die Desktop-App.
-Prüfungen, Tests und Architektur: [Entwicklung](https://schreibzeug.app/de/development.html).
+Prüfungen, Tests und Architektur: [Entwicklung](https://schreibzeug.app/development.html).
 
 ## Mehr von uns
 
@@ -259,7 +258,7 @@ Sicherheitslücken bitte vertraulich melden ([SECURITY.md](SECURITY.md)).
 
 [Fehler melden](https://github.com/Speicherstadt/schreibzeug/issues/new?template=bug_report.yml) &nbsp;·&nbsp; [Funktion vorschlagen](https://github.com/Speicherstadt/schreibzeug/issues/new?template=feature_request.yml)
 
-<sub>Lizenz: <a href="LICENSE">AGPL-3.0</a> · © Tristan Teufel und Mitwirkende · <a href="README.en.md">English version</a><br>
+<sub>Lizenz: <a href="LICENSE">AGPL-3.0</a> · © Tristan Teufel und Mitwirkende<br>
 Wer eine veränderte Version weitergibt oder für andere betreibt, muss ihren Quellcode unter der AGPL anbieten.<br>
 Für IT-Dienstleister und Hoster: <a href="https://speicherstadt.app/partner/">Partnerprogramm</a>.<br>
 Schreibzeug baut auf der Open-Source-Engine Euro-Office auf und steht in keiner Verbindung zu Euro-Office, ONLYOFFICE, Collabora, CryptPad, Microsoft oder Google; die Namen sind Marken ihrer Inhaber.</sub>

@@ -1,94 +1,93 @@
 ---
-title: Word, Excel, PowerPoint and PDF on your own server
-og_title: "Schreibzeug: Feels familiar. Belongs to you."
+title: Word, Excel, PowerPoint und PDF auf dem eigenen Server
+og_title: "Schreibzeug: Fühlt sich vertraut an. Gehört dir."
 description: >-
-  Edit Word, Excel, PowerPoint and PDF together in the browser or as a desktop app – on your own
-  server, with no per-user cost. A tour in pictures.
+  Word, Excel, PowerPoint und PDF gemeinsam im Browser oder als Desktop-App bearbeiten – auf
+  deinem eigenen Server, ohne Kosten pro Benutzer. Ein Rundgang in Bildern.
 image: screenshots/editor-light.png
 hide:
   - navigation
   - toc
 ---
 
-<!-- The English tour (index.de.md is the German one), to send to customers: what Schreibzeug
-     does, in pictures, without a word about hosting. The screenshots show the app in German, as it
-     is for now. -->
+<!-- The tour, to send to customers: what Schreibzeug does, in pictures,
+     without a word about hosting. -->
 
 <div class="showcase-hero" markdown>
 
-# Feels familiar. Belongs to you.
+# Fühlt sich vertraut an. Gehört dir.
 
-<p class="showcase-claim">Documents, spreadsheets, presentations and PDFs – together in real time,
-in the browser or as an app on your computer. Your files stay with you, and they stay what they
-are: .docx, .xlsx, .pptx.</p>
+<p class="showcase-claim">Dokumente, Tabellen, Präsentationen und PDFs – gemeinsam in Echtzeit,
+im Browser oder als App auf dem PC. Deine Dateien bleiben bei dir, und sie bleiben, was sie sind:
+.docx, .xlsx, .pptx.</p>
 
-[Take the tour](#rundgang){ .md-button .md-button--primary } [Try the demo](https://schreibzeug.app/demo/){ .md-button } [Every feature in detail](overview.md){ .md-button }
+[Rundgang starten](#rundgang){ .md-button .md-button--primary } [Demo ausprobieren](https://schreibzeug.app/demo/){ .md-button } [Alle Funktionen im Detail](overview.md){ .md-button }
 
 </div>
 
 <div class="showcase-shot" markdown>
-![Schreibzeug in the browser: a Word document with the toolbar](screenshots/editor-light.png#only-light){ width="1280" height="800" }
-![Schreibzeug in the browser: a Word document with the toolbar](screenshots/editor-dark.png#only-dark){ width="1280" height="800" }
+![Schreibzeug im Browser: ein Word-Dokument mit Werkzeugleiste](screenshots/editor-light.png#only-light){ width="1280" height="800" }
+![Schreibzeug im Browser: ein Word-Dokument mit Werkzeugleiste](screenshots/editor-dark.png#only-dark){ width="1280" height="800" }
 </div>
 
 <div class="showcase-feature" id="rundgang" markdown>
 <div markdown>
-<span class="showcase-kicker">Documents · .docx · light and dark</span>
+<span class="showcase-kicker">Dokumente · .docx · hell und dunkel</span>
 
-## Word in the browser. Without Word.
+## Word im Browser. Ohne Word.
 
-Write letters, quotes and contracts the way you know: styles, tables, headers and footers, a
-table of contents, spell checking. Mail merge and PDF export included. Light or dark, as you like
-it.
+Briefe, Angebote und Verträge schreiben, wie man es kennt: Formatvorlagen, Tabellen, Kopf- und
+Fußzeilen, Inhaltsverzeichnis, Rechtschreibprüfung auf Deutsch. Serienbriefe und PDF-Export
+inklusive. Hell oder dunkel, wie es dir gefällt.
 </div>
 <div class="showcase-shot" markdown>
-![A Word document in the browser in the dark theme](screenshots/editor-dark.png#only-light){ width="1280" height="800" loading="lazy" }
-![A Word document in the browser in the light theme](screenshots/editor-light.png#only-dark){ width="1280" height="800" loading="lazy" }
+![Ein Word-Dokument im Browser im dunklen Design](screenshots/editor-dark.png#only-light){ width="1280" height="800" loading="lazy" }
+![Ein Word-Dokument im Browser im hellen Design](screenshots/editor-light.png#only-dark){ width="1280" height="800" loading="lazy" }
 </div>
 </div>
 
 <div class="showcase-feature showcase-feature--flip" markdown>
 <div markdown>
-<span class="showcase-kicker">Together</span>
+<span class="showcase-kicker">Gemeinsam</span>
 
-## Three people in one document. At the same time.
+## Zu dritt in einem Dokument. Gleichzeitig.
 
-Everyone sees the others' cursors, comments arrive live, changes can be tracked and accepted. No
-more "quote_final_v3_really_final.docx".
+Jeder sieht die Cursor der anderen, Kommentare kommen live an, Änderungen lassen sich verfolgen
+und annehmen. Schluss mit „Angebot_final_v3_wirklich_final.docx“.
 </div>
 <div class="showcase-shot" markdown>
-![A quote with a colleague's comment and the field to reply](screenshots/comments-light.png#only-light){ width="1280" height="800" loading="lazy" }
-![A quote with a colleague's comment and the field to reply](screenshots/comments-dark.png#only-dark){ width="1280" height="800" loading="lazy" }
+![Ein Angebot mit dem Kommentar einer Kollegin und dem Feld zum Antworten](screenshots/comments-light.png#only-light){ width="1280" height="800" loading="lazy" }
+![Ein Angebot mit dem Kommentar einer Kollegin und dem Feld zum Antworten](screenshots/comments-dark.png#only-dark){ width="1280" height="800" loading="lazy" }
 </div>
 </div>
 
 <div class="showcase-feature" markdown>
 <div markdown>
-<span class="showcase-kicker">Spreadsheets · .xlsx</span>
+<span class="showcase-kicker">Tabellen · .xlsx</span>
 
-## Excel sheets that stay Excel sheets
+## Excel-Tabellen, die Excel-Tabellen bleiben
 
-Formulas, number formats, filters, charts, pivot tables and conditional formatting. The file stays
-a real .xlsx – your accountant opens it in Excel as always.
+Formeln, Zahlenformate, Filter, Diagramme, Pivot-Tabellen und bedingte Formatierung. Die Datei
+bleibt eine echte .xlsx – der Steuerberater öffnet sie in Excel wie immer.
 </div>
 <div class="showcase-shot" markdown>
-![A price list as a spreadsheet with a sum formula](screenshots/spreadsheet-light.png#only-light){ width="1280" height="800" loading="lazy" }
-![A price list as a spreadsheet with a sum formula](screenshots/spreadsheet-dark.png#only-dark){ width="1280" height="800" loading="lazy" }
+![Eine Preisliste als Tabelle mit Summenformel](screenshots/spreadsheet-light.png#only-light){ width="1280" height="800" loading="lazy" }
+![Eine Preisliste als Tabelle mit Summenformel](screenshots/spreadsheet-dark.png#only-dark){ width="1280" height="800" loading="lazy" }
 </div>
 </div>
 
 <div class="showcase-feature showcase-feature--flip" markdown>
 <div markdown>
-<span class="showcase-kicker">Presentations · .pptx</span>
+<span class="showcase-kicker">Präsentationen · .pptx</span>
 
-## The presentation for the customer meeting
+## Die Präsentation fürs Kundengespräch
 
-Slides, layouts, themes and transitions, speaker notes and a slide show straight from the browser.
-PowerPoint files stay PowerPoint files.
+Folien, Layouts, Designs und Übergänge, Sprechernotizen und eine Bildschirmpräsentation direkt
+aus dem Browser. PowerPoint-Dateien bleiben PowerPoint-Dateien.
 </div>
 <div class="showcase-shot" markdown>
-![A presentation with the slide list and the title slide](screenshots/presentation-light.png#only-light){ width="1280" height="800" loading="lazy" }
-![A presentation with the slide list and the title slide](screenshots/presentation-dark.png#only-dark){ width="1280" height="800" loading="lazy" }
+![Eine Präsentation mit Folienliste und Titelfolie](screenshots/presentation-light.png#only-light){ width="1280" height="800" loading="lazy" }
+![Eine Präsentation mit Folienliste und Titelfolie](screenshots/presentation-dark.png#only-dark){ width="1280" height="800" loading="lazy" }
 </div>
 </div>
 
@@ -96,137 +95,139 @@ PowerPoint files stay PowerPoint files.
 <div markdown>
 <span class="showcase-kicker">PDF</span>
 
-## Fill in, sign and redact PDFs
+## PDFs ausfüllen, unterschreiben, schwärzen
 
-Fill in and sign forms, highlight and comment, insert and remove pages, black out what's
-confidential. Scanned letters become searchable with text recognition.
+Formulare ausfüllen und unterschreiben, markieren und kommentieren, Seiten einfügen und
+entfernen, Vertrauliches schwärzen. Eingescannte Briefe werden per Texterkennung durchsuchbar.
 </div>
 <div class="showcase-shot" markdown>
-![An order form as a PDF, filled in in the browser](screenshots/pdf-light.png#only-light){ width="1280" height="800" loading="lazy" }
-![An order form as a PDF, filled in in the browser](screenshots/pdf-dark.png#only-dark){ width="1280" height="800" loading="lazy" }
+![Ein Auftragsformular als PDF wird im Browser ausgefüllt](screenshots/pdf-light.png#only-light){ width="1280" height="800" loading="lazy" }
+![Ein Auftragsformular als PDF wird im Browser ausgefüllt](screenshots/pdf-dark.png#only-dark){ width="1280" height="800" loading="lazy" }
 </div>
 </div>
 
 <div class="showcase-feature showcase-feature--flip" markdown>
 <div markdown>
-<span class="showcase-kicker">Notes · .md, .txt</span>
+<span class="showcase-kicker">Notizen · .md, .txt</span>
 
-## Notes that are simply notes
+## Notizen, die einfach Notizen sind
 
-Markdown with a live preview, checklists and tables – for minutes, to-dos and project notes. The
-file stays text, byte for byte.
+Markdown mit Live-Vorschau, Checklisten und Tabellen – für Protokolle, To-dos und
+Projektnotizen. Die Datei bleibt Text, Byte für Byte.
 </div>
 <div class="showcase-shot" markdown>
-![Project notes in Markdown with a checklist and a table](screenshots/text-light.png#only-light){ width="1280" height="800" loading="lazy" }
-![Project notes in Markdown with a checklist and a table](screenshots/text-dark.png#only-dark){ width="1280" height="800" loading="lazy" }
+![Projektnotizen als Markdown mit Checkliste und Tabelle](screenshots/text-light.png#only-light){ width="1280" height="800" loading="lazy" }
+![Projektnotizen als Markdown mit Checkliste und Tabelle](screenshots/text-dark.png#only-dark){ width="1280" height="800" loading="lazy" }
 </div>
 </div>
 
 <div class="showcase-feature" markdown>
 <div markdown>
-<span class="showcase-kicker">Files</span>
+<span class="showcase-kicker">Dateien</span>
 
-## All your files in one place
+## Alle Dateien an einem Ort
 
-Folders, uploads, recently opened, trash. Every saved version can be brought back – even last
-week's, before someone deleted half the contract.
+Ordner, Hochladen, zuletzt geöffnet, Papierkorb. Jede gespeicherte Version lässt sich
+zurückholen – auch die von letzter Woche, bevor jemand den halben Vertrag gelöscht hat.
 </div>
 <div class="showcase-shot" markdown>
-![My files: folders, Word, Excel, PDF, Markdown and PowerPoint files](screenshots/files-light.png#only-light){ width="1280" height="800" loading="lazy" }
-![My files: folders, Word, Excel, PDF, Markdown and PowerPoint files](screenshots/files-dark.png#only-dark){ width="1280" height="800" loading="lazy" }
+![Meine Dateien: Ordner, Word-, Excel-, PDF-, Markdown- und PowerPoint-Dateien](screenshots/files-light.png#only-light){ width="1280" height="800" loading="lazy" }
+![Meine Dateien: Ordner, Word-, Excel-, PDF-, Markdown- und PowerPoint-Dateien](screenshots/files-dark.png#only-dark){ width="1280" height="800" loading="lazy" }
 </div>
 </div>
 
 <div class="showcase-feature showcase-feature--flip" markdown>
 <div markdown>
-<span class="showcase-kicker">Sharing</span>
+<span class="showcase-kicker">Teilen</span>
 
-## Share with one click
+## Teilen mit einem Klick
 
-With colleagues or by link to the outside, to edit or only to view, with an expiry date if you
-like. Guests create an account with one click – no installation, no Microsoft account. No more
-attachment ping-pong.
+Mit Kollegen oder per Link nach draußen, zum Bearbeiten oder nur zum Ansehen, auf Wunsch
+mit Ablaufdatum. Gäste legen mit einem Klick ein Konto an – ohne Installation, ohne
+Microsoft-Konto. Kein Anhang-Pingpong mehr.
 </div>
 <div class="showcase-shot" markdown>
-![Sharing a folder with a colleague and by link](screenshots/share-light.png#only-light){ width="1280" height="800" loading="lazy" }
-![Sharing a folder with a colleague and by link](screenshots/share-dark.png#only-dark){ width="1280" height="800" loading="lazy" }
+![Einen Ordner mit einem Kollegen und per Link teilen](screenshots/share-light.png#only-light){ width="1280" height="800" loading="lazy" }
+![Einen Ordner mit einem Kollegen und per Link teilen](screenshots/share-dark.png#only-dark){ width="1280" height="800" loading="lazy" }
 </div>
 </div>
 
 <div class="showcase-feature" markdown>
 <div markdown>
-<span class="showcase-kicker">New</span>
+<span class="showcase-kicker">Neu anlegen</span>
 
-## A new document in three seconds
+## In drei Sekunden zum neuen Dokument
 
-New, type a name, go. Word, Excel, PowerPoint or a note – right in the right folder.
+Neu, Name eintippen, los. Word, Excel, PowerPoint oder eine Notiz – direkt im richtigen
+Ordner.
 </div>
 <div class="showcase-shot" markdown>
-![Creating a new document](screenshots/new-document-light.png#only-light){ width="1280" height="800" loading="lazy" }
-![Creating a new document](screenshots/new-document-dark.png#only-dark){ width="1280" height="800" loading="lazy" }
+![Ein neues Dokument anlegen](screenshots/new-document-light.png#only-light){ width="1280" height="800" loading="lazy" }
+![Ein neues Dokument anlegen](screenshots/new-document-dark.png#only-dark){ width="1280" height="800" loading="lazy" }
 </div>
 </div>
 
 <div class="showcase-center" markdown>
 
-## And why all of it is better off with you
+## Und warum das alles bei dir besser aufgehoben ist
 
 </div>
 
 <div class="showcase-cards" markdown>
 <div markdown>
-**🇪🇺 Your files stay with you**
+**🇪🇺 Deine Dateien bleiben bei dir**
 
-On your server, or with the desktop app on your own computer. No US cloud, no telemetry. GDPR
-without the headache.
+Auf deinem Server oder mit der Desktop-App auf deinem eigenen Rechner. Keine US-Cloud, keine
+Telemetrie. DSGVO ohne Bauchschmerzen.
 </div>
 <div markdown>
-**📄 Real Office files**
+**📄 Echte Office-Dateien**
 
-A .docx stays a .docx. Word, Excel and LibreOffice open everything as before – no format of its
-own, no lock-in.
+Eine .docx bleibt eine .docx. Word, Excel und LibreOffice öffnen alles wie vorher – kein
+eigenes Format, kein Lock-in.
 </div>
 <div markdown>
-**💶 No cost per head**
+**💶 Keine Kosten pro Kopf**
 
-No subscription per user. The whole team works along, however big it gets.
+Kein Abo pro Benutzer. Das ganze Team arbeitet mit, egal wie groß es wird.
 </div>
 <div markdown>
-**🧾 E-invoices**
+**🧾 E-Rechnungen**
 
-ZUGFeRD invoices straight from the invoice document; e-invoices inside PDFs are read and shown.
+ZUGFeRD-Rechnungen direkt aus dem Rechnungsdokument; E-Rechnungen in PDFs werden gelesen und
+angezeigt.
 </div>
 <div markdown>
-**🖥️ Also as a desktop app**
+**🖥️ Auch als Desktop-App**
 
-For Windows, macOS and Linux – with the files in your own Documents folder, no server at all.
+Für Windows, macOS und Linux – mit den Dateien im eigenen Dokumente-Ordner, ganz ohne Server.
 </div>
 <div markdown>
-**🤖 AI, if you want it**
+**🤖 KI, wenn du willst**
 
-Claude and other assistants find, read and write your files with your rights. Changes to an open
-document need your approval.
+Claude und andere Assistenten finden, lesen und schreiben deine Dateien mit deinen Rechten.
+Änderungen an einem offenen Dokument brauchen deine Zustimmung.
 </div>
 <div markdown>
-**✉️ Goes with Kontext**
+**✉️ Passt zu Kontext**
 
-Together with [Kontext](https://kontext.email/en/), your documents sit next to
-mail, calendar and chat – with one sign-in.
+Zusammen mit [Kontext](https://kontext.email/) die Dokumente neben
+Mail, Kalender und Chat – mit einer Anmeldung.
 </div>
 <div markdown>
 **🔓 Open Source**
 
-Open source code, built on the Euro-Office engine.
+Offener Quellcode, gebaut auf der Euro-Office-Engine.
 </div>
 </div>
 
 <div class="showcase-hero" markdown>
 
-## Office for businesses that work instead of counting licences
+## Office für Betriebe, die arbeiten, statt Lizenzen zu zählen
 
-<p class="showcase-claim">Trades · law firms and practices · freelancers · small and mid-sized
-businesses. Made in Europe.</p>
+<p class="showcase-claim">Handwerk · Kanzleien und Praxen · Selbstständige · kleine und mittlere
+Betriebe. Made in Europe.</p>
 
-[Every feature in detail](overview.md){ .md-button .md-button--primary } [Mail, calendar and chat with Kontext](https://kontext.email/en/){ .md-button }
+[Alle Funktionen im Detail](overview.md){ .md-button .md-button--primary } [Mail, Kalender und Chat mit Kontext](https://kontext.email/){ .md-button }
 
 </div>

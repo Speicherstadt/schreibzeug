@@ -7,6 +7,9 @@ installers: the [releases](https://github.com/Speicherstadt/schreibzeug/releases
 
 ## Unreleased
 
+- **Documentation in German only**: [schreibzeug.app](https://schreibzeug.app/) and the README are
+  now German only; the English pages are gone. Links to the former German pages under `/de/` lead
+  to the same page. The app itself stays in German and English.
 - **Saving to an archive**: with the new settings `SCHREIBZEUG_ARCHIVE_URL` and
   `SCHREIBZEUG_ARCHIVE_TOKEN` (and optionally `SCHREIBZEUG_ARCHIVE_NAME`), "Datei → Im Archiv
   ablegen …" sends the saved version of a document as PDF/A, and on request the Office file too, to

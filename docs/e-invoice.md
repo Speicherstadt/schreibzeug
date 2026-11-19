@@ -1,70 +1,75 @@
-# E-invoices
+# E-Rechnungen { #e-invoices }
 
-Since 2025 German businesses must be able to receive e-invoices; from 2027 the larger ones, and from
-2028 all of them, have to send them. A ZUGFeRD invoice is both kinds at once: a PDF for people, with the invoice for machines
-attached as XML. Schreibzeug reads them ([PDFs](pdf.md#e-invoices-zugferd)) and makes them from a
-text document.
+Seit 2025 müssen deutsche Unternehmen E-Rechnungen empfangen können; ab 2027 müssen die größeren
+und ab 2028 alle sie auch verschicken. Eine ZUGFeRD-Rechnung ist beides zugleich: ein PDF für
+Menschen, mit der Rechnung für Maschinen als angehängtem XML. Schreibzeug liest sie
+([PDFs](pdf.md#e-invoices-zugferd)) und erstellt sie aus einem Textdokument.
 
-## Making one from a Word invoice
+## Aus einer Word-Rechnung erstellen { #making-one-from-a-word-invoice }
 
-"Datei → Als E-Rechnung (ZUGFeRD) …" in the text editor opens a dialog with the invoice's data,
-read from the document: number, dates, seller and recipient, the lines, the VAT rate, bank details.
-The person checks and completes them; "E-Rechnung erstellen" downloads `<Name> (E-Rechnung).pdf`.
+„Datei → Als E-Rechnung (ZUGFeRD) …“ im Texteditor öffnet einen Dialog mit den Daten der Rechnung,
+aus dem Dokument gelesen: Nummer, Daten, Verkäufer und Empfänger, die Positionen, der
+Umsatzsteuersatz, die Bankverbindung. Die Person prüft und ergänzt sie; „E-Rechnung erstellen“ lädt
+`<Name> (E-Rechnung).pdf` herunter.
 
-What happens, in `apps/web/src/editor/use-e-invoice.tsx`:
+Was geschieht, in `apps/web/src/editor/use-e-invoice.tsx`:
 
-1. The document as it is now (`editor.save()`, the .docx) is read as text: `packages/ooxml`
-   `docxContent` gives its paragraphs and tables, headers and footers included.
-2. `packages/einvoice` `draftFromDocument` reads the invoice from that text, the way German
-   invoices lay it out and Schreibzeug's invoice template has it (DIN 5008): the sender's line
-   above the address field is the seller, the address field the recipient, "Rechnungsnummer",
-   "Rechnungsdatum", "Leistungszeitraum" and "bis zum …" the details, the first table with a
-   description and a price column the lines (without its rows of sums), "Umsatzsteuer 19 %" the
-   rate (and "§ 19 UStG" a small business without VAT), "Steuernummer", "USt-IdNr.", "IBAN" and
-   "BIC" in the footer the seller's. A template's placeholders ("[Nr.]") count as empty. Nothing is
-   guessed: what is not found stays empty for the dialog.
-3. The dialog (`e-invoice-dialog.tsx`) shows that as a form and computes the sums as the XML will
-   have them. If the document states a total ("Rechnungsbetrag") that differs from what the lines
-   add up to, it says so: the e-invoice contains the lines as they are in the dialog, and a
-   recipient's software checks the XML, not the page. `draftProblems` names what an EN 16931
-   invoice needs and is missing before anything is made. The seller's details can be remembered in
-   the browser (localStorage) for the next invoice.
-4. `facturXml` writes the invoice as Factur-X / ZUGFeRD 2 in the EN 16931 profile ("COMFORT"):
-   UN/CEFACT CII D16B, the amounts computed in cents as integers, the VAT once per rate from its base
-   (BR-CO-17). Regular VAT is category S (Z at 0 %); a small business is E with the exemption reason
-   § 19 UStG requires, and its Steuernummer becomes the seller's ID where there is no VAT ID
-   (BR-CO-26). Payment is a SEPA transfer (code 58) to the IBAN.
-5. The document is exported as PDF/A ([PDF/A](pdf.md#pdfa)), and `zugferdPdf` makes it a ZUGFeRD
-   invoice with pdf-lib: `factur-x.xml` attached with `/AFRelationship /Alternative` and listed in
-   the catalog's `/AF`, the XMP metadata rewritten to PDF/A-3 with the Factur-X properties
-   (`fx:DocumentType` INVOICE, `fx:ConformanceLevel` EN 16931) and the PDF/A extension schema that
-   declares them, unfiltered, and the Info dictionary to match it. Producer and creator are
-   "Schreibzeug".
+1. Das Dokument, wie es jetzt ist (`editor.save()`, die .docx), wird als Text gelesen:
+   `packages/ooxml` `docxContent` liefert seine Absätze und Tabellen, mit Kopf- und Fußzeilen.
+2. `packages/einvoice` `draftFromDocument` liest die Rechnung aus diesem Text, so wie deutsche
+   Rechnungen sie anordnen und die Rechnungsvorlage von Schreibzeug sie hat (DIN 5008): Die
+   Absenderzeile über dem Anschriftfeld ist der Verkäufer, das Anschriftfeld der Empfänger,
+   „Rechnungsnummer“, „Rechnungsdatum“, „Leistungszeitraum“ und „bis zum …“ die Angaben, die erste
+   Tabelle mit einer Beschreibungs- und einer Preisspalte die Positionen (ohne ihre Summenzeilen),
+   „Umsatzsteuer 19 %“ der Satz (und „§ 19 UStG“ ein Kleinunternehmen ohne Umsatzsteuer),
+   „Steuernummer“, „USt-IdNr.“, „IBAN“ und „BIC“ in der Fußzeile die des Verkäufers. Die Platzhalter
+   einer Vorlage („[Nr.]“) zählen als leer. Nichts wird geraten: Was nicht gefunden wird, bleibt für
+   den Dialog leer.
+3. Der Dialog (`e-invoice-dialog.tsx`) zeigt das als Formular und berechnet die Summen so, wie das
+   XML sie haben wird. Nennt das Dokument einen Gesamtbetrag („Rechnungsbetrag“), der von der Summe
+   der Positionen abweicht, sagt er das: Die E-Rechnung enthält die Positionen so, wie sie im Dialog
+   stehen, und die Software eines Empfängers prüft das XML, nicht die Seite. `draftProblems` nennt,
+   was eine Rechnung nach EN 16931 braucht und was fehlt, bevor irgendetwas erstellt wird. Die
+   Angaben des Verkäufers lassen sich für die nächste Rechnung im Browser merken (localStorage).
+4. `facturXml` schreibt die Rechnung als Factur-X / ZUGFeRD 2 im Profil EN 16931 („COMFORT“):
+   UN/CEFACT CII D16B, die Beträge in Cent als ganze Zahlen berechnet, die Umsatzsteuer einmal pro
+   Satz aus ihrer Bemessungsgrundlage (BR-CO-17). Reguläre Umsatzsteuer ist Kategorie S (Z bei 0 %);
+   ein Kleinunternehmen ist E mit dem Befreiungsgrund, den § 19 UStG verlangt, und seine
+   Steuernummer wird zur Kennung des Verkäufers, wo es keine USt-IdNr. gibt (BR-CO-26). Die Zahlung
+   ist eine SEPA-Überweisung (Code 58) auf die IBAN.
+5. Das Dokument wird als PDF/A exportiert ([PDF/A](pdf.md#pdfa)), und `zugferdPdf` macht daraus mit
+   pdf-lib eine ZUGFeRD-Rechnung: `factur-x.xml` angehängt mit `/AFRelationship /Alternative` und im
+   `/AF` des Katalogs aufgeführt, die XMP-Metadaten auf PDF/A-3 umgeschrieben, mit den
+   Factur-X-Eigenschaften (`fx:DocumentType` INVOICE, `fx:ConformanceLevel` EN 16931) und dem
+   PDF/A-Erweiterungsschema, das sie deklariert, ungefiltert, und das Info-Dictionary passend dazu.
+   Producer und Creator sind „Schreibzeug“.
 
-Not yet: credit notes and corrections (a negative total is refused), allowances and charges (a
-line with a negative price, which BR-27 forbids, is refused),
-prepayments, currencies other than the euro, XRechnung (the CIUS for public buyers, which also
-needs the seller's contact and a Leitweg-ID) and UBL. Those are what Haben, the accounting app,
-writes; Schreibzeug turns a document into an invoice.
+Noch nicht: Gutschriften und Korrekturen (ein negativer Gesamtbetrag wird abgelehnt), Nachlässe und
+Zuschläge (eine Position mit negativem Preis, die BR-27 verbietet, wird abgelehnt), Anzahlungen,
+andere Währungen als der Euro, XRechnung (die CIUS für öffentliche Auftraggeber, die außerdem den
+Kontakt des Verkäufers und eine Leitweg-ID braucht) und UBL. Das ist es, was Haben, die
+Buchhaltungs-App, schreibt; Schreibzeug macht aus einem Dokument eine Rechnung.
 
-## Checked against the rules
+## Gegen die Regeln geprüft { #checked-against-the-rules }
 
-When this was written, the XML was checked against the CII schema and the EN 16931 business rules of
-the CEN validation artefacts (ConnectingEurope/eInvoicing-EN16931: `cii/schema`,
-`cii/xslt/EN16931-CII-validation.xslt`, run with SaxonJS): the sample invoice of
-`packages/einvoice/test` with regular VAT at two rates, as a small business, with a single day of
-service, without a bank account, with a 0 % line and a note, and the invoice the E2E test makes
-passed without a failed assertion. In CI, the job `einvoice` runs the validator of Mustang
-(ZUGFeRD/mustangproject, the open-source ZUGFeRD library) on the PDF `e2e/e-invoice.spec.ts` makes:
-XML schema and rules, and the PDF/A-3 with veraPDF.
+Als dies geschrieben wurde, wurde das XML gegen das CII-Schema und die Geschäftsregeln von EN 16931
+aus den CEN-Validierungsartefakten geprüft (ConnectingEurope/eInvoicing-EN16931: `cii/schema`,
+`cii/xslt/EN16931-CII-validation.xslt`, ausgeführt mit SaxonJS): Die Beispielrechnung aus
+`packages/einvoice/test` mit regulärer Umsatzsteuer zu zwei Sätzen, als Kleinunternehmen, mit einem
+einzigen Leistungstag, ohne Bankkonto, mit einer Position zu 0 % und einer Notiz, und die Rechnung,
+die der E2E-Test erstellt, bestanden ohne eine fehlgeschlagene Assertion. In der CI führt der Job
+`einvoice` den Validator von Mustang (ZUGFeRD/mustangproject, die Open-Source-Bibliothek für
+ZUGFeRD) auf dem PDF aus, das `e2e/e-invoice.spec.ts` erstellt: XML-Schema und Regeln und das
+PDF/A-3 mit veraPDF.
 
-## Tests
+## Tests { #tests }
 
-`packages/einvoice/test`: the sums and their rounding, the XML read back with the reader, the checks,
-the reading of documents (the filled-in template, an invoice of a small business with its bank in the
-footer, a document that is no invoice), German numbers and dates, and the ZUGFeRD PDF (attachment,
-`/AF`, XMP, Info). `packages/ooxml/test/docx-text.test.ts`: paragraphs, tables, nested tables,
-deleted text, headers and footers. `e2e/e-invoice.spec.ts` opens `test-files/rechnung.docx` (the
-invoice template filled in), checks what the dialog read, completes it, downloads the invoice and
-reads it back; a second test opens a document that is no invoice and checks what the dialog says
-is missing.
+`packages/einvoice/test`: die Summen und ihre Rundung, das XML, mit dem Reader zurückgelesen, die
+Prüfungen, das Lesen von Dokumenten (die ausgefüllte Vorlage, eine Rechnung eines
+Kleinunternehmens mit seiner Bank in der Fußzeile, ein Dokument, das keine Rechnung ist), deutsche
+Zahlen und Daten und das ZUGFeRD-PDF (Anhang, `/AF`, XMP, Info).
+`packages/ooxml/test/docx-text.test.ts`: Absätze, Tabellen, verschachtelte Tabellen, gelöschter
+Text, Kopf- und Fußzeilen. `e2e/e-invoice.spec.ts` öffnet `test-files/rechnung.docx` (die
+ausgefüllte Rechnungsvorlage), prüft, was der Dialog gelesen hat, ergänzt es, lädt die Rechnung
+herunter und liest sie zurück; ein zweiter Test öffnet ein Dokument, das keine Rechnung ist, und
+prüft, was laut Dialog fehlt.

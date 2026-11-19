@@ -1,42 +1,42 @@
-# Schreibzeug
+# Schreibzeug { #schreibzeug }
 
-Schreibzeug is a self-hosted, open-source office suite: documents, spreadsheets, presentations and
-PDFs, edited together in real time in the browser or in a desktop app for Windows, macOS and Linux.
-It uses the Euro-Office engine (the open-source fork of ONLYOFFICE) without a document server, and
-it keeps your files as what they are: .docx, .xlsx, .pptx, .odt, .ods, .odp and .pdf, and Markdown
-notes and text files (.md, .txt).
+Schreibzeug ist eine selbst gehostete Open-Source-Office-Suite: Dokumente, Tabellen, Präsentationen
+und PDFs, gemeinsam in Echtzeit bearbeitet, im Browser oder in einer Desktop-App für Windows, macOS
+und Linux. Es nutzt die Euro-Office-Engine (den Open-Source-Fork von ONLYOFFICE) ohne Document
+Server, und es lässt deine Dateien, was sie sind: .docx, .xlsx, .pptx, .odt, .ods, .odp und .pdf,
+dazu Markdown-Notizen und Textdateien (.md, .txt).
 
-A tour in pictures for customers and colleagues is the [start page](index.md); the
-[demo](https://schreibzeug.app/demo/) runs the editors in the browser with sample
-files, without a server ([how](development.md#the-demo)).
+Einen Rundgang in Bildern für Kunden und Kollegen bietet die [Startseite](index.md); die
+[Demo](https://schreibzeug.app/demo/) führt die Editoren mit Beispieldateien im
+Browser aus, ohne Server ([wie](development.md#the-demo)).
 
-![The Schreibzeug editor with a Word document open, toolbar above the page](screenshots/editor-light.png)
+![Der Schreibzeug-Editor mit einem geöffneten Word-Dokument, die Werkzeugleiste über der Seite](screenshots/editor-light.png)
 
-## Start here
-
-| | |
-|---|---|
-| [Installation](installation.md) | run the server with Docker: settings, reverse proxy, backups, updates, troubleshooting |
-| [Accounts and sharing](accounts.md) | sign-up, roles, sharing with accounts and by link |
-| [Sign-in through Kontext](kontext.md) | OpenID Connect, Schreibzeug as Kontext's "Dokumente" |
-| [Desktop app](desktop.md) | files on your computer without a server, or a window onto a server |
-
-## Using it
+## Hier anfangen { #start-here }
 
 | | |
 |---|---|
-| [Files and versions](files.md) | folders, uploads, versions, trash, search (API and MCP) and the files API |
-| [Collaboration](collaboration.md) | several people in one file, through the server's relay |
-| [PDFs](pdf.md) | forms, notes, signatures, OCR, pages, PDF/A |
-| [Markdown and text files](text.md) | notes with a live preview, kept in their own encoding and line endings |
-| [E-invoices](e-invoice.md) | ZUGFeRD and Factur-X: reading them, making them from an invoice |
-| [MCP server](mcp.md) | Claude Code and other AI assistants in your files |
-| [Accessibility](accessibility.md) | WCAG 2.2 AA as the goal, the menu bar by keyboard, the engine's screen reader support (Strg+Alt+Z) |
+| [Installation](installation.md) | den Server mit Docker betreiben: Einstellungen, Reverse Proxy, Backups, Updates, Fehlersuche |
+| [Konten und Teilen](accounts.md) | Registrierung, Rollen, Teilen mit Konten und per Link |
+| [Anmeldung über Kontext](kontext.md) | OpenID Connect, Schreibzeug als „Dokumente“ in Kontext |
+| [Desktop-App](desktop.md) | Dateien auf deinem Rechner ohne Server, oder ein Fenster zu einem Server |
 
-## How it is built
+## Benutzen { #using-it }
 
 | | |
 |---|---|
-| [Architecture](architecture.md) | the workspaces, the web app, screenshots and format fidelity |
-| [The editing engine](engine.md) | how the interface drives `sdkjs`, feature by feature |
-| [Development](development.md) | running it from source, checks, tests, releases |
+| [Dateien und Versionen](files.md) | Ordner, Hochladen, Versionen, Papierkorb, Suche (API und MCP) und die Dateien-API |
+| [Zusammenarbeit](collaboration.md) | mehrere Personen in einer Datei, über das Relay des Servers |
+| [PDFs](pdf.md) | Formulare, Notizen, Signaturen, OCR, Seiten, PDF/A |
+| [Markdown- und Textdateien](text.md) | Notizen mit Live-Vorschau, in ihrer eigenen Kodierung und mit ihren Zeilenenden erhalten |
+| [E-Rechnungen](e-invoice.md) | ZUGFeRD und Factur-X: sie lesen und aus einer Rechnung erstellen |
+| [MCP-Server](mcp.md) | Claude Code und andere KI-Assistenten in deinen Dateien |
+| [Barrierefreiheit](accessibility.md) | WCAG 2.2 AA als Ziel, die Menüleiste per Tastatur, die Screenreader-Unterstützung der Engine (Strg+Alt+Z) |
+
+## Wie es gebaut ist { #how-it-is-built }
+
+| | |
+|---|---|
+| [Architektur](architecture.md) | die Workspaces, die Web-App, Screenshots und Formattreue |
+| [Die Bearbeitungs-Engine](engine.md) | wie die Oberfläche `sdkjs` steuert, Funktion für Funktion |
+| [Entwicklung](development.md) | aus dem Quellcode starten, Prüfungen, Tests, Releases |

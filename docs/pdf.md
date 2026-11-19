@@ -1,223 +1,249 @@
-# PDFs
+# PDFs { #pdfs }
 
-Schreibzeug opens a PDF in the engine's PDF editor, in the browser, without a Document Server, and
-saves it as a PDF again. What can be done with it: fill in forms, add notes and text boxes, mark
-text (highlight, underline, strike out), draw freehand and shapes, sign, black out areas for good,
-turn, add and remove pages, append another PDF, save pages as a PDF of their own, print and
-download. How the engine reads and writes the file is in
-[the engine](engine.md#pdfs).
+Schreibzeug öffnet ein PDF im PDF-Editor der Engine, im Browser, ohne Document Server, und
+speichert es wieder als PDF. Was sich damit machen lässt: Formulare ausfüllen, Notizen und
+Textfelder hinzufügen, Text markieren (hervorheben, unterstreichen, durchstreichen), freihand und
+Formen zeichnen, unterschreiben, Bereiche endgültig schwärzen, Seiten drehen, einfügen und
+entfernen, ein weiteres PDF anhängen, Seiten als eigenes PDF speichern, drucken und herunterladen.
+Wie die Engine die Datei liest und schreibt, steht unter [Die Engine](engine.md#pdfs).
 
-On a phone held upright the pages get the whole width of the screen: the page thumbnails beside
-them are left out (a media query in `engine/frame/editor/pdf/main/index.html`, below the width the
-app takes for a phone, `apps/web/src/editor/use-mobile-view.ts`), and turning or removing a page
-acts on the page in view.
+Auf einem hochkant gehaltenen Telefon bekommen die Seiten die ganze Breite des Bildschirms: Die
+Seitenvorschauen daneben fallen weg (eine Media Query in
+`engine/frame/editor/pdf/main/index.html`, unterhalb der Breite, die die App für ein Telefon
+annimmt, `apps/web/src/editor/use-mobile-view.ts`), und Drehen oder Entfernen einer Seite wirkt auf
+die sichtbare Seite.
 
-## Opening and saving
+## Öffnen und Speichern { #opening-and-saving }
 
-A PDF opens like any other file: from the file list into `/edit/:id`, where the edit page picks the
-PDF view (`apps/web/src/editor/pdf-view.tsx`). `packages/editor-core` `openPdfDocument`
-(`src/pdf.ts`) hands the file's own bytes to the editor; there is no conversion. Saving asks the
-editor for its changes since the file was opened and lets x2t write them into that file
-(`savePdf`), so every save is a whole PDF and a new version on the server, as for Office files. A
-PDF without changes is saved as it is. "Datei → Herunterladen" downloads that PDF; "Drucken"
-prints it through the browser, as for Office files ([engine](engine.md#pdf-and-printing)).
+Ein PDF öffnet sich wie jede andere Datei: aus der Dateiliste nach `/edit/:id`, wo die
+Bearbeitungsseite die PDF-Ansicht wählt (`apps/web/src/editor/pdf-view.tsx`).
+`packages/editor-core` `openPdfDocument` (`src/pdf.ts`) übergibt dem Editor die eigenen Bytes der
+Datei; eine Umwandlung gibt es nicht. Beim Speichern fragt es den Editor nach seinen Änderungen
+seit dem Öffnen und lässt x2t sie in diese Datei schreiben (`savePdf`); jede Speicherung ist also
+ein ganzes PDF und eine neue Version auf dem Server, wie bei Office-Dateien. Ein PDF ohne
+Änderungen wird gespeichert, wie es ist. „Datei → Herunterladen“ lädt dieses PDF herunter;
+„Drucken“ druckt es über den Browser, wie bei Office-Dateien
+([Engine](engine.md#pdf-and-printing)).
 
-## Commenting, not designing
+## Kommentieren, nicht gestalten { #commenting-not-designing }
 
-The editor opens in commenting mode, as web-apps opens a PDF (`pdfeditor` `Main.js`: annotate,
-`asc_setRestriction(View)`). In it, forms are filled in, annotations added and pages turned, added
-and removed; the page content and the form's fields stay as they are. Without it the editor is the
-form designer: every field shows its name and a click selects the field to move it.
+Der Editor öffnet im Kommentiermodus, so wie web-apps ein PDF öffnet (`pdfeditor` `Main.js`:
+annotate, `asc_setRestriction(View)`). Darin werden Formulare ausgefüllt, Anmerkungen hinzugefügt
+und Seiten gedreht, eingefügt und entfernt; der Seiteninhalt und die Felder des Formulars bleiben,
+wie sie sind. Ohne ihn ist der Editor der Formular-Designer: Jedes Feld zeigt seinen Namen, und ein
+Klick wählt das Feld aus, um es zu verschieben.
 
-## The tools
+## Die Werkzeuge { #the-tools }
 
-| Tool | Engine call (pdf/api.js) |
+| Werkzeug | Aufruf der Engine (pdf/api.js) |
 |---|---|
-| select, move the page (hand) | `asc_setViewerTargetType("select" \| "hand")` |
-| highlight, underline, strike out | `SetMarkerFormat(ANNOTATIONS_TYPES.Highlight …, true, opacity, r, g, b)`, off: `SetMarkerFormat(undefined, false)`; the engine ends it with `asc_onMarkerFormatChanged` |
-| freehand | `asc_StartDrawInk(pen)`, off: `asc_StopInkDrawer()` |
-| rectangle, ellipse, line | `StartAddAnnot(ANNOTATIONS_TYPES.Square …, pen, true)`, off: `StartAddAnnot("", undefined, false)`; ended: `asc_onStartAddShapeChanged(false)` |
-| text box | `AddFreeTextAnnot(FREE_TEXT_INTENT_TYPE.freeText)` on the page in view |
-| note | `asc_addComment(data)`: the comments panel, as in the other editors; a note is a text annotation on the page in view |
-| black out | `SetRedactTool(true)` draws boxes; `ApplyRedact()` removes what is under them from the page (`drawingfile.wasm` `RedactPage`), and saving writes the page without it. The older versions of the file still hold the original, and anyone who may open the file may open them ([files](files.md)): share a blacked-out PDF as a new file (download it, or save the pages apart) |
-| turn, add, remove pages | `asc_RotatePage(±90, pages)`, `asc_AddPage(position)`, `asc_RemovePage(pages)` after `asc_CanRemovePages`; on the pages selected in the thumbnails (`getSelectedPages`), or the page in view |
-| undo, redo | `Undo()`, `Redo()`; `asc_onCanUndo`, `asc_onCanRedo` |
+| auswählen, Seite verschieben (Hand) | `asc_setViewerTargetType("select" \| "hand")` |
+| hervorheben, unterstreichen, durchstreichen | `SetMarkerFormat(ANNOTATIONS_TYPES.Highlight …, true, opacity, r, g, b)`, aus: `SetMarkerFormat(undefined, false)`; die Engine beendet es mit `asc_onMarkerFormatChanged` |
+| freihand | `asc_StartDrawInk(pen)`, aus: `asc_StopInkDrawer()` |
+| Rechteck, Ellipse, Linie | `StartAddAnnot(ANNOTATIONS_TYPES.Square …, pen, true)`, aus: `StartAddAnnot("", undefined, false)`; beendet: `asc_onStartAddShapeChanged(false)` |
+| Textfeld | `AddFreeTextAnnot(FREE_TEXT_INTENT_TYPE.freeText)` auf der sichtbaren Seite |
+| Notiz | `asc_addComment(data)`: die Kommentarleiste, wie in den anderen Editoren; eine Notiz ist eine Textanmerkung auf der sichtbaren Seite |
+| schwärzen | `SetRedactTool(true)` zeichnet Kästen; `ApplyRedact()` entfernt, was darunter liegt, von der Seite (`drawingfile.wasm` `RedactPage`), und beim Speichern wird die Seite ohne es geschrieben. Die älteren Versionen der Datei enthalten noch das Original, und jeder, der die Datei öffnen darf, darf auch sie öffnen ([Dateien](files.md)): Teile ein geschwärztes PDF als neue Datei (lad es herunter oder speichere die Seiten getrennt) |
+| Seiten drehen, einfügen, entfernen | `asc_RotatePage(±90, pages)`, `asc_AddPage(position)`, `asc_RemovePage(pages)` nach `asc_CanRemovePages`; auf den in den Vorschauen ausgewählten Seiten (`getSelectedPages`) oder der sichtbaren Seite |
+| rückgängig, wiederholen | `Undo()`, `Redo()`; `asc_onCanUndo`, `asc_onCanRedo` |
 
-## Signing
+## Unterschreiben { #signing }
 
-"Unterschreiben" opens a dialog (`apps/web/src/editor/signature-dialog.tsx`) to draw the signature
-with the mouse, a pen or a finger, or to take the last one used in this browser (kept as strokes in
-`localStorage`, only there). The strokes go on the page in view as an ink annotation, sharp at any
-size, about 6 cm wide (a tall drawing at most about 3 cm high) in the middle of what is in view,
-and can be moved and sized there
-(`packages/editor-core/src/pdf-signature.ts`). It is built the way the engine's document builder
-builds one (`pdf/apiBuilder.js` `Api.CreateInkAnnot`: annotation props, a solid border of the
-pen's width and colour, `SetInkPoints`), in one step of the history. It is a signature to look at,
-not a digital signature with a certificate.
+„Unterschreiben“ öffnet einen Dialog (`apps/web/src/editor/signature-dialog.tsx`), um die
+Unterschrift mit der Maus, einem Stift oder einem Finger zu zeichnen oder die zuletzt in diesem
+Browser benutzte zu nehmen (als Striche in `localStorage` gespeichert, nur dort). Die Striche kommen
+als Freihand-Anmerkung auf die sichtbare Seite, scharf in jeder Größe, etwa 6 cm breit (eine hohe
+Zeichnung höchstens etwa 3 cm hoch) in der Mitte des sichtbaren Bereichs, und lassen sich dort
+verschieben und in der Größe ändern (`packages/editor-core/src/pdf-signature.ts`). Sie wird so
+aufgebaut, wie der Dokument-Builder der Engine eine aufbaut (`pdf/apiBuilder.js`
+`Api.CreateInkAnnot`: Anmerkungseigenschaften, ein durchgezogener Rand in Breite und Farbe des
+Stifts, `SetInkPoints`), in einem Schritt des Verlaufs. Es ist eine Unterschrift zum Ansehen, keine
+digitale Signatur mit Zertifikat.
 
-A picture of a signature would be an image stamp, but this engine cannot make one:
-`CPDFDoc.AddStampAnnot` reads the stamp render an image stamp lacks and throws, and with that
-worked around, x2t's WebAssembly build stops on writing the stamp. So the dialog offers drawing
-only. Saving still hands the document's images to x2t in "media/" beside the change file, for
-changes that refer to pictures.
+Ein Bild einer Unterschrift wäre ein Bildstempel, aber diese Engine kann keinen erzeugen:
+`CPDFDoc.AddStampAnnot` liest die Stempeldarstellung, die einem Bildstempel fehlt, und wirft einen
+Fehler, und ist das umgangen, bleibt der WebAssembly-Build von x2t beim Schreiben des Stempels
+stehen. Der Dialog bietet deshalb nur das Zeichnen an. Beim Speichern übergibt es x2t trotzdem die
+Bilder des Dokuments in „media/“ neben der Änderungsdatei, für Änderungen, die sich auf Bilder
+beziehen.
 
-## Digital signatures
+## Digitale Signaturen { #digital-signatures }
 
-"Kommentieren → Digital signieren …" signs the PDF with the person's own certificate, a PKCS#12
-file (.p12, .pfx) and its password, in the browser; the certificate never leaves it (PKCS#12, RSA; not a qualified eIDAS
-signature).
-`packages/pdf-sign` does the work, without the engine:
+„Kommentieren → Digital signieren …“ signiert das PDF mit dem eigenen Zertifikat der Person, einer
+PKCS#12-Datei (.p12, .pfx) und ihrem Passwort, im Browser; das Zertifikat verlässt ihn nie
+(PKCS#12, RSA; keine qualifizierte eIDAS-Signatur).
+`packages/pdf-sign` erledigt die Arbeit, ohne die Engine:
 
-1. `readIdentity` opens the PKCS#12 file with node-forge (RSA keys; a wrong password is said as
-   such) and takes the certificate that belongs to the key, the others as its chain.
-2. `signPdf` saves the PDF once more with pdf-lib, with an invisible signature field and a
-   signature dictionary (`/Filter /Adobe.PPKLite /SubFilter /adbe.pkcs7.detached`, a /Contents of
-   16 KB of zeros, a /ByteRange of placeholders), then fills in the byte range around /Contents
-   and a detached PKCS#7 signature (RFC 2315, SHA-256, with content type, message digest and
-   signing time as signed attributes) over those bytes (ISO 32000-1 12.8).
-3. The PDF view stores the signed PDF as the newest version and opens it.
+1. `readIdentity` öffnet die PKCS#12-Datei mit node-forge (RSA-Schlüssel; ein falsches Passwort
+   wird als solches gemeldet) und nimmt das Zertifikat, das zum Schlüssel gehört, die anderen als
+   seine Kette.
+2. `signPdf` speichert das PDF mit pdf-lib noch einmal, mit einem unsichtbaren Signaturfeld und
+   einem Signaturverzeichnis (`/Filter /Adobe.PPKLite /SubFilter /adbe.pkcs7.detached`, ein
+   /Contents aus 16 KB Nullen, ein /ByteRange aus Platzhaltern), füllt dann den Byte-Bereich um
+   /Contents aus und eine abgetrennte PKCS#7-Signatur (RFC 2315, SHA-256, mit Inhaltstyp,
+   Nachrichten-Digest und Signaturzeit als signierten Attributen) über diese Bytes
+   (ISO 32000-1 12.8).
+3. Die PDF-Ansicht speichert das signierte PDF als neueste Version und öffnet es.
 
-`checkSignatures` reads every signature of a PDF: the digest of the byte ranges against the
-signed message digest, the RSA signature over the signed attributes with the certificate the
-signature carries, and whether the ranges reach the end of the file. It only reads a /ByteRange
-as signers write it (from the start of the file, ordered, inside the file, a gap of at most 128 KB
-of hex), checks at most 32 signatures, and calls a signature invalid when the gap is anything but
-one hex string with only zeros after the DER signature: nothing unsigned can ride along. /Reason
-and /Location are read from the signature dictionary's signed bytes, never from the gap; the
-signing time comes from the signed attributes. The view shows the result
-above the pages, with who signed, when and why; a self-signed certificate is called so, and the
-trust chain of other certificates is not checked. Once a signed PDF is changed, the view warns
-that saving breaks the signature: the engine writes the file anew. A PDF that is signed already
-is not signed a second time yet; that needs an incremental update, which pdf-lib does not write.
-Poppler's `pdfsig` takes the signatures as valid ("Signature is Valid", "Total document signed").
+`checkSignatures` liest jede Signatur eines PDFs: den Digest der Byte-Bereiche gegen den signierten
+Nachrichten-Digest, die RSA-Signatur über die signierten Attribute mit dem Zertifikat, das die
+Signatur mitbringt, und ob die Bereiche bis zum Ende der Datei reichen. Es liest einen /ByteRange
+nur so, wie Signierprogramme ihn schreiben (ab dem Anfang der Datei, geordnet, innerhalb der Datei,
+eine Lücke von höchstens 128 KB Hex), prüft höchstens 32 Signaturen und nennt eine Signatur
+ungültig, wenn die Lücke etwas anderes ist als ein Hex-String mit nur Nullen nach der
+DER-Signatur: Nichts Unsigniertes kann mitreisen. /Reason und /Location werden aus den signierten
+Bytes des Signaturverzeichnisses gelesen, nie aus der Lücke; die Signaturzeit kommt aus den
+signierten Attributen. Die Ansicht zeigt das Ergebnis über den Seiten, mit wer, wann und warum
+signiert hat; ein selbstsigniertes Zertifikat wird so genannt, und die Vertrauenskette anderer
+Zertifikate wird nicht geprüft. Sobald ein signiertes PDF geändert wird, warnt die Ansicht, dass
+das Speichern die Signatur bricht: Die Engine schreibt die Datei neu. Ein bereits signiertes PDF
+wird noch nicht ein zweites Mal signiert; das braucht ein inkrementelles Update, das pdf-lib nicht
+schreibt. Popplers `pdfsig` hält die Signaturen für gültig („Signature is Valid“, „Total document
+signed“).
 
-The signing code (node-forge and pdf-lib, about 700 KB before compression) loads when someone signs or opens a PDF with a
-signature, not with the app.
+Der Signier-Code (node-forge und pdf-lib, etwa 700 KB vor der Kompression) lädt, wenn jemand
+signiert oder ein PDF mit einer Signatur öffnet, nicht mit der App.
 
-## Pages between files
+## Seiten zwischen Dateien { #pages-between-files }
 
-"Seiten → PDF anhängen …" puts the pages of a PDF from the computer at the end, the way pages
-pasted into the thumbnails come in (`CPDFDoc.MergePagesBinary` in one history step); forms and
-annotations of both files stay. "Als neues PDF speichern" makes a PDF of the selected pages with
-what was changed on them (`CPDFDoc.GetPagesBinary`, which `drawingfile.wasm` `SplitPages` writes)
-and stores it beside the file as "<Name> – Seiten 1–2.pdf" (in "Meine Dateien" when the folder
-belongs to someone else).
+„Seiten → PDF anhängen …“ setzt die Seiten eines PDFs vom Rechner ans Ende, so wie in die
+Vorschauen eingefügte Seiten hereinkommen (`CPDFDoc.MergePagesBinary` in einem Schritt des
+Verlaufs); Formulare und Anmerkungen beider Dateien bleiben. „Als neues PDF speichern“ macht aus
+den ausgewählten Seiten mit dem, was auf ihnen geändert wurde, ein PDF
+(`CPDFDoc.GetPagesBinary`, das `drawingfile.wasm` `SplitPages` schreibt) und speichert es neben
+der Datei als „<Name> – Seiten 1–2.pdf“ (in „Meine Dateien“, wenn der Ordner jemand anderem
+gehört).
 
-## E-invoices (ZUGFeRD)
+## E-Rechnungen (ZUGFeRD) { #e-invoices-zugferd }
 
-A ZUGFeRD or Factur-X invoice is a PDF for people with the invoice for machines attached, as XML
-(CII; an XRechnung or a UBL invoice may come attached the same way). Opening such a PDF shows a card
-above it: the invoice's number and date, who sends it to whom, net, tax and total, what is due
-until when; "Details" adds the IBAN, the payment reference, the VAT ID, the period of service and
-the lines. "XML herunterladen" gives the attached XML as it is, for accounting software that
-wants it alone. The card says what the XML says, not what the page shows: changing the PDF does
-not change the invoice data, and the card says so.
+Eine ZUGFeRD- oder Factur-X-Rechnung ist ein PDF für Menschen, an das die Rechnung für Maschinen als
+XML angehängt ist (CII; eine XRechnung oder eine UBL-Rechnung kann auf dieselbe Weise angehängt
+sein). Wer ein solches PDF öffnet, sieht darüber eine Karte: Nummer und Datum der Rechnung, wer sie
+an wen schickt, netto, Steuer und Summe, was bis wann fällig ist; „Details“ ergänzt IBAN,
+Verwendungszweck, USt-IdNr., Leistungszeitraum und die Positionen. „XML herunterladen“ liefert das
+angehängte XML, wie es ist, für Buchhaltungssoftware, die es allein haben will. Die Karte zeigt,
+was das XML sagt, nicht was die Seite zeigt: Eine Änderung am PDF ändert die Rechnungsdaten nicht,
+und die Karte sagt das.
 
-`packages/einvoice` is taken from Haben (github.com/firsttris/haben, `packages/einvoice`,
-AGPL-3.0-only, the same author), without Node and with failures as values:
+`packages/einvoice` ist aus Haben übernommen (github.com/firsttris/haben, `packages/einvoice`,
+AGPL-3.0-only, derselbe Autor), ohne Node und mit Fehlern als Werten:
 
-- `extractEmbeddedXml` looks through the `EmbeddedFiles` name tree, the catalog's `/AF` (PDF/A-3)
-  and, failing both, any file specification, and prefers `factur-x.xml`, `zugferd-invoice.xml`
-  and `xrechnung.xml` to other XML attachments. An attachment is unpacked to 32 MB at most.
-- `readInvoiceXml` reads CII (ZUGFeRD 1 and 2, Factur-X, XRechnung CII) and UBL (Invoice,
-  CreditNote) with fast-xml-parser, namespace prefixes removed; amounts in cents as integers,
-  credit notes negative. XML it cannot read gives the reason, and the card shows it beside the
-  download.
+- `extractEmbeddedXml` sucht im Namensbaum `EmbeddedFiles`, in `/AF` des Katalogs (PDF/A-3) und,
+  wenn beides nichts ergibt, in jeder Dateispezifikation, und zieht `factur-x.xml`,
+  `zugferd-invoice.xml` und `xrechnung.xml` anderen XML-Anhängen vor. Ein Anhang wird auf höchstens
+  32 MB entpackt.
+- `readInvoiceXml` liest CII (ZUGFeRD 1 und 2, Factur-X, XRechnung CII) und UBL (Invoice,
+  CreditNote) mit fast-xml-parser, ohne Namensraum-Präfixe; Beträge in Cent als Ganzzahlen,
+  Gutschriften negativ. XML, das es nicht lesen kann, ergibt den Grund, und die Karte zeigt ihn
+  neben dem Download.
 
-Saving keeps the attachment: x2t writes the changes into the PDF itself (see "Opening and saving"), and
-`e2e/pdf-invoice.spec.ts` reads the invoice back from the stored file after turning a page.
-Making ZUGFeRD invoices from a text document is described in [E-invoices](e-invoice.md).
+Beim Speichern bleibt der Anhang: x2t schreibt die Änderungen in das PDF selbst (siehe „Öffnen und
+Speichern“), und `e2e/pdf-invoice.spec.ts` liest die Rechnung nach dem Drehen einer Seite aus der
+gespeicherten Datei zurück. Wie ZUGFeRD-Rechnungen aus einem Textdokument entstehen, steht unter
+[E-Rechnungen](e-invoice.md).
 
-## Text recognition
+## Texterkennung { #text-recognition }
 
-A scanned PDF is pictures of pages: its words can be neither searched nor copied. Opening one
-shows a notice above it ("Dieses PDF besteht nur aus Bildern …"), and "Text erkennen" there or in
-"Seiten → Text erkennen (OCR) …" recognises the text with [Tesseract](https://github.com/naptha/tesseract.js)
-(Apache-2.0) in a worker of the page, German and English, and stores the PDF as a new version.
-It looks as before; the text lies over the page, invisible, where its letters are.
+Ein gescanntes PDF besteht aus Bildern von Seiten: Seine Wörter lassen sich weder durchsuchen noch
+kopieren. Wer eines öffnet, sieht darüber einen Hinweis („Dieses PDF besteht nur aus Bildern …“),
+und „Text erkennen“ dort oder unter „Seiten → Text erkennen (OCR) …“ erkennt den Text mit
+[Tesseract](https://github.com/naptha/tesseract.js) (Apache-2.0) in einem Worker der Seite, Deutsch
+und Englisch, und speichert das PDF als neue Version. Es sieht aus wie vorher; der Text liegt
+unsichtbar über der Seite, dort, wo seine Buchstaben sind.
 
-- Which pages: `packages/pdf-ocr` `textlessPages` reads the saved PDF with pdf-lib and takes the
-  pages whose content, and the form XObjects it draws, shows no text (no `Tj`/`TJ` in a text
-  object). Pages with text stay as they are, so a second run finds nothing to do.
-- The page images: the engine draws each of those pages at 300 dpi, unrotated and without
-  annotations (`PageCommands.render` → pdf/src/file.js `CFile.getPage`); Tesseract gets them as PNG,
-  as its loader does not take the frame's canvases for canvases.
-- The text layer: `addTextLayer` sets each word in Helvetica, text rendering mode 3 (invisible,
-  ISO 32000-1 9.3.6), at the place and height of its box on the image and stretched to its width
-  (`Tz`), as OCRmyPDF does; Helvetica is not embedded, as invisible text is never drawn. Characters
-  WinAnsi has no code for become "?".
-- Nothing leaves the computer: tesseract.js would load its core and the language models from a CDN;
-  `apps/web/ocr-plugin.ts` serves them from the app at `/ocr` instead (the core builds with and
-  without SIMD, `tessdata_best` integer models of `deu` and `eng`, about 16 MB in all), and the
-  desktop app has them offline. They load when text is recognised, not with the app.
+- Welche Seiten: `packages/pdf-ocr` `textlessPages` liest das gespeicherte PDF mit pdf-lib und nimmt
+  die Seiten, deren Inhalt, samt den Form-XObjects, die er zeichnet, keinen Text zeigt (kein
+  `Tj`/`TJ` in einem Textobjekt). Seiten mit Text bleiben, wie sie sind, ein zweiter Durchlauf
+  findet also nichts zu tun.
+- Die Seitenbilder: Die Engine zeichnet jede dieser Seiten mit 300 dpi, ungedreht und ohne
+  Anmerkungen (`PageCommands.render` → pdf/src/file.js `CFile.getPage`); Tesseract bekommt sie als
+  PNG, weil sein Loader die Canvas-Elemente des Frames nicht als Canvas erkennt.
+- Die Textebene: `addTextLayer` setzt jedes Wort in Helvetica, Textdarstellungsmodus 3
+  (unsichtbar, ISO 32000-1 9.3.6), an Ort und Höhe seines Kastens im Bild und auf dessen Breite
+  gestreckt (`Tz`), wie OCRmyPDF es macht; Helvetica wird nicht eingebettet, da unsichtbarer Text
+  nie gezeichnet wird. Zeichen, für die WinAnsi keinen Code hat, werden zu „?“.
+- Nichts verlässt den Rechner: tesseract.js würde seinen Kern und die Sprachmodelle von einem CDN
+  laden; `apps/web/ocr-plugin.ts` liefert sie stattdessen aus der App unter `/ocr` aus (der Kern
+  gebaut mit und ohne SIMD, `tessdata_best`-Integer-Modelle von `deu` und `eng`, zusammen etwa
+  16 MB), und die Desktop-App hat sie offline. Sie laden, wenn Text erkannt wird, nicht mit der App.
 
-A digitally signed PDF is not changed: the text layer would break the signature.
+Ein digital signiertes PDF wird nicht geändert: Die Textebene würde die Signatur brechen.
 
-## PDF/A
+## PDF/A { #pdfa }
 
-"Datei → Als PDF/A herunterladen" gives the PDF with the changes made as PDF/A-2 for archiving,
-as "<Name> (PDF-A).pdf"; the stored file stays as it is. x2t draws the PDF anew into a PDF/A
-(`X2tConverter/src/lib/pdf_image.h`: with `m_bIsPDFA` a PDF is not copied to a PDF), with the
-change file applied first, as when saving, and the fonts the engine drew it with in `m_sFontDir`
-(`print.ts`). Text documents, spreadsheets and presentations have the same menu item (`docs/engine.md`).
+„Datei → Als PDF/A herunterladen“ liefert das PDF mit den vorgenommenen Änderungen als PDF/A-2 für
+die Archivierung, als „<Name> (PDF-A).pdf“; die gespeicherte Datei bleibt, wie sie ist. x2t
+zeichnet das PDF neu in ein PDF/A (`X2tConverter/src/lib/pdf_image.h`: mit `m_bIsPDFA` wird ein PDF
+nicht in ein PDF kopiert), wobei die Änderungsdatei zuerst angewendet wird, wie beim Speichern, und
+die Schriften, mit denen die Engine es gezeichnet hat, in `m_sFontDir` liegen (`print.ts`).
+Textdokumente, Tabellen und Präsentationen haben denselben Menüpunkt (`docs/engine.md`).
 
-The PDF/A embeds every font, as it has to. One limit: a PDF that leaves out one of the 14 standard
-fonts (Helvetica, Times, Courier and their styles, which a reader brings along) is drawn with the
-converter's own copies of them, which are Type 1 fonts, and x2t embeds only TrueType, OpenType and
-CFF fonts (`PdfFile/PdfWriter.cpp` `GetFont`); the text in those fonts becomes outlines: it looks
-the same but cannot be searched or copied. Text in fonts the PDF embeds stays text.
+Das PDF/A bettet jede Schrift ein, wie es muss. Eine Grenze: Ein PDF, das eine der 14
+Standardschriften weglässt (Helvetica, Times, Courier und ihre Schnitte, die ein Reader
+mitbringt), wird mit den eigenen Kopien des Konverters gezeichnet, und das sind Type-1-Schriften;
+x2t bettet aber nur TrueType-, OpenType- und CFF-Schriften ein (`PdfFile/PdfWriter.cpp`
+`GetFont`), der Text in diesen Schriften wird also zu Umrissen: Er sieht gleich aus, lässt sich
+aber nicht durchsuchen oder kopieren. Text in Schriften, die das PDF einbettet, bleibt Text.
 
-## Pens
+## Stifte { #pens }
 
-Pens are `asc_CStroke` objects as web-apps builds them (`Toolbar.js` `onInsertShapeComment`): a
-solid colour, a width in millimetres, opaque. One tool is on at a time; switching ends the one
-before the way it was started. The last page cannot be removed; the toolbar says so.
+Stifte sind `asc_CStroke`-Objekte, so wie web-apps sie baut (`Toolbar.js`
+`onInsertShapeComment`): eine Vollfarbe, eine Breite in Millimetern, deckend. Es ist immer nur ein
+Werkzeug an; ein Wechsel beendet das vorige so, wie es gestartet wurde. Die letzte Seite lässt sich
+nicht entfernen; die Werkzeugleiste sagt das.
 
-## Typing into forms
+## In Formulare tippen { #typing-into-forms }
 
-The editor finds a font for every new character and loads it while typing. Until it is there, a
-form field takes no keys (`pdf/src/document.js` `getTextController` → `checkFieldFont`), so the
-second key of someone typing fast went missing. When a PDF opens, `preloadTypingFonts` lets the
-font picker collect the fonts for the characters of German and English text and loads them, as the
-first key would. Tab moves to the next field.
+Der Editor sucht für jedes neue Zeichen eine Schrift und lädt sie beim Tippen. Bis sie da ist,
+nimmt ein Formularfeld keine Tasten an (`pdf/src/document.js` `getTextController` →
+`checkFieldFont`), sodass bei schnellem Tippen die zweite Taste verloren ging. Wenn ein PDF sich
+öffnet, lässt `preloadTypingFonts` die Schriftauswahl die Schriften für die Zeichen deutscher und
+englischer Texte sammeln und lädt sie, wie es die erste Taste täte. Tab springt zum nächsten Feld.
 
-A form's JavaScript (format, keystroke, calculation and link actions) does not run, so a field
-another program formats by script shows its plain value; the scripts stay in the saved PDF
-([code in documents](engine.md#code-in-documents-does-not-run)).
+Das JavaScript eines Formulars (Format-, Tastendruck-, Berechnungs- und Link-Aktionen) läuft
+nicht; ein Feld, das ein anderes Programm per Skript formatiert, zeigt also seinen rohen Wert; die
+Skripte bleiben im gespeicherten PDF erhalten
+([Code in Dokumenten](engine.md#code-in-documents-does-not-run)).
 
-## Together
+## Gemeinsam { #together }
 
-Several people edit a PDF at once, as an Office file: the PDF view opens in the file's editing
-session ([collaboration](collaboration.md)), the PDF editor sends its changes through the relay
-and replays the others' (pdf/src/CollaborativeEditing.js), and any save writes everyone's changes
-into the PDF the session started from. Notes, markings, form values and page operations of one
-show up for the others.
+Mehrere Leute bearbeiten ein PDF gleichzeitig, wie eine Office-Datei: Die PDF-Ansicht öffnet sich
+in der Bearbeitungssitzung der Datei ([Zusammenarbeit](collaboration.md)), der PDF-Editor schickt
+seine Änderungen über das Relay und spielt die der anderen ein (pdf/src/CollaborativeEditing.js),
+und jede Speicherung schreibt die Änderungen aller in das PDF, mit dem die Sitzung begann. Notizen,
+Markierungen, Formularwerte und Seitenoperationen des einen erscheinen bei den anderen.
 
-Typing into a form field takes the field's lock from the relay for every key: the PDF editor
-checks the lock without the fast-mode exception the text editor uses (`CPDFDoc.Document_Is_
-SelectionLocked` → `CollaborativeEditing.Get_GlobalLock`), and keys that come while a request is
-on its way are dropped. At a person's pace on a nearby server that does not happen; on a slow
-connection someone who types very fast can lose a character in a shared form.
+Tippen in ein Formularfeld holt sich für jede Taste die Sperre des Felds vom Relay: Der PDF-Editor
+prüft die Sperre ohne die Ausnahme für den schnellen Modus, die der Texteditor benutzt
+(`CPDFDoc.Document_Is_
+SelectionLocked` → `CollaborativeEditing.Get_GlobalLock`), und Tasten, die kommen, während eine
+Anfrage unterwegs ist, gehen verloren. Im Tempo eines Menschen auf einem nahen Server passiert das
+nicht; über eine langsame Verbindung kann jemand, der sehr schnell tippt, in einem gemeinsamen
+Formular ein Zeichen verlieren.
 
-## Tests
+## Tests { #tests }
 
-`e2e/pdf-sign.spec.ts` signs through the app with a certificate made for the test (a wrong
-password first), checks the stored file and the warning after a change; `packages/pdf-sign/test`
-signs and checks below the app, also a changed byte, bytes added after signing, data planted in
-the padding of /Contents, a range past the end of the file and thousands of junk /ByteRange entries.
-`e2e/pdf-invoice.spec.ts` opens `test-files/rechnung.pdf` (a ZUGFeRD invoice written by
-`test-files/rechnung.ts`), checks the card and the XML download, and that saving keeps the invoice;
-`packages/einvoice/test` reads CII, ZUGFeRD 2 BASIC WL, UBL and a UBL credit note and finds the
-XML among other attachments. `e2e/pdf-ocr.spec.ts` uploads a scan made in the browser (text drawn into a PNG), recognises its
-text through the notice and checks the stored text layer and that a second run has nothing to do;
-`packages/pdf-ocr/test` checks which pages count as textless and where the words go, and
-`apps/web/src/editor/ocr.test.ts` the run over the pages. `e2e/pdf-a.spec.ts` downloads a text document and an edited PDF as PDF/A and checks the
-conformance in the XMP metadata, the output intent, and that every font is embedded with a
-ToUnicode map. `e2e/pdf-engine.spec.ts` checks the engine below the app; `e2e/pdf-together.spec.ts` has two
-people fill in and comment the same PDF. `e2e/pdf.spec.ts` works through the app
-with `test-files/formular.pdf`: turn a page and add one, fill in both fields (typed at once, Tab to
-the next), remove a page and not the last, add a note and a drawing, highlight, black out a
-heading, sign with a drawn signature, append `test-files/anhang.pdf`, save a page as a PDF of its
-own. Each test reads the saved file back with pdf-lib: pages, rotation, field values,
-annotations, and the text left on the page. `packages/editor-core/test/pdf.test.ts` checks the
-calls the commands make.
+`e2e/pdf-sign.spec.ts` signiert über die App mit einem für den Test erzeugten Zertifikat (zuerst
+mit einem falschen Passwort), prüft die gespeicherte Datei und die Warnung nach einer Änderung;
+`packages/pdf-sign/test` signiert und prüft unterhalb der App, auch ein geändertes Byte, nach dem
+Signieren angehängte Bytes, in der Auffüllung von /Contents versteckte Daten, einen Bereich über
+das Dateiende hinaus und Tausende unsinnige /ByteRange-Einträge.
+`e2e/pdf-invoice.spec.ts` öffnet `test-files/rechnung.pdf` (eine ZUGFeRD-Rechnung, geschrieben von
+`test-files/rechnung.ts`), prüft die Karte und den XML-Download und dass beim Speichern die
+Rechnung erhalten bleibt; `packages/einvoice/test` liest CII, ZUGFeRD 2 BASIC WL, UBL und eine
+UBL-Gutschrift und findet das XML unter anderen Anhängen. `e2e/pdf-ocr.spec.ts` lädt einen im
+Browser erzeugten Scan hoch (Text in ein PNG gezeichnet), erkennt seinen Text über den Hinweis und
+prüft die gespeicherte Textebene und dass ein zweiter Durchlauf nichts zu tun hat;
+`packages/pdf-ocr/test` prüft, welche Seiten als textlos gelten und wohin die Wörter kommen, und
+`apps/web/src/editor/ocr.test.ts` den Durchlauf über die Seiten. `e2e/pdf-a.spec.ts` lädt ein
+Textdokument und ein bearbeitetes PDF als PDF/A herunter und prüft die Konformität in den
+XMP-Metadaten, den Output Intent und dass jede Schrift mit einer ToUnicode-Tabelle eingebettet ist.
+`e2e/pdf-engine.spec.ts` prüft die Engine unterhalb der App; in `e2e/pdf-together.spec.ts` füllen
+zwei Leute dasselbe PDF aus und kommentieren es. `e2e/pdf.spec.ts` arbeitet sich mit
+`test-files/formular.pdf` durch die App: eine Seite drehen und eine einfügen, beide Felder
+ausfüllen (sofort getippt, mit Tab zum nächsten), eine Seite entfernen und die letzte nicht, eine
+Notiz und eine Zeichnung hinzufügen, hervorheben, eine Überschrift schwärzen, mit einer
+gezeichneten Unterschrift unterschreiben, `test-files/anhang.pdf` anhängen, eine Seite als eigenes
+PDF speichern. Jeder Test liest die gespeicherte Datei mit pdf-lib zurück: Seiten, Drehung,
+Feldwerte, Anmerkungen und den Text, der auf der Seite übrig ist.
+`packages/editor-core/test/pdf.test.ts` prüft die Aufrufe, die die Befehle machen.
