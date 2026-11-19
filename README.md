@@ -17,12 +17,12 @@ Editing together in real time, in the browser or as a desktop app. No document s
 [![License: AGPL-3.0](https://img.shields.io/badge/license-AGPL--3.0-blue)](LICENSE)
 [![Desktop](https://img.shields.io/badge/desktop-Windows%20%7C%20macOS%20%7C%20Linux-lightgrey)](https://github.com/Speicherstadt/schreibzeug/releases/latest)
 
-[Why](#-why-schreibzeug) •
-[Install](#-install) •
-[Features](#-features) •
-[Screenshots](#-screenshots) •
-[Alternatives](#-schreibzeug-and-the-alternatives) •
-[FAQ](#-faq) •
+[Why](#why-schreibzeug) •
+[Install](#quick-start) •
+[Features](#features) •
+[Screenshots](#screenshots) •
+[Alternatives](#schreibzeug-and-the-alternatives) •
+[FAQ](#faq) •
 [Documentation](https://schreibzeug.app/) •
 [Deutsch](README.de.md)
 
@@ -140,6 +140,8 @@ http://localhost:3000. Settings, your own reverse proxy, backups and updates are
 [installation guide](https://schreibzeug.app/installation.html).
 The desktop app is described under [Desktop app](https://schreibzeug.app/desktop.html); its installers for Windows, macOS and Linux are attached to every [release](https://github.com/Speicherstadt/schreibzeug/releases).
 
+No server or IT of your own? Schreibzeug is available hosted or through an IT service provider from the [partner programme](https://speicherstadt.app/en/partner/).
+
 ## FAQ
 
 <details>
@@ -208,11 +210,11 @@ Everything in detail, with search: **[schreibzeug.app](https://schreibzeug.app/)
 
 [![TypeScript](https://img.shields.io/badge/TypeScript-3178c6?logo=typescript&logoColor=white)](https://www.typescriptlang.org)
 [![Bun](https://img.shields.io/badge/Bun-000000?logo=bun&logoColor=white)](https://bun.sh)
+[![Hono](https://img.shields.io/badge/Hono-e36002?logo=hono&logoColor=white)](https://hono.dev)
 [![React](https://img.shields.io/badge/React-149eca?logo=react&logoColor=white)](https://react.dev)
 [![TanStack](https://img.shields.io/badge/TanStack-Router%20%7C%20Query-ff4154?logo=reactquery&logoColor=white)](https://tanstack.com)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind%20CSS-06b6d4?logo=tailwindcss&logoColor=white)](https://tailwindcss.com)
 [![Vite](https://img.shields.io/badge/Vite-646cff?logo=vite&logoColor=white)](https://vite.dev)
-[![Hono](https://img.shields.io/badge/Hono-e36002?logo=hono&logoColor=white)](https://hono.dev)
 [![SQLite](https://img.shields.io/badge/SQLite-Drizzle-003b57?logo=sqlite&logoColor=white)](https://orm.drizzle.team)
 [![Tauri](https://img.shields.io/badge/Tauri-24c8db?logo=tauri&logoColor=white)](https://tauri.app)
 
@@ -258,7 +260,8 @@ Security problems please report privately ([SECURITY.md](SECURITY.md)).
 [Report a bug](https://github.com/Speicherstadt/schreibzeug/issues/new?template=bug_report.yml) &nbsp;·&nbsp; [Request a feature](https://github.com/Speicherstadt/schreibzeug/issues/new?template=feature_request.yml)
 
 <sub>License: <a href="LICENSE">AGPL-3.0</a> · © Tristan Teufel and contributors · <a href="README.de.md">Deutsche Version</a><br>
-Changed versions you pass on or run for others must offer their source code under the AGPL. For IT service providers: partnership with a direct line to the developers, plus setup and support via <a href="https://teufel-it.de">teufel-it.de</a>.<br>
+Changed versions you pass on or run for others must offer their source code under the AGPL.<br>
+For IT service providers and hosters: <a href="https://speicherstadt.app/en/partner/">partner programme</a>.<br>
 Schreibzeug builds on the open-source Euro-Office engine and is not affiliated with Euro-Office, ONLYOFFICE, Collabora, CryptPad, Microsoft or Google; the names are trademarks of their owners.</sub>
 
 </div>
