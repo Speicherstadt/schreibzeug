@@ -217,7 +217,7 @@ Mail, Kalender und Chat – mit einer Anmeldung.
 <div markdown>
 **🔓 Open Source**
 
-Offener Quellcode, gebaut auf der europäischen Euro-Office-Engine.
+Offener Quellcode, gebaut auf der Euro-Office-Engine.
 </div>
 </div>
 

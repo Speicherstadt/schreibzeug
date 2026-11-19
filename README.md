@@ -36,15 +36,13 @@ Cloud office suites keep your documents on someone else's servers and charge per
 Self-hosted office suites usually need a separate document server next to Nextcloud. Schreibzeug
 is one small server with its own interface and file management.
 
-- **Made in Europe, for Europe**: developed in Europe, open source, on Euro-Office's European
-  engine and your server. No US provider in between, so no access to your files under the US
-  CLOUD Act.
-- **Your files stay with you (GDPR)**: documents live on your server, or with the desktop app on
-  your own computer. No US cloud, no third-party document server, no telemetry.
+- **Digital sovereignty (GDPR)**: your documents live on your server, or with the desktop app on
+  your own computer. No US provider in between, so the US CLOUD Act doesn't reach your files; no
+  third-party document server, no telemetry, and open source, so nobody can take it away from you.
 - **Real Office files**: a .docx stays a .docx, an .xlsx an .xlsx, an .odt an .odt – Word, Excel
   and LibreOffice open them as before.
-- **Mature compatibility**: the editing engine is Euro-Office, the European open-source fork of
-  ONLYOFFICE, so tables, tracked changes, comments, charts and pivot tables come through intact.
+- **Mature compatibility**: the editing engine is Euro-Office, the open-source fork of ONLYOFFICE,
+  so tables, tracked changes, comments, charts and pivot tables come through intact.
 - **Editing together in real time**: several people in the same file with live cursors and
   comments, without a document server.
 - **E-invoices**: ZUGFeRD invoices straight from an invoice document, and e-invoices in PDFs read

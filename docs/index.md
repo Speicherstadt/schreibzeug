@@ -216,7 +216,7 @@ mail, calendar and chat – with one sign-in.
 <div markdown>
 **🔓 Open Source**
 
-Open source code, built on the European Euro-Office engine.
+Open source code, built on the Euro-Office engine.
 </div>
 </div>
 

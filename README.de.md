@@ -35,16 +35,14 @@ Office-Pakete aus der Cloud halten deine Dokumente auf fremden Servern und koste
 Selbst gehostete Office-Pakete brauchen meist einen eigenen Dokumentenserver neben Nextcloud.
 Schreibzeug ist ein kleiner Server mit eigener Oberfläche und eigener Dateiverwaltung.
 
-- **Aus Europa, für Europa**: in Europa entwickelt, Open Source, auf der europäischen Engine
-  Euro-Office und deinem Server. Kein US-Anbieter dazwischen, also auch kein Zugriff auf deine
-  Dateien über den US CLOUD Act.
-- **Deine Dateien bleiben bei dir (DSGVO)**: Dokumente liegen auf deinem Server oder mit der
-  Desktop-App auf deinem eigenen Rechner. Keine US-Cloud, kein fremder Dokumentenserver, keine
-  Telemetrie.
+- **Digitale Souveränität (DSGVO)**: Deine Dokumente liegen auf deinem Server oder mit der
+  Desktop-App auf deinem eigenen Rechner. Kein US-Anbieter dazwischen, also kein Zugriff über den
+  US CLOUD Act; kein fremder Dokumentenserver, keine Telemetrie, und Open Source, also kann dir das
+  niemand wegnehmen.
 - **Echte Office-Dateien**: Eine .docx bleibt eine .docx, eine .xlsx eine .xlsx, eine .odt eine
   .odt – Word, Excel und LibreOffice öffnen sie wie vorher.
-- **Ausgereifte Kompatibilität**: Die Engine ist Euro-Office, der europäische Open-Source-Fork von
-  ONLYOFFICE; Tabellen, Änderungsverfolgung, Kommentare, Diagramme und Pivot-Tabellen kommen heil an.
+- **Ausgereifte Kompatibilität**: Die Engine ist Euro-Office, der Open-Source-Fork von ONLYOFFICE;
+  Tabellen, Änderungsverfolgung, Kommentare, Diagramme und Pivot-Tabellen kommen heil an.
 - **Gemeinsam in Echtzeit**: Mehrere Leute in derselben Datei, mit Cursorn und Kommentaren live,
   ohne Dokumentenserver.
 - **E-Rechnungen**: ZUGFeRD-Rechnungen direkt aus einem Rechnungsdokument, E-Rechnungen in PDFs
