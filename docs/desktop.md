@@ -180,7 +180,9 @@ von Tauri, mit `apps/desktop/patches/*.patch` angewendet (einmal, nach
 `src-tauri/target/patched-cli/`), und die Skripte des Desktop-Pakets nutzen sie: `tauri`
 (`cd apps/desktop && bun run tauri …`; die Wurzel hat kein solches Skript), `desktop:dev` und
 `desktop:build` (der `desktop`-Job der CI baut sie auf `main`, sodass ein Release, das auf seinem
-Tag läuft und den Cache von `main` liest, sie dort findet, statt vier Minuten dafür zu brauchen);
+Tag läuft und den Cache von `main` liest, sie dort findet, statt vier Minuten dafür zu brauchen;
+beide laufen auf Ubuntu 24.04, und der Cache-Schlüssel nennt das Runner-Image, denn eine auf einem
+neueren Ubuntu gebaute CLI braucht ein neueres glibc);
 Windows und macOS nutzen die veröffentlichte CLI. Das Skript bricht ab, wenn ein Patch auf eine
 neue Version nicht mehr passt: Dann prüfen, ob dieses Release den Fehler behebt, und den Patch
 entfernen, wie in `apps/desktop/patches/README.md` beschrieben.
