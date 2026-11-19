@@ -140,7 +140,7 @@ http://localhost:3000. Settings, your own reverse proxy, backups and updates are
 [installation guide](https://schreibzeug.app/installation.html).
 The desktop app is described under [Desktop app](https://schreibzeug.app/desktop.html); its installers for Windows, macOS and Linux are attached to every [release](https://github.com/Speicherstadt/schreibzeug/releases).
 
-No server or IT of your own? Schreibzeug is available hosted or through an IT service provider from the [partner programme](https://speicherstadt.app/en/partner/).
+No server or IT of your own? Schreibzeug is available hosted on request or through an IT service provider from the [partner programme](https://speicherstadt.app/en/partner/).
 
 ## FAQ
 

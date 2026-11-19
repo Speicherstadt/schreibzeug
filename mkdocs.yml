@@ -30,7 +30,7 @@ nav:
       - Accounts and sharing: accounts.md
       - Sign-in through Kontext: kontext.md
       - Desktop app: desktop.md
-      - Hosted or with a partner: support.md
+      - Hosted or with a partner: hosted.md
   - Working with it:
       - Files and versions: files.md
       - Collaboration: collaboration.md
