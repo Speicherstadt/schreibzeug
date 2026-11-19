@@ -13,22 +13,9 @@ Editing together in real time, in the browser or as a desktop app. No document s
 [![CI](https://github.com/Speicherstadt/schreibzeug/actions/workflows/ci.yml/badge.svg)](https://github.com/Speicherstadt/schreibzeug/actions/workflows/ci.yml)
 [![Release](https://img.shields.io/github/v/release/Speicherstadt/schreibzeug?logo=github&label=release)](https://github.com/Speicherstadt/schreibzeug/releases/latest)
 [![Docker Pulls](https://img.shields.io/docker/pulls/tristanteu/schreibzeug?logo=docker&logoColor=white)](https://hub.docker.com/r/tristanteu/schreibzeug)
-[![Image Size](https://img.shields.io/docker/image-size/tristanteu/schreibzeug/latest?logo=docker&logoColor=white&label=image)](https://hub.docker.com/r/tristanteu/schreibzeug)
 [![Docs](https://img.shields.io/badge/docs-schreibzeug.app-4f46e5?logo=materialformkdocs&logoColor=white)](https://schreibzeug.app/)
 [![License: AGPL-3.0](https://img.shields.io/badge/license-AGPL--3.0-blue)](LICENSE)
 [![Desktop](https://img.shields.io/badge/desktop-Windows%20%7C%20macOS%20%7C%20Linux-lightgrey)](https://github.com/Speicherstadt/schreibzeug/releases/latest)
-[![GDPR](https://img.shields.io/badge/GDPR-files%20on%20your%20server-15803d)](#-why-schreibzeug)
-[![Made in Europe](https://img.shields.io/badge/made%20in-Europe-003399)](https://github.com/Euro-Office)
-[![MCP server](https://img.shields.io/badge/MCP-Claude%20Code-d97757)](https://schreibzeug.app/mcp.html)
-[![TypeScript](https://img.shields.io/badge/TypeScript-3178c6?logo=typescript&logoColor=white)](https://www.typescriptlang.org)
-[![Bun](https://img.shields.io/badge/Bun-000000?logo=bun&logoColor=white)](https://bun.sh)
-[![React](https://img.shields.io/badge/React-149eca?logo=react&logoColor=white)](https://react.dev)
-[![TanStack](https://img.shields.io/badge/TanStack-Router%20%7C%20Query-ff4154?logo=reactquery&logoColor=white)](https://tanstack.com)
-[![Tailwind CSS](https://img.shields.io/badge/Tailwind%20CSS-06b6d4?logo=tailwindcss&logoColor=white)](https://tailwindcss.com)
-[![Vite](https://img.shields.io/badge/Vite-646cff?logo=vite&logoColor=white)](https://vite.dev)
-[![Hono](https://img.shields.io/badge/Hono-e36002?logo=hono&logoColor=white)](https://hono.dev)
-[![SQLite](https://img.shields.io/badge/SQLite-Drizzle-003b57?logo=sqlite&logoColor=white)](https://orm.drizzle.team)
-[![Tauri](https://img.shields.io/badge/Tauri-24c8db?logo=tauri&logoColor=white)](https://tauri.app)
 
 [Why](#-why-schreibzeug) •
 [Install](#-install) •
@@ -215,6 +202,16 @@ update needs: the [changelog](CHANGELOG.md).
 
 ## 🛠️ Development
 
+[![TypeScript](https://img.shields.io/badge/TypeScript-3178c6?logo=typescript&logoColor=white)](https://www.typescriptlang.org)
+[![Bun](https://img.shields.io/badge/Bun-000000?logo=bun&logoColor=white)](https://bun.sh)
+[![React](https://img.shields.io/badge/React-149eca?logo=react&logoColor=white)](https://react.dev)
+[![TanStack](https://img.shields.io/badge/TanStack-Router%20%7C%20Query-ff4154?logo=reactquery&logoColor=white)](https://tanstack.com)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind%20CSS-06b6d4?logo=tailwindcss&logoColor=white)](https://tailwindcss.com)
+[![Vite](https://img.shields.io/badge/Vite-646cff?logo=vite&logoColor=white)](https://vite.dev)
+[![Hono](https://img.shields.io/badge/Hono-e36002?logo=hono&logoColor=white)](https://hono.dev)
+[![SQLite](https://img.shields.io/badge/SQLite-Drizzle-003b57?logo=sqlite&logoColor=white)](https://orm.drizzle.team)
+[![Tauri](https://img.shields.io/badge/Tauri-24c8db?logo=tauri&logoColor=white)](https://tauri.app)
+
 Requires [Bun](https://bun.sh) 1.4 or newer, on Linux x86_64 for preparing the engine; the database is a SQLite file.
 
 ```bash
@@ -233,7 +230,7 @@ More open-source apps for your own server, covering email, accounting, a documen
 
 ## 🤝 Contributing
 
-Issues and pull requests are welcome. For a rendering or compatibility bug, please attach a file
+Bugs and ideas are welcome as issues, through the [bug report form](https://github.com/Speicherstadt/schreibzeug/issues/new?template=bug_report.yml), and pull requests too. For a rendering or compatibility bug, please attach a file
 that shows it (or a small one that reproduces it) and say which program made it. Please run
 `bun run lint && bun run typecheck && bun run test` before opening a pull request; the checks,
 conventions and how contributions are licensed are in [CONTRIBUTING.md](CONTRIBUTING.md).
