@@ -30,7 +30,7 @@ nav:
       - Accounts and sharing: accounts.md
       - Sign-in through Kontext: kontext.md
       - Desktop app: desktop.md
-      - Support and partnership: support.md
+      - Hosted or with a partner: support.md
   - Working with it:
       - Files and versions: files.md
       - Collaboration: collaboration.md
@@ -106,7 +106,7 @@ plugins:
             Accounts and sharing: Konten und Teilen
             Sign-in through Kontext: Anmeldung über Kontext
             Desktop app: Desktop-App
-            Support and partnership: Support und Partnerschaft
+            Hosted or with a partner: Gehostet oder mit Partner
             Working with it: Arbeiten damit
             Files and versions: Dateien und Versionen
             Collaboration: Zusammenarbeit

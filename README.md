@@ -23,7 +23,6 @@ Editing together in real time, in the browser or as a desktop app. No document s
 [Screenshots](#screenshots) •
 [Alternatives](#schreibzeug-and-the-alternatives) •
 [FAQ](#faq) •
-[Support](#support-and-partnership) •
 [Documentation](https://schreibzeug.app/) •
 [Deutsch](README.de.md)
 
@@ -141,6 +140,8 @@ http://localhost:3000. Settings, your own reverse proxy, backups and updates are
 [installation guide](https://schreibzeug.app/installation.html).
 The desktop app is described under [Desktop app](https://schreibzeug.app/desktop.html); its installers for Windows, macOS and Linux are attached to every [release](https://github.com/Speicherstadt/schreibzeug/releases).
 
+No server or IT of your own? Schreibzeug is available hosted or through an IT service provider from the [partner programme](https://speicherstadt.app/en/partner/).
+
 ## FAQ
 
 <details>
@@ -233,17 +234,6 @@ app. Checks, tests and architecture: [Development](https://schreibzeug.app/devel
 
 More open-source apps for your own server, covering email, accounting, a document archive and more: **[speicherstadt.app](https://speicherstadt.app)**
 
-## Support and partnership
-
-Schreibzeug is free (AGPL). If you'd rather not set it up or run it yourself, the developers help:
-
-- **Setup and migration** on your server
-- **Support** with updates, backups and questions while it runs
-- **Hosted operation** of Schreibzeug, without a server of your own
-- **Partnership for IT service providers** who set up Schreibzeug for their customers: a direct line to the developers
-
-More on [speicherstadt.app](https://speicherstadt.app/en/#support), enquiries to [info@teufel-it.de](mailto:info@teufel-it.de).
-
 ## Contributing
 
 Bugs and ideas are welcome as issues, through the [bug report form](https://github.com/Speicherstadt/schreibzeug/issues/new?template=bug_report.yml), and pull requests too. For a rendering or compatibility bug, please attach a file
@@ -271,6 +261,7 @@ Security problems please report privately ([SECURITY.md](SECURITY.md)).
 
 <sub>License: <a href="LICENSE">AGPL-3.0</a> · © Tristan Teufel and contributors · <a href="README.de.md">Deutsche Version</a><br>
 Changed versions you pass on or run for others must offer their source code under the AGPL.<br>
+For IT service providers and hosters: <a href="https://speicherstadt.app/en/partner/">partner programme</a>.<br>
 Schreibzeug builds on the open-source Euro-Office engine and is not affiliated with Euro-Office, ONLYOFFICE, Collabora, CryptPad, Microsoft or Google; the names are trademarks of their owners.</sub>
 
 </div>

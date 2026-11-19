@@ -4,8 +4,8 @@ Schreibzeug is one server (Bun, `apps/server`) that serves the web app, the file
 collaboration relay and the MCP endpoint from one port. Everything it keeps lives in one data
 folder: the SQLite database `schreibzeug.db`, the file contents under `blobs/`, and `auth-secret`.
 
-No time for setup and operation? The developers set Schreibzeug up or run it for you, see
-[Support and partnership](support.md).
+No server or IT of your own? Schreibzeug is available hosted or through an IT service provider from the
+[partner programme](support.md).
 
 ## With Docker Compose
 

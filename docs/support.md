@@ -1,30 +1,26 @@
 ---
 description: >-
-  Support and partnership for Schreibzeug: setup and migration, support while it runs, hosted
-  operation and a partnership for IT service providers, from the developers.
+  Schreibzeug hosted or with a partner: hosted operation on request, or setup and care by an IT
+  service provider or hoster from the partner programme.
 ---
 
-# Support and partnership { #support }
+# Hosted or with a partner { #hosted-or-partner }
 
-Schreibzeug is free (AGPL). If you'd rather not set it up or run it yourself, the developers help.
+This documentation covers running Schreibzeug yourself. If you'd rather not, there are two other ways.
 
-## Setup and migration { #setup }
+## Hosted { #hosted }
 
-The developers set Schreibzeug up on your server and move your existing documents into it.
+Schreibzeug is available as hosted operation on request, without a server of your own.
 
-## Support { #operation-support }
+## With a partner { #partner }
 
-Help with updates, backups and questions while Schreibzeug runs.
+IT service providers and hosters from the partner programme set Schreibzeug up and look after it for
+their customers.
 
-## Hosted operation { #hosted }
+## Questions { #questions }
 
-Schreibzeug as a hosted service, without a server of your own.
+Questions about using Schreibzeug go to the public
+[issues](https://github.com/Speicherstadt/schreibzeug/issues). Free one-to-one help isn't offered;
+setup for a single company is done by a partner, or by the developers as a paid project.
 
-## Partnership for IT service providers { #partnership }
-
-For IT service providers who set up Schreibzeug for their customers: a direct line to the developers.
-
-## Contact { #contact }
-
-More on [speicherstadt.app](https://speicherstadt.app/en/#support), enquiries to
-[info@teufel-it.de](mailto:info@teufel-it.de).
+More on the [partner programme](https://speicherstadt.app/en/partner/) page.

@@ -22,7 +22,6 @@ Gemeinsam in Echtzeit, im Browser oder als Desktop-App. Ohne Dokumentenserver un
 [Schnellstart](#schnellstart) •
 [FAQ](#faq) •
 [Dokumentation](https://schreibzeug.app/de/) •
-[Support und Partnerschaft](#support-und-partnerschaft) •
 [Entwicklung](#entwicklung) •
 [English](README.md)
 
@@ -142,6 +141,8 @@ http://localhost:3000. Einstellungen, ein eigener Reverse Proxy, Backups und Upd
 [Installationsanleitung](https://schreibzeug.app/de/installation.html).
 Die Desktop-App beschreibt [Desktop-App](https://schreibzeug.app/de/desktop.html); ihre Installer für Windows, macOS und Linux hängen an jedem [Release](https://github.com/Speicherstadt/schreibzeug/releases).
 
+Keinen eigenen Server oder keine eigene IT? Schreibzeug gibt es gehostet oder über einen IT-Dienstleister aus dem [Partnerprogramm](https://speicherstadt.app/partner/).
+
 ## FAQ
 
 <details>
@@ -234,18 +235,6 @@ Prüfungen, Tests und Architektur: [Entwicklung](https://schreibzeug.app/de/deve
 
 Weitere Open-Source-Apps für deinen eigenen Server, etwa für Mail, Buchhaltung, ein Dokumentenarchiv und mehr: **[speicherstadt.app](https://speicherstadt.app)**
 
-## Support und Partnerschaft
-
-Schreibzeug ist kostenlos (AGPL). Wer es nicht selbst einrichten oder betreiben will, bekommt Hilfe von den
-Entwicklern:
-
-- **Einrichtung und Umzug** auf deinem Server
-- **Support** bei Updates, Backups und Fragen im Betrieb
-- **Betrieb** von Schreibzeug als gehosteter Dienst, ohne eigenen Server
-- **Partnerschaft für IT-Dienstleister**, die Schreibzeug bei ihren Kunden einrichten: direkter Draht zur Entwicklung
-
-Mehr auf [speicherstadt.app](https://speicherstadt.app/#support), Anfragen an [info@teufel-it.de](mailto:info@teufel-it.de).
-
 ## Mitwirken
 
 Fehler und Ideen gern als Issue, mit dem [Formular für Fehlerberichte](https://github.com/Speicherstadt/schreibzeug/issues/new?template=bug_report.yml); Pull Requests sind ebenso willkommen. Bei einem Darstellungs- oder Kompatibilitätsfehler bitte
@@ -274,6 +263,7 @@ Sicherheitslücken bitte vertraulich melden ([SECURITY.md](SECURITY.md)).
 
 <sub>Lizenz: <a href="LICENSE">AGPL-3.0</a> · © Tristan Teufel und Mitwirkende · <a href="README.md">English version</a><br>
 Wer eine veränderte Version weitergibt oder für andere betreibt, muss ihren Quellcode unter der AGPL anbieten.<br>
+Für IT-Dienstleister und Hoster: <a href="https://speicherstadt.app/partner/">Partnerprogramm</a>.<br>
 Schreibzeug baut auf der Open-Source-Engine Euro-Office auf und steht in keiner Verbindung zu Euro-Office, ONLYOFFICE, Collabora, CryptPad, Microsoft oder Google; die Namen sind Marken ihrer Inhaber.</sub>
 
 </div>

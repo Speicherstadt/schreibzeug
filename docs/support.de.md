@@ -1,31 +1,28 @@
 ---
 description: >-
-  Support und Partnerschaft für Schreibzeug: Einrichtung und Umzug, Support im Betrieb, Betrieb als
-  gehosteter Dienst und eine Partnerschaft für IT-Dienstleister, von den Entwicklern.
+  Schreibzeug gehostet oder mit Partner: Betrieb als gehosteter Dienst auf Anfrage, oder Einrichtung
+  und Betreuung durch einen IT-Dienstleister oder Hoster aus dem Partnerprogramm.
 ---
 
-# Support und Partnerschaft { #support }
+# Gehostet oder mit Partner { #hosted-or-partner }
 
-Schreibzeug ist kostenlos (AGPL). Wer es nicht selbst einrichten oder betreiben will, bekommt Hilfe
-von den Entwicklern.
+Diese Dokumentation beschreibt, wie du Schreibzeug selbst betreibst. Wer das nicht will, hat zwei
+andere Wege.
 
-## Einrichtung und Umzug { #setup }
+## Gehostet { #hosted }
 
-Die Entwickler richten Schreibzeug auf deinem Server ein und ziehen deine vorhandenen Dokumente um.
+Schreibzeug gibt es auf Anfrage als gehosteten Dienst, ohne eigenen Server.
 
-## Support { #operation-support }
+## Mit Partner { #partner }
 
-Hilfe bei Updates, Backups und Fragen im Betrieb.
+IT-Dienstleister und Hoster aus dem Partnerprogramm richten Schreibzeug für ihre Kunden ein und
+betreuen es.
 
-## Betrieb { #hosted }
+## Fragen { #questions }
 
-Schreibzeug als gehosteter Dienst, ohne eigenen Server.
+Fragen zur Nutzung von Schreibzeug gehören in die öffentlichen
+[Issues](https://github.com/Speicherstadt/schreibzeug/issues). Kostenlose Einzelhilfe gibt es nicht;
+die Einrichtung für ein einzelnes Unternehmen übernimmt ein Partner oder die Entwicklung als bezahltes
+Projekt.
 
-## Partnerschaft für IT-Dienstleister { #partnership }
-
-Für IT-Dienstleister, die Schreibzeug bei ihren Kunden einrichten: direkter Draht zur Entwicklung.
-
-## Kontakt { #contact }
-
-Mehr auf [speicherstadt.app](https://speicherstadt.app/#support), Anfragen an
-[info@teufel-it.de](mailto:info@teufel-it.de).
+Mehr auf der Seite zum [Partnerprogramm](https://speicherstadt.app/partner/).
