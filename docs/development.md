@@ -1,160 +1,170 @@
-# Development
+# Entwicklung { #development }
 
-Requires [Bun](https://bun.sh) 1.4 or newer and Linux x86_64. Preparing the editing engine
-(`engine/scripts/prepare.ts`) downloads the pinned Euro-Office release, about 630 MB, unpacks it with
-`ar`, `tar -xJ` and `unzip` (on Debian and Ubuntu: `binutils`, `xz-utils`, `unzip`) and runs its
-font generator, a Linux x86_64 binary. `bun run dev` runs that step first, so on macOS or Windows
-work in a Linux VM or container. The database is a SQLite file; nothing else needs installing.
+Voraussetzung sind [Bun](https://bun.sh) 1.4 oder neuer und Linux x86_64. Das Vorbereiten der
+Bearbeitungs-Engine (`engine/scripts/prepare.ts`) lädt das festgelegte Euro-Office-Release herunter,
+etwa 630 MB, entpackt es mit `ar`, `tar -xJ` und `unzip` (auf Debian und Ubuntu: `binutils`,
+`xz-utils`, `unzip`) und führt seinen Schriftgenerator aus, ein Linux-x86_64-Binary. `bun run dev`
+erledigt diesen Schritt zuerst, also arbeite auf macOS oder Windows in einer Linux-VM oder einem
+Container. Die Datenbank ist eine SQLite-Datei; sonst muss nichts installiert werden.
 
 ```bash
 git clone https://github.com/Speicherstadt/schreibzeug && cd schreibzeug
 bun install
-bun run dev              # http://localhost:5173, with the API on http://localhost:3000
+bun run dev              # http://localhost:5173, mit der API auf http://localhost:3000
 ```
 
-`bun run dev` prepares the engine first (`bun run engine:prepare`: downloads the pinned Euro-Office
-release and generates its fonts; a no-op once it is up to date), then starts the server (data:
-`SCHREIBZEUG_DATA_DIR`) and the web app together with `bun run --parallel dev:server dev:web`
-(not `bun run --filter`: it runs workspaces in dependency order, and as `apps/web` depends on
-`apps/server` it would wait for the server's endless `dev` before starting Vite). If
-Vite fails, the server is stopped too; a server that crashes keeps waiting under `bun --watch`
-for the next change, so Vite keeps running. Ctrl+C stops both. `bun run --parallel` pipes their
-output, so `dev` sets `FORCE_COLOR=1` when it runs in a terminal to keep the colours; Vite's
-keyboard shortcuts (`h`, `r`, `o`, `q`) only work when it runs alone: `bun run dev:web` in one
-terminal, `bun run dev:server` (or `bun run server`) in another. The Vite server forwards `/api`
-(WebSockets included) and `/mcp` to the API server.
+`bun run dev` bereitet zuerst die Engine vor (`bun run engine:prepare`: lädt das festgelegte
+Euro-Office-Release herunter und erzeugt seine Schriften; tut nichts, sobald sie aktuell ist),
+startet dann den Server (Daten: `SCHREIBZEUG_DATA_DIR`) und die Web-App zusammen mit
+`bun run --parallel dev:server dev:web` (nicht `bun run --filter`: Das führt Workspaces in der
+Reihenfolge ihrer Abhängigkeiten aus, und da `apps/web` von `apps/server` abhängt, würde es auf das
+endlose `dev` des Servers warten, bevor es Vite startet). Scheitert Vite, wird auch der Server
+gestoppt; ein Server, der abstürzt, wartet unter `bun --watch` auf die nächste Änderung, Vite läuft
+also weiter. Strg+C stoppt beide. `bun run --parallel` leitet ihre Ausgabe durch eine Pipe, deshalb
+setzt `dev` `FORCE_COLOR=1`, wenn es in einem Terminal läuft, damit die Farben bleiben; die
+Tastenkürzel von Vite (`h`, `r`, `o`, `q`) funktionieren nur, wenn es allein läuft:
+`bun run dev:web` in einem Terminal, `bun run dev:server` (oder `bun run server`) in einem anderen.
+Der Vite-Server leitet `/api` (mit WebSockets) und `/mcp` an den API-Server weiter.
 
-## Checks
+## Prüfungen { #checks }
 
 ```bash
-bun run engine:prepare   # once, and after a change in engine/: build and E2E need the engine
-bunx playwright install chromium   # once: Playwright's browser for the E2E tests
-bun run lint             # Biome, then checks (file size, interface texts, rings)
-bun run typecheck        # tsc in every workspace
-bun run i18n:check       # every interface text in German and English
-bun run test             # Vitest on Bun: unit and integration tests (SQLite)
-bun run test:e2e         # Playwright with the real engine: E2E and format fidelity
-bun run build            # the web app
-mkdocs build --strict    # this documentation (pip install -r requirements-docs.txt)
+bun run engine:prepare   # einmal und nach einer Änderung in engine/: Build und E2E brauchen die Engine
+bunx playwright install chromium   # einmal: der Browser von Playwright für die E2E-Tests
+bun run lint             # Biome, dann checks (Dateigröße, Oberflächentexte, Ringe)
+bun run typecheck        # tsc in jedem Workspace
+bun run i18n:check       # jeder Oberflächentext auf Deutsch und Englisch
+bun run test             # Vitest auf Bun: Unit- und Integrationstests (SQLite)
+bun run test:e2e         # Playwright mit der echten Engine: E2E und Formattreue
+bun run build            # die Web-App
+mkdocs build --strict    # diese Dokumentation (pip install -r requirements-docs.txt)
 ```
 
-`bun run build` and the E2E tests do not prepare the engine themselves, and the build quietly leaves
-it out when `engine/dist` is missing (`apps/web/engine-plugin.ts`): the app then builds, but opens
-no document. Without Playwright's own browser download, an installed Chromium can be used:
-`PLAYWRIGHT_CHROMIUM_PATH=/path/to/chrome bun run test:e2e`. CI (`.github/workflows/ci.yml`)
-runs all of it, the E2E suite in three shards, plus the desktop app's Rust checks and a validation
-of the e-invoices against EN 16931 and PDF/A-3. Draft pull requests and changes to Markdown or
-`docs/` alone do not start it; "Ready for review" does.
+`bun run build` und die E2E-Tests bereiten die Engine nicht selbst vor, und der Build lässt sie
+stillschweigend weg, wenn `engine/dist` fehlt (`apps/web/engine-plugin.ts`): Die App baut dann,
+öffnet aber kein Dokument. Ohne den eigenen Browser-Download von Playwright lässt sich ein
+installiertes Chromium verwenden: `PLAYWRIGHT_CHROMIUM_PATH=/path/to/chrome bun run test:e2e`. Die
+CI (`.github/workflows/ci.yml`) führt all das aus, die E2E-Suite in drei Shards, dazu die
+Rust-Prüfungen der Desktop-App und eine Validierung der E-Rechnungen gegen EN 16931 und PDF/A-3.
+Entwurfs-Pull-Requests und Änderungen nur an Markdown oder `docs/` starten sie nicht; „Ready for
+review“ schon.
 
-`checks` ([firsttris/workflows](https://github.com/firsttris/workflows#checks), set up in `checks.json`)
-fails on a source file past 400 lines that is not in `.checks/large-files.txt`; those older files are
-split in a change of their own. It also fails on a ring of imports between modules (the folders under
-`packages/` and `apps/*/src/`). Biome notes functions past 80 lines, and in a pull request `bun checks pr`
-points out a function that is new or grew past that, along with code changed without docs and a fix
-without a test.
+`checks` ([firsttris/workflows](https://github.com/firsttris/workflows#checks), eingestellt in `checks.json`)
+schlägt bei einer Quelldatei über 400 Zeilen fehl, die nicht in `.checks/large-files.txt` steht; diese
+älteren Dateien werden in einer eigenen Änderung geteilt. Ebenso schlägt es bei einem Ring von Importen
+zwischen Modulen fehl (den Ordnern unter `packages/` und `apps/*/src/`). Biome weist auf Funktionen über 80 Zeilen hin, und
+in einem Pull Request nennt `bun checks pr` eine Funktion, die neu oder darüber gewachsen ist, dazu Code ohne
+Doku und einen Fix ohne Test.
 
-All scripts of the root `package.json`:
+Alle Skripte der `package.json` in der Wurzel:
 
-| Script | What it does |
+| Skript | Was es tut |
 |---|---|
-| `dev` | Prepares the engine, then the server and the web app's dev server together |
-| `server` | The server alone, restarting on changes |
-| `engine:prepare` | The engine in `engine/dist` (`--force` to prepare it again) |
-| `build` | The web app in `apps/web/dist`, the prepared engine copied in |
-| `build:demo` | The [demo](#the-demo) in `apps/web/dist-demo`, for GitHub Pages under `/demo/` |
-| `preview` | The built web app on http://localhost:4173, with `/api` and `/mcp` forwarded like `dev` |
-| `typecheck`, `lint` | The interface texts compiled, then `tsc -b`; Biome, then `checks` |
-| `i18n`, `i18n:check` | Compiles the interface texts (`apps/web/messages`) with Paraglide; the same, then checks that every text is in German and English and none is left in the code (a step of its own in CI) ([interface texts](architecture.md#interface-texts)) |
-| `format` | Biome with `--write`: fixes formatting and what else it can |
-| `test`, `test:watch` | Vitest once, including the check that every interface text is in German and English; Vitest watching the files |
-| `test:e2e` | Playwright, projects `chromium` (the specs) and `fidelity`; a spec path after it runs only that spec |
-| `test:fidelity`, `fidelity:update` | Only the format-fidelity project; the same, taking new reference pictures |
-| `screenshots` | The pictures in `docs/screenshots` (`e2e/screenshots.shot.ts`) |
-| `test-files` | Writes the test documents in `test-files/` again (`test-files/make.ts`) |
+| `dev` | Bereitet die Engine vor, dann den Server und den Dev-Server der Web-App zusammen |
+| `server` | Den Server allein, mit Neustart bei Änderungen |
+| `engine:prepare` | Die Engine in `engine/dist` (`--force`, um sie erneut vorzubereiten) |
+| `build` | Die Web-App in `apps/web/dist`, mit der vorbereiteten Engine hineinkopiert |
+| `build:demo` | Die [Demo](#the-demo) in `apps/web/dist-demo`, für GitHub Pages unter `/demo/` |
+| `preview` | Die gebaute Web-App auf http://localhost:4173, mit `/api` und `/mcp` weitergeleitet wie bei `dev` |
+| `typecheck`, `lint` | Die Oberflächentexte kompiliert, dann `tsc -b`; Biome, dann `checks` |
+| `i18n`, `i18n:check` | Kompiliert die Oberflächentexte (`apps/web/messages`) mit Paraglide; dasselbe, dann die Prüfung, dass jeder Text auf Deutsch und Englisch vorliegt und keiner im Code steht (ein eigener Schritt in der CI) ([Oberflächentexte](architecture.md#interface-texts)) |
+| `format` | Biome mit `--write`: korrigiert die Formatierung und was es sonst kann |
+| `test`, `test:watch` | Vitest einmal, mit der Prüfung, dass jeder Oberflächentext auf Deutsch und Englisch vorliegt; Vitest, das die Dateien beobachtet |
+| `test:e2e` | Playwright, die Projekte `chromium` (die Specs) und `fidelity`; ein Spec-Pfad dahinter führt nur diese Spec aus |
+| `test:fidelity`, `fidelity:update` | Nur das Projekt für Formattreue; dasselbe, mit neuen Referenzbildern |
+| `screenshots` | Die Bilder in `docs/screenshots` (`e2e/screenshots.shot.ts`) |
+| `test-files` | Schreibt die Testdokumente in `test-files/` neu (`test-files/make.ts`) |
 
-## The demo
+## Die Demo { #the-demo }
 
-The [demo](https://schreibzeug.app/demo/) is the web app without a server: a build
-of its own (`bun run build:demo`, Vite mode `demo`, into `apps/web/dist-demo`) answers the app's
-requests to `/api` in the page itself (`apps/web/src/demo/`). The engine runs in the browser anyway;
-the server only stores the files and relays the editing sessions, and both run in the page here:
+Die [Demo](https://schreibzeug.app/demo/) ist die Web-App ohne Server: Ein eigener
+Build (`bun run build:demo`, Vite-Modus `demo`, nach `apps/web/dist-demo`) beantwortet die Anfragen
+der App an `/api` in der Seite selbst (`apps/web/src/demo/`). Die Engine läuft ohnehin im Browser;
+der Server speichert nur die Dateien und leitet die Bearbeitungssitzungen weiter, und beides läuft
+hier in der Seite:
 
-- **The API** is the desktop app's local API (`apps/local` `createLocalApp`, [desktop
-  app](desktop.md#files-on-this-computer)) over files held in memory (`src/demo/folder.ts`) instead
-  of a folder on disk, with a gate that lets everyone in (the page is the server). So the app sees
-  `/api/info` answer `local` and leaves out what only a server has, as on the computer: accounts,
-  sharing, versions, the trash, access tokens.
-- **The editing session** is the server's own hub (`apps/server/src/collab/hub.ts`) behind the same
-  collaboration route. `src/demo/page-socket.ts` is the WebSocket between them: Hono's WebSocket
-  helper on the API's side, what `joinSession` (`packages/editor-core/src/collab.ts`) expects of a
-  browser WebSocket on the app's side. The editors open, save and autosave exactly as on a server.
-- **Images** put into a document are shown from blob URLs (`src/demo/media.ts`): the engine loads
-  them from an `<img>` in its frame, which no swapped `fetch` reaches.
-- **Start:** `src/main.tsx` imports `src/demo/install.ts` before the first request. It seeds the
-  folder with test files (`test-files/angebot.docx`, `preise.xlsx`, `vortrag.pptx`, `notiz.md`,
-  `formular.pdf`), swaps `window.fetch` and `window.WebSocket` for those to `/api`, and hands the
-  app the blob URLs for images. `import.meta.env.MODE === "demo"` is written out at every check, so
-  Vite leaves the demo out of every other build.
-- **What it cannot do:** the files are gone when the tab is reloaded; nobody else can join an
-  editing session; uploads and new files live in the same memory.
-- **Paths:** the routes live after the `#` (`createHashHistory`), as GitHub Pages has no fallback to
-  `index.html`; the app, the engine (`engine-plugin.ts` `underBase`) and the text recognition sit
-  under Vite's `base`, `/demo/` (another one with `DEMO_BASE=/ bun run build:demo`). The
-  build carries the whole engine, about 350 MB, of which the browser loads what it opens.
-- **Publishing:** `docs.yml` builds it on every push to `main` with the engine from CI's cache and
-  puts it into the site at `/demo/`.
-- **Tests:** `apps/web/src/demo/*.test.ts` (the folder, the API with its WebSocket),
-  `e2e/demo.spec.ts` on the dev server in demo mode under the same path (`bunx vite --mode demo`).
+- **Die API** ist die lokale API der Desktop-App (`apps/local` `createLocalApp`,
+  [Desktop-App](desktop.md#files-on-this-computer)) über Dateien im Speicher (`src/demo/folder.ts`)
+  statt über einem Ordner auf der Festplatte, mit einem Gate, das alle hereinlässt (die Seite ist
+  der Server). Die App sieht also `/api/info` mit `local` antworten und lässt weg, was nur ein
+  Server hat, wie auf dem Computer: Konten, Teilen, Versionen, den Papierkorb, Zugriffstokens.
+- **Die Bearbeitungssitzung** ist der eigene Hub des Servers (`apps/server/src/collab/hub.ts`)
+  hinter derselben Route für die Zusammenarbeit. `src/demo/page-socket.ts` ist der WebSocket
+  zwischen ihnen: der WebSocket-Helfer von Hono auf der Seite der API, das, was `joinSession`
+  (`packages/editor-core/src/collab.ts`) auf der Seite der App von einem Browser-WebSocket
+  erwartet. Die Editoren öffnen, speichern und speichern automatisch genau wie auf einem Server.
+- **Bilder**, die in ein Dokument eingefügt werden, werden aus Blob-URLs gezeigt
+  (`src/demo/media.ts`): Die Engine lädt sie aus einem `<img>` in ihrem Frame, das kein
+  ausgetauschtes `fetch` erreicht.
+- **Start:** `src/main.tsx` importiert `src/demo/install.ts` vor der ersten Anfrage. Es füllt den
+  Ordner mit Testdateien (`test-files/angebot.docx`, `preise.xlsx`, `vortrag.pptx`, `notiz.md`,
+  `formular.pdf`), tauscht `window.fetch` und `window.WebSocket` für die Anfragen an `/api` aus und
+  gibt der App die Blob-URLs für Bilder. `import.meta.env.MODE === "demo"` steht bei jeder Prüfung
+  ausgeschrieben, sodass Vite die Demo aus jedem anderen Build herauslässt.
+- **Was sie nicht kann:** Die Dateien sind weg, wenn der Tab neu geladen wird; niemand sonst kann
+  einer Bearbeitungssitzung beitreten; Uploads und neue Dateien leben im selben Speicher.
+- **Pfade:** Die Routen stehen nach dem `#` (`createHashHistory`), da GitHub Pages keinen Fallback
+  auf `index.html` hat; die App, die Engine (`engine-plugin.ts` `underBase`) und die Texterkennung
+  liegen unter der `base` von Vite, `/demo/` (eine andere mit
+  `DEMO_BASE=/ bun run build:demo`). Der Build enthält die ganze Engine, etwa 350 MB, von denen der
+  Browser lädt, was er öffnet.
+- **Veröffentlichen:** `docs.yml` baut sie bei jedem Push auf `main` mit der Engine aus dem Cache
+  der CI und legt sie unter `/demo/` in die Site.
+- **Tests:** `apps/web/src/demo/*.test.ts` (der Ordner, die API mit ihrem WebSocket),
+  `e2e/demo.spec.ts` auf dem Dev-Server im Demo-Modus unter demselben Pfad
+  (`bunx vite --mode demo`).
 
-## Releases
+## Releases { #releases }
 
-A release is a button: **Actions → Bump version → Run workflow**, with `patch`, `minor` or `major`
-(or a pre-release: `preminor` gives `v0.2.0-rc.1`, `prerelease` the next candidate, `patch` then
-`v0.2.0`). It raises the version in `package.json`, `apps/desktop/package.json` and
-`apps/desktop/src-tauri/Cargo.toml` (with `Cargo.lock`), commits "Release vX.Y.Z" on `main`, tags
-it and starts `release.yml` on the tag. That workflow skips the checks when `main`'s CI already
-passed on the commit before the release commit (so wait for `main`'s CI after a merge, or the
-release runs the checks again) and builds the Docker image and the desktop app at the same time.
-The image is published as soon as the checks pass, a few minutes after the tag, without waiting
-for the installers (about a quarter of an hour); the GitHub release with the installers attached
-follows once both are there. A failed installer build leaves the image published and makes no
-GitHub release. The shared workflows come from
+Ein Release ist ein Knopfdruck: **Actions → Bump version → Run workflow**, mit `patch`, `minor`
+oder `major` (oder einer Vorabversion: `preminor` ergibt `v0.2.0-rc.1`, `prerelease` den nächsten
+Kandidaten, `patch` dann `v0.2.0`). Es erhöht die Version in `package.json`,
+`apps/desktop/package.json` und `apps/desktop/src-tauri/Cargo.toml` (mit `Cargo.lock`), committet
+„Release vX.Y.Z“ auf `main`, taggt es und startet `release.yml` auf dem Tag. Dieser Workflow
+überspringt die Prüfungen, wenn die CI von `main` auf dem Commit vor dem Release-Commit schon
+bestanden hat (warte also nach einem Merge auf die CI von `main`, sonst führt das Release die
+Prüfungen erneut aus), und baut das Docker-Image und die Desktop-App gleichzeitig. Das Image wird
+veröffentlicht, sobald die Prüfungen bestanden sind, ein paar Minuten nach dem Tag, ohne auf die
+Installer zu warten (etwa eine Viertelstunde); das GitHub-Release mit den angehängten Installern
+folgt, sobald beides da ist. Ein gescheiterter Installer-Build lässt das Image veröffentlicht und
+erzeugt kein GitHub-Release. Die geteilten Workflows kommen aus
 [firsttris/workflows](https://github.com/firsttris/workflows) (`bump-version.yml`,
 `tested-on-main.yml`, `docker-release.yml`, `github-release.yml`).
 
-| Workflow | What it does |
+| Workflow | Was er tut |
 |---|---|
-| `bump.yml` | **Actions → Bump version**: the next version, its tag, and the release on it |
-| `release.yml` | On a tag `vX.Y.Z`: the checks (unless `main` ran them), the desktop app, the Docker image (`docker/Dockerfile`, amd64) and the GitHub release |
-| `desktop.yml` | **Actions → Desktop app** builds the desktop app for Windows, macOS and Linux, unsigned for now; also part of every release |
-| `screenshots.yml` | **Actions → Update screenshots** takes the README and documentation pictures and the format-fidelity references |
-| `engine-pin.yml` | On a Renovate branch that moves the engine or the converter: sets `asset` and `sha256` of the new release in `engine/engine.json` and starts CI on that commit |
-| `docs.yml` | Publishes this documentation and the [demo](#the-demo) on GitHub Pages on every push to `main` (a pull request that changes `docs/` only builds the documentation): English at `/`, German at `/de/` (mkdocs-static-i18n). A page is translated by a file next to it (`index.de.md` for `index.md`); without one the German site shows the English text. The start page is the tour in pictures, `overview.md` the overview. MkDocs Material's `privacy` plugin downloads the fonts and other external assets at build time, so the site loads nothing from Google Fonts or a CDN; the footer links to the legal notice and the privacy policy (`copyright` in `mkdocs.yml`, per language) |
+| `bump.yml` | **Actions → Bump version**: die nächste Version, ihr Tag und das Release darauf |
+| `release.yml` | Bei einem Tag `vX.Y.Z`: die Prüfungen (sofern `main` sie nicht ausgeführt hat), die Desktop-App, das Docker-Image (`docker/Dockerfile`, amd64) und das GitHub-Release |
+| `desktop.yml` | **Actions → Desktop app** baut die Desktop-App für Windows, macOS und Linux, vorerst unsigniert; auch Teil jedes Releases |
+| `screenshots.yml` | **Actions → Update screenshots** nimmt die Bilder für README und Dokumentation sowie die Referenzen für die Formattreue auf |
+| `engine-pin.yml` | Auf einem Renovate-Branch, der die Engine oder den Konverter weiterbewegt: setzt `asset` und `sha256` des neuen Releases in `engine/engine.json` und startet die CI auf diesem Commit |
+| `docs.yml` | Veröffentlicht diese Dokumentation und die [Demo](#the-demo) bei jedem Push auf `main` auf GitHub Pages (ein Pull Request, der `docs/` ändert, baut nur die Dokumentation): auf Deutsch, eine Datei je Seite (`docs/x.md`). Frühere Adressen unter `/de/` leiten auf dieselbe Seite weiter (mkdocs-redirects, `redirect_maps` in `mkdocs.yml`). Die Startseite ist der Rundgang in Bildern, `overview.md` die Übersicht. Das `privacy`-Plugin von MkDocs Material lädt Schriften und andere externe Dateien beim Bauen herunter, sodass die Site nichts von Google Fonts oder einem CDN lädt; die Fußzeile verlinkt Impressum und Datenschutzerklärung (`copyright` in `mkdocs.yml`) |
 
-## Dependency updates
+## Abhängigkeits-Updates { #dependency-updates }
 
-[Renovate](https://github.com/apps/renovate) (`.github/renovate.json5`) opens a pull request for each
-new release of what Schreibzeug builds on, and lists what is open in the "Dependency Dashboard"
-issue. None of these merges itself:
+[Renovate](https://github.com/apps/renovate) (`.github/renovate.json5`) öffnet für jedes neue
+Release dessen, worauf Schreibzeug aufbaut, einen Pull Request und listet, was offen ist, im Issue
+„Dependency Dashboard“. Keiner davon merged sich selbst:
 
-| Pull request | What it moves |
+| Pull Request | Was er bewegt |
 |---|---|
-| Euro-Office engine | `version` of the engine in `engine/engine.json` (Euro-Office Document Server releases; release candidates are left out); `engine-pin.yml` adds `asset` and `sha256`. Like every engine update it passes only when the format-fidelity screenshots stay the same |
-| x2t converter | `converter.version` in `engine/engine.json` (cryptpad/onlyoffice-x2t-wasm), the same way |
-| Tauri | the Tauri 3 alphas of `apps/desktop` (crates and npm packages together); `scripts/tauri.ts` stops when the CLI patch no longer applies ([Patched Tauri CLI](desktop.md#patched-tauri-cli)) |
-| Bun | the Bun images in `docker/Dockerfile`, `BUN_VERSION` in the workflows and `@types/bun` |
-| Caddy | the reverse proxy in `deploy/compose.yaml` |
-| Mustang-CLI | the validator of the `einvoice` job in `ci.yml` |
+| Euro-Office-Engine | `version` der Engine in `engine/engine.json` (Releases des Euro-Office Document Server; Release Candidates bleiben außen vor); `engine-pin.yml` ergänzt `asset` und `sha256`. Wie jedes Engine-Update besteht er nur, wenn die Screenshots der Formattreue gleich bleiben |
+| x2t-Konverter | `converter.version` in `engine/engine.json` (cryptpad/onlyoffice-x2t-wasm), genauso |
+| Tauri | die Tauri-3-Alphas von `apps/desktop` (Crates und npm-Pakete zusammen); `scripts/tauri.ts` bricht ab, wenn der CLI-Patch nicht mehr passt ([Gepatchte Tauri-CLI](desktop.md#patched-tauri-cli)) |
+| Bun | die Bun-Images in `docker/Dockerfile`, `BUN_VERSION` in den Workflows und `@types/bun` |
+| Caddy | der Reverse Proxy in `deploy/compose.yaml` |
+| Mustang-CLI | der Validator des Jobs `einvoice` in `ci.yml` |
 
-Everything else (the other packages, the actions, the images) comes with the shared settings of
-[firsttris/workflows](https://github.com/firsttris/workflows#renovate-in-every-project): minor and
-patch updates on the 1st of the month in one pull request that Renovate merges itself when CI is
-green, majors only when ticked in the Dependency Dashboard, security fixes at once.
+Alles andere (die übrigen Pakete, die Actions, die Images) kommt mit den geteilten Einstellungen von
+[firsttris/workflows](https://github.com/firsttris/workflows#renovate-in-every-project): Minor- und
+Patch-Updates am 1. des Monats in einem Pull Request, den Renovate selbst merged, wenn die CI grün
+ist, Major-Updates nur, wenn sie im Dependency Dashboard angehakt sind, Sicherheitskorrekturen
+sofort.
 
-## Stack
+## Stack { #stack }
 
-A React SPA with TanStack Router and Query, Tailwind and shadcn-style components (`apps/web`);
-Euro-Office `sdkjs` as the editing engine, driven only from `packages/editor-core`; a Bun server
-with Hono, Drizzle and SQLite (`apps/server`); Tauri 3 (alpha) for the desktop app (`apps/desktop`). Why it
-is built this way: [Architecture](architecture.md); how the interface talks to the engine:
-[The editing engine](engine.md).
+Eine React-SPA mit TanStack Router und Query, Tailwind und Komponenten im Stil von shadcn
+(`apps/web`); Euro-Office `sdkjs` als Bearbeitungs-Engine, angesteuert nur aus
+`packages/editor-core`; ein Bun-Server mit Hono, Drizzle und SQLite (`apps/server`); Tauri 3
+(Alpha) für die Desktop-App (`apps/desktop`). Warum es so gebaut ist: [Architektur](architecture.md);
+wie die Oberfläche mit der Engine spricht: [Die Bearbeitungs-Engine](engine.md).

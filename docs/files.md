@@ -1,288 +1,308 @@
-# Files
+# Dateien { #files }
 
-`apps/server` stores folders and files and every version of a file. It is a Hono app on Bun
-(`src/app.ts`) over SQLite (`bun:sqlite` with Drizzle, `src/db/schema.ts`) and a folder of blobs;
-both live in the data folder, so copying that folder backs up everything.
+`apps/server` speichert Ordner und Dateien und jede Version einer Datei. Es ist eine Hono-App auf
+Bun (`src/app.ts`) über SQLite (`bun:sqlite` mit Drizzle, `src/db/schema.ts`) und einem Ordner mit
+Blobs; beides liegt im Datenordner, wer diesen Ordner kopiert, sichert also alles.
 
-SQLite rather than PostgreSQL: one process and one folder to run, nothing else to install, the
-same database the desktop app can use locally, and the same choice as firsttris/sekretaer, which
-Schreibzeug is meant to join. While several people edit, their changes go through the relay in memory;
-the database sees a save every few seconds, which one writer at a time handles easily.
-`bun:sqlite` is synchronous, so the repository functions are too: a function that does not await
-is not interleaved with other requests, and a transaction must not await (`src/db/database.ts`).
+SQLite statt PostgreSQL: ein Prozess und ein Ordner im Betrieb, sonst nichts zu installieren,
+dieselbe Datenbank, die die Desktop-App lokal benutzen kann, und dieselbe Wahl wie
+firsttris/sekretaer, zu dem Schreibzeug dazukommen soll. Während mehrere Leute bearbeiten, laufen
+ihre Änderungen über das Relay im Speicher; die Datenbank sieht alle paar Sekunden eine
+Speicherung, was ein Schreiber zur Zeit leicht schafft. `bun:sqlite` ist synchron, die
+Repository-Funktionen sind es also auch: Eine Funktion, die nicht wartet (`await`), wird nicht mit
+anderen Anfragen verschachtelt, und eine Transaktion darf nicht warten (`src/db/database.ts`).
 
-## Data
+## Daten { #data }
 
-| Table | What it holds |
+| Tabelle | Was sie enthält |
 |---|---|
-| `nodes` | Folders and files in one tree (`parent_id`, `null` is the root of the owner's files, `owner_id` whose they are; see [accounts](accounts.md)). A file has `mime`, `size` and its newest `version`. |
-| `versions` | The saved states of a file, [thinned out with age](#versions): number, size, the SHA-256 of its bytes, and `kept` when someone chose to keep it. |
-| `media` | Which image belongs to which file: the file and the SHA-256 of an image put into it while it was edited. |
-| `shares` | Who else may open a node, with `edit` or `view`; see [accounts](accounts.md#sharing). |
-| `invites` | Links that share a node: a random token, the role, when it expires. |
-| `pending_shares` | Shares with an address that has no account yet, taken over at its first sign-in; see [accounts](accounts.md). |
-| `access_tokens` | Personal access tokens for MCP clients: only their SHA-256, name, scope, expiry, last use; see [the MCP server](mcp.md#access-tokens). |
+| `nodes` | Ordner und Dateien in einem Baum (`parent_id`, `null` ist die Wurzel der Dateien des Eigentümers, `owner_id`, wem sie gehören; siehe [Konten](accounts.md)). Eine Datei hat `mime`, `size` und ihre neueste `version`. |
+| `versions` | Die gespeicherten Stände einer Datei, [mit dem Alter ausgedünnt](#versions): Nummer, Größe, der SHA-256 ihrer Bytes und `kept`, wenn jemand sie behalten wollte. |
+| `media` | Welches Bild zu welcher Datei gehört: die Datei und der SHA-256 eines Bilds, das beim Bearbeiten in sie eingefügt wurde. |
+| `shares` | Wer einen Knoten sonst noch öffnen darf, mit `edit` oder `view`; siehe [Konten](accounts.md#sharing). |
+| `invites` | Links, die einen Knoten teilen: ein zufälliges Token, die Rolle, wann er abläuft. |
+| `pending_shares` | Freigaben an eine Adresse, die noch kein Konto hat, übernommen bei ihrer ersten Anmeldung; siehe [Konten](accounts.md). |
+| `access_tokens` | Persönliche Zugangsschlüssel für MCP-Clients: nur ihr SHA-256, Name, Umfang, Ablauf, letzte Benutzung; siehe [den MCP-Server](mcp.md#access-tokens). |
 
-The bytes are in the blob store (`src/blobs.ts`), under `data/blobs/ab/abcdef…` by their SHA-256:
-the same bytes are stored once, and a blob is written to a temporary name and renamed, so a crash
-never leaves half a blob under a real key. Images put into a document while it is edited go there
-too, named after their hash (`src/files/media.ts`), and `media` notes the file each one was put
-into; once saved, the Office file holds them itself.
+Die Bytes liegen im Blob-Speicher (`src/blobs.ts`), unter `data/blobs/ab/abcdef…` nach ihrem
+SHA-256: Dieselben Bytes werden nur einmal gespeichert, und ein Blob wird unter einem temporären
+Namen geschrieben und umbenannt, sodass ein Absturz nie einen halben Blob unter einem echten
+Schlüssel hinterlässt. Bilder, die beim Bearbeiten in ein Dokument eingefügt werden, kommen auch
+dorthin, benannt nach ihrem Hash (`src/files/media.ts`), und `media` vermerkt, in welche Datei
+jedes eingefügt wurde; nach dem Speichern enthält die Office-Datei sie selbst.
 
-Names are unique per folder (at the top level per owner), ignoring case, as on macOS and Windows (a partial unique index on
-`name_key` among nodes outside the trash; the server keeps `name_key` as the lowercased name, because
-SQLite's own `lower()` only knows ASCII and would let "Übersicht" and "übersicht" stand side by side).
-Times are stored as milliseconds. Names must not contain `/ \ : * ? " < > |` or control
-characters, so every file can be downloaded under its name on every system
-(`packages/files-api/src/schemas.ts`).
+Namen sind pro Ordner eindeutig (auf der obersten Ebene pro Eigentümer), ohne Rücksicht auf
+Groß- und Kleinschreibung, wie unter macOS und Windows (ein partieller eindeutiger Index auf
+`name_key` unter den Knoten außerhalb des Papierkorbs; der Server führt `name_key` als den Namen in
+Kleinbuchstaben, weil SQLites eigenes `lower()` nur ASCII kennt und „Übersicht“ und „übersicht“
+nebeneinander stehen ließe). Zeiten werden in Millisekunden gespeichert. Namen dürfen weder
+`/ \ : * ? " < > |` noch Steuerzeichen enthalten, damit sich jede Datei auf jedem System unter
+ihrem Namen herunterladen lässt (`packages/files-api/src/schemas.ts`).
 
-Saving adds a version. Concurrent saves of one file lock its row and get consecutive numbers.
+Speichern fügt eine Version hinzu. Gleichzeitige Speicherungen einer Datei sperren deren Zeile und
+bekommen aufeinanderfolgende Nummern.
 
-## Versions
+## Versionen { #versions }
 
-The editor saves a few seconds after each change (`AUTOSAVE_DELAY` in
-`packages/editor-core/src/session-progress.ts`), so a day's work makes hundreds of versions. After
-every save and restore the server thins out the file's older ones (`src/files/thinning.ts`), as
-Nextcloud does:
+Der Editor speichert ein paar Sekunden nach jeder Änderung (`AUTOSAVE_DELAY` in
+`packages/editor-core/src/session-progress.ts`); ein Arbeitstag ergibt also Hunderte von
+Versionen. Nach jedem Speichern und Wiederherstellen dünnt der Server die älteren der Datei aus
+(`src/files/thinning.ts`), wie Nextcloud es tut:
 
-| Age | What stays |
+| Alter | Was bleibt |
 |---|---|
-| up to a day | every version |
-| up to 30 days | the newest per hour |
-| up to a year | the newest per day |
-| older | the newest per week |
+| bis zu einem Tag | jede Version |
+| bis zu 30 Tagen | die neueste pro Stunde |
+| bis zu einem Jahr | die neueste pro Tag |
+| älter | die neueste pro Woche |
 
-The newest version always stays, and so does every version someone chose to keep ("Version
-behalten" in the versions dialog, `PATCH /files/:id/versions/:number` with `{ "kept": true }`, for
-those who may edit), and every version [saved to an archive](#saving-to-an-archive): the sent invoice, the signed contract. With `SCHREIBZEUG_VERSIONS=all` every
-version stays ([installation](installation.md#settings)).
+Die neueste Version bleibt immer, und ebenso jede Version, die jemand behalten wollte („Version
+behalten“ im Versionen-Dialog, `PATCH /files/:id/versions/:number` mit `{ "kept": true }`, für
+alle, die bearbeiten dürfen), und jede Version, die [in einem Archiv abgelegt](#saving-to-an-archive) wurde: die verschickte Rechnung, der unterschriebene Vertrag. Mit
+`SCHREIBZEUG_VERSIONS=all` bleibt jede Version ([Installation](installation.md#settings)).
 
-A thinned-out version's row goes at once; its bytes stay in the blob store until the collection
-(`src/blob-collection.ts`), which runs every six hours and removes the blobs that no version and no
-image refers to and that were stored more than an hour ago. A save stores its bytes before it writes
-their row, and storing bytes that are already there renews their time, so the collection never takes
-the blob of a save under way.
+Die Zeile einer ausgedünnten Version verschwindet sofort; ihre Bytes bleiben im Blob-Speicher bis
+zur Sammlung (`src/blob-collection.ts`), die alle sechs Stunden läuft und die Blobs entfernt, auf
+die keine Version und kein Bild verweist und die vor mehr als einer Stunde gespeichert wurden. Eine
+Speicherung legt ihre Bytes ab, bevor sie deren Zeile schreibt, und das Ablegen schon vorhandener
+Bytes erneuert deren Zeit, sodass die Sammlung nie den Blob einer laufenden Speicherung nimmt.
 
-## Trash
+## Papierkorb { #trash }
 
-Trashing a node sets `trashed_at` on it and on everything below it with the same time, and marks it
-as `trash_root`. Everywhere else "not in the trash" is then a single column. The trash lists the
-roots; restoring one clears what was trashed with it, while what had been trashed before stays in
-the trash. A restore fails when the old folder is itself in the trash or the name has been taken
-again.
+Wird ein Knoten in den Papierkorb gelegt, bekommen er und alles darunter `trashed_at` mit derselben
+Zeit, und er wird als `trash_root` markiert. Überall sonst ist „nicht im Papierkorb“ dann eine
+einzige Spalte. Der Papierkorb listet die Wurzeln; wer eine wiederherstellt, holt zurück, was mit
+ihr in den Papierkorb kam, während das, was schon vorher dort lag, im Papierkorb bleibt. Eine
+Wiederherstellung schlägt fehl, wenn der alte Ordner selbst im Papierkorb liegt oder der Name
+wieder vergeben ist.
 
-## API
+## API { #api }
 
-All under `/api`; bodies are JSON unless noted. Every route but `/health`, `/info`, Better Auth's
-`/auth/*`, `GET /invites/:token` and `DELETE /sessions` (only with a token from Kontext,
-[Kontext](kontext.md#tokens-from-kontext)) needs a session or a personal access token and acts for its user ([accounts](accounts.md),
-[MCP server](mcp.md#access-tokens)). Errors are
-`{ "error": { "kind", "message" } }`, with `kind` one of `not_found` (404), `invalid` (400),
-`unauthorized` (401), `forbidden` (403: the role is too weak), `not_a_folder` (422), `name_taken` and `conflict` (409), `too_large` (413),
-`internal` (500), from `POST /files/import` also `link_expired` (410) and `upstream_failed` (502), and from
-`POST /files/:id/archive` also `upstream_failed` and `upstream_refused` (502).
+Alles unter `/api`; Bodys sind JSON, sofern nicht anders angegeben. Jede Route außer `/health`,
+`/info`, Better Auths `/auth/*`, `GET /invites/:token` und `DELETE /sessions` (nur mit einem Token
+von Kontext, [Kontext](kontext.md#tokens-from-kontext)) braucht eine Sitzung oder einen
+persönlichen Zugangsschlüssel und handelt für dessen Benutzer ([Konten](accounts.md),
+[MCP-Server](mcp.md#access-tokens)). Fehler sind
+`{ "error": { "kind", "message" } }`, wobei `kind` eines ist von `not_found` (404), `invalid`
+(400), `unauthorized` (401), `forbidden` (403: die Rolle reicht nicht), `not_a_folder` (422),
+`name_taken` und `conflict` (409), `too_large` (413), `internal` (500), von
+`POST /files/import` auch `link_expired` (410) und `upstream_failed` (502) und von
+`POST /files/:id/archive` auch `upstream_failed` und `upstream_refused` (502).
 
-Only the uploads (`POST /files`, `PUT /files/:id/content`, `POST /files/:id/media`, `POST /files/:id/archive`) take bodies up to
-`SCHREIBZEUG_MAX_UPLOAD_MB`. Better Auth's `/auth/*` answers a body over 64 KB with `413` before it
-reads it, and every other route one over 16 MB (`src/limits.ts`): Bun's own limit is sized for the
-uploads, and Better Auth reads a JSON body whole before it checks who is asking.
+Nur die Uploads (`POST /files`, `PUT /files/:id/content`, `POST /files/:id/media`, `POST /files/:id/archive`) nehmen Bodys bis
+`SCHREIBZEUG_MAX_UPLOAD_MB`. Better Auths `/auth/*` beantwortet einen Body über 64 KB mit `413`,
+bevor es ihn liest, und jede andere Route einen über 16 MB (`src/limits.ts`): Buns eigenes Limit
+ist auf die Uploads ausgelegt, und Better Auth liest einen JSON-Body ganz, bevor es prüft, wer
+fragt.
 
-Every node in an answer carries `role`, what the user may do with it: `owner`, `edit` or `view`.
+Jeder Knoten in einer Antwort trägt `role`, was der Benutzer damit darf: `owner`, `edit` oder
+`view`.
 
-| Route | What it does |
+| Route | Was sie tut |
 |---|---|
-| `GET /nodes?parent=root\|<id>` | A folder: the folder, its path from the root (for a shared folder, from the folder that was shared), its children (folders first, by name) |
-| `GET /nodes/:id` | One node |
-| `PATCH /nodes/:id` | Rename (`name`; needs edit and the folder it lies in, [sharing](accounts.md#sharing)) and/or move (`parentId`, owner only) |
-| `POST /nodes/:id/trash` | Move into the trash |
-| `POST /nodes/:id/restore` | Bring back from the trash |
-| `GET /trash`, `GET /recent` | What is in the trash; files by last change (both only the user's own) |
-| `GET /storage` | How much room there is, [below](#storage) |
-| `GET /search?q=` | Nodes whose name contains `q`, ignoring case: the user's own and what lies in or below what is shared with them, files first, at most 50 |
-| `GET /nodes/:id/shares` | Who the node is shared with (owner only) |
-| `PUT /nodes/:id/shares` | Share with the account behind `email`, or change its `role` (`edit`, `view`) |
-| `DELETE /nodes/:id/shares/:userId` | Take a share back |
-| `GET /shared` | What others shared with the user, with `ownerName` |
-| `GET /nodes/:id/invites` | The node's links that still hold (owner only) |
-| `POST /nodes/:id/invites` | A new link (`role`, `days`: 1, 7 or 30) |
-| `DELETE /nodes/:id/invites/:token` | Delete a link |
-| `GET /invites/:token` | What a link shares (`nodeName`, `kind`, `ownerName`, `role`, `expiresAt`); **no session needed** |
-| `POST /invites/:token/accept` | Accept a link: a share with its role, never weaker than one the user has |
-| `POST /folders` | New folder (`parentId`, `name`) |
-| `POST /files` | Upload (multipart: `file`, optional `parentId`) |
-| `POST /files/import` | A copy of the file behind another app's link as a new file (`url`, optional `name`, `parentId`), [below](#opening-a-file-from-another-app) |
-| `POST /files/blank` | New file (`parentId`, `name`, `format`: `docx`, `xlsx`, `pptx`, or `md` and `txt`, which are empty) |
-| `GET /files/:id/content[?version=n]` | The bytes of the newest or a given version, as a download (`Content-Disposition: attachment`, `X-Content-Type-Options: nosniff`) |
-| `PUT /files/:id/content` | Save: the body becomes a new version; from a shared session with `x-schreibzeug-session-save` (409 when that session is gone; the edit role is checked first, so someone without it gets 404/403 whatever the session's state), see [collaboration](collaboration.md#saving). With `If-Match: "<sha256>"` only while the newest version's content has that SHA-256, else 409 (the text editor, [Markdown and text files](text.md#saving)); a malformed one is 400 |
-| `GET /files/:id/versions` | All versions, newest first |
-| `POST /files/:id/media` | Store an image put into the file while editing (PNG, JPEG, GIF, BMP, by its first bytes); answers its name, `<sha256>.<ext>`. Needs `edit` |
-| `GET /files/:id/media/:name` | That image, for everyone who may see the file; only images put into this file, never another blob by its hash; with `X-Content-Type-Options: nosniff` |
-| `POST /files/:id/copy` | A copy of the newest version, named "… (Kopie).docx", next to the original when the user may add there, otherwise in their own files |
-| `POST /files/:id/versions/:number/restore` | Make an older version the newest again (as a new version; the ones in between stay) |
-| `PATCH /files/:id/versions/:number` | `{ "kept": true }` keeps a version from being [thinned out](#versions), `false` lets it go again (edit) |
-| `POST /files/:id/archive` | Sends the newest version to the archive as PDF/A and/or the file itself, and keeps it (edit), [below](#saving-to-an-archive) |
+| `GET /nodes?parent=root\|<id>` | Ein Ordner: der Ordner, sein Pfad von der Wurzel (bei einem geteilten Ordner von dem Ordner, der geteilt wurde), seine Kinder (Ordner zuerst, nach Namen) |
+| `GET /nodes/:id` | Ein Knoten |
+| `PATCH /nodes/:id` | Umbenennen (`name`; braucht Bearbeiten und den Ordner, in dem er liegt, [Teilen](accounts.md#sharing)) und/oder verschieben (`parentId`, nur Eigentümer) |
+| `POST /nodes/:id/trash` | In den Papierkorb verschieben |
+| `POST /nodes/:id/restore` | Aus dem Papierkorb zurückholen |
+| `GET /trash`, `GET /recent` | Was im Papierkorb liegt; Dateien nach letzter Änderung (beide nur die eigenen des Benutzers) |
+| `GET /storage` | Wie viel Platz da ist, [unten](#storage) |
+| `GET /search?q=` | Knoten, deren Name `q` enthält, ohne Rücksicht auf Groß- und Kleinschreibung: die eigenen des Benutzers und was in oder unter dem liegt, was mit ihm geteilt ist, Dateien zuerst, höchstens 50 |
+| `GET /nodes/:id/shares` | Mit wem der Knoten geteilt ist (nur Eigentümer) |
+| `PUT /nodes/:id/shares` | Mit dem Konto hinter `email` teilen oder dessen `role` ändern (`edit`, `view`) |
+| `DELETE /nodes/:id/shares/:userId` | Eine Freigabe zurücknehmen |
+| `GET /shared` | Was andere mit dem Benutzer geteilt haben, mit `ownerName` |
+| `GET /nodes/:id/invites` | Die Links des Knotens, die noch gelten (nur Eigentümer) |
+| `POST /nodes/:id/invites` | Ein neuer Link (`role`, `days`: 1, 7 oder 30) |
+| `DELETE /nodes/:id/invites/:token` | Einen Link löschen |
+| `GET /invites/:token` | Was ein Link teilt (`nodeName`, `kind`, `ownerName`, `role`, `expiresAt`); **keine Sitzung nötig** |
+| `POST /invites/:token/accept` | Einen Link annehmen: eine Freigabe mit seiner Rolle, nie schwächer als eine, die der Benutzer schon hat |
+| `POST /folders` | Neuer Ordner (`parentId`, `name`) |
+| `POST /files` | Hochladen (multipart: `file`, optional `parentId`) |
+| `POST /files/import` | Eine Kopie der Datei hinter dem Link einer anderen App als neue Datei (`url`, optional `name`, `parentId`), [unten](#opening-a-file-from-another-app) |
+| `POST /files/blank` | Neue Datei (`parentId`, `name`, `format`: `docx`, `xlsx`, `pptx`, oder `md` und `txt`, die leer sind) |
+| `GET /files/:id/content[?version=n]` | Die Bytes der neuesten oder einer bestimmten Version, als Download (`Content-Disposition: attachment`, `X-Content-Type-Options: nosniff`) |
+| `PUT /files/:id/content` | Speichern: Der Body wird zu einer neuen Version; aus einer gemeinsamen Sitzung mit `x-schreibzeug-session-save` (409, wenn diese Sitzung nicht mehr besteht; die Bearbeiten-Rolle wird zuerst geprüft, wer sie nicht hat, bekommt also 404/403, egal in welchem Zustand die Sitzung ist), siehe [Zusammenarbeit](collaboration.md#saving). Mit `If-Match: "<sha256>"` nur, solange der Inhalt der neuesten Version diesen SHA-256 hat, sonst 409 (der Texteditor, [Markdown- und Textdateien](text.md#saving)); ein fehlerhafter ergibt 400 |
+| `GET /files/:id/versions` | Alle Versionen, neueste zuerst |
+| `POST /files/:id/media` | Ein beim Bearbeiten in die Datei eingefügtes Bild speichern (PNG, JPEG, GIF, BMP, nach seinen ersten Bytes); antwortet mit seinem Namen, `<sha256>.<ext>`. Braucht `edit` |
+| `GET /files/:id/media/:name` | Dieses Bild, für alle, die die Datei sehen dürfen; nur Bilder, die in diese Datei eingefügt wurden, nie ein anderer Blob über seinen Hash; mit `X-Content-Type-Options: nosniff` |
+| `POST /files/:id/copy` | Eine Kopie der neuesten Version, benannt „… (Kopie).docx“, neben dem Original, wenn der Benutzer dort etwas hinzufügen darf, sonst in seinen eigenen Dateien |
+| `POST /files/:id/versions/:number/restore` | Eine ältere Version wieder zur neuesten machen (als neue Version; die dazwischen bleiben) |
+| `PATCH /files/:id/versions/:number` | `{ "kept": true }` bewahrt eine Version vor dem [Ausdünnen](#versions), `false` gibt sie wieder frei (Bearbeiten) |
+| `POST /files/:id/archive` | Sendet die neueste Version als PDF/A und/oder die Datei selbst an das Archiv und behält sie (Bearbeiten), [unten](#saving-to-an-archive) |
 | `GET /health` | `{ "ok": true }` |
-| `GET /info` | `{ "mode": "server" }`, with `oidc: { name }` when a sign-in provider is set `embedOrigin` when a site may frame the app ([Kontext](kontext.md)) and `archive: { name? }` when documents can be [saved to an archive](#saving-to-an-archive); the desktop app's local server answers `{ "mode": "local", "rootName" }` ([desktop app](desktop.md#files-on-this-computer)). **No session needed** |
+| `GET /info` | `{ "mode": "server" }`, mit `oidc: { name }`, wenn ein Anmeldeanbieter eingestellt ist, `embedOrigin`, wenn eine Website die App in einem Frame zeigen darf ([Kontext](kontext.md)), und `archive: { name? }`, wenn sich Dokumente [in einem Archiv ablegen](#saving-to-an-archive) lassen; der lokale Server der Desktop-App antwortet `{ "mode": "local", "rootName" }` ([Desktop-App](desktop.md#files-on-this-computer)). **Keine Sitzung nötig** |
 
-More routes, described where they belong:
+Weitere Routen, beschrieben dort, wo sie hingehören:
 
-| Route | Where |
+| Route | Wo |
 |---|---|
-| `GET /tokens`, `POST /tokens`, `DELETE /tokens/:id` | Personal access tokens, only with a session ([MCP server](mcp.md#access-tokens)) |
-| `POST /files/:id/agent`, `GET /files/:id/outline` | A job for the open editor ([MCP server](mcp.md#editing-in-the-open-tab)) |
-| `GET /collab/:fileId` (WebSocket) | The editing session of a file ([collaboration](collaboration.md)) |
-| `GET /agent/:fileId` (WebSocket) | An open editor taking jobs ([MCP server](mcp.md#editing-in-the-open-tab)) |
-| `DELETE /sessions` | Kontext signs someone out everywhere ([Kontext](kontext.md#tokens-from-kontext)) |
-| `/mcp` (outside `/api`) | The MCP endpoint ([MCP server](mcp.md#the-endpoint)) |
+| `GET /tokens`, `POST /tokens`, `DELETE /tokens/:id` | Persönliche Zugangsschlüssel, nur mit Sitzung ([MCP-Server](mcp.md#access-tokens)) |
+| `POST /files/:id/agent`, `GET /files/:id/outline` | Ein Auftrag für den offenen Editor ([MCP-Server](mcp.md#editing-in-the-open-tab)) |
+| `GET /collab/:fileId` (WebSocket) | Die Bearbeitungssitzung einer Datei ([Zusammenarbeit](collaboration.md)) |
+| `GET /agent/:fileId` (WebSocket) | Ein offener Editor, der Aufträge annimmt ([MCP-Server](mcp.md#editing-in-the-open-tab)) |
+| `DELETE /sessions` | Kontext meldet jemanden überall ab ([Kontext](kontext.md#tokens-from-kontext)) |
+| `/mcp` (außerhalb von `/api`) | Der MCP-Endpunkt ([MCP-Server](mcp.md#the-endpoint)) |
 
-## Storage
+## Speicherplatz { #storage }
 
-`GET /api/storage` answers what the user's own files take and how much room is left
-(`src/files/storage.ts`, `src/disk.ts`):
+`GET /api/storage` antwortet, wie viel die eigenen Dateien des Benutzers belegen und wie viel Platz
+übrig ist (`src/files/storage.ts`, `src/disk.ts`):
 
-- `usage`: the sizes of their versions, split into `files` (the newest version of every file
-  outside the trash), `versions` (the older ones that [thinning](#versions) left) and `trash` (every version
-  of what lies there). These are the files' sizes: the blob store keeps the same bytes once, so the
-  disk may hold less. A shared file counts for its owner.
-- `disk`: `free` and `total` of the drive that holds the data folder (`statfs`; `free` is what an
-  unprivileged process may still write, without the blocks reserved for root), asked anew each
-  time; `null` when the system does not say. Every signed-in account sees it: they share the
-  drive.
-- `uploadLimit`: `SCHREIBZEUG_MAX_UPLOAD_MB` in bytes.
+- `usage`: die Größen ihrer Versionen, aufgeteilt in `files` (die neueste Version jeder Datei
+  außerhalb des Papierkorbs), `versions` (die älteren, die das [Ausdünnen](#versions) übrig gelassen
+  hat) und `trash` (jede Version dessen, was dort liegt). Das sind die Größen der Dateien: Der
+  Blob-Speicher hält dieselben Bytes nur einmal, die Platte kann also weniger belegen. Eine geteilte
+  Datei zählt für ihren Eigentümer.
+- `disk`: `free` und `total` des Laufwerks, auf dem der Datenordner liegt (`statfs`; `free` ist das,
+  was ein unprivilegierter Prozess noch schreiben darf, ohne die für root reservierten Blöcke),
+  jedes Mal neu abgefragt; `null`, wenn das System es nicht sagt. Jedes angemeldete Konto sieht
+  es: Sie teilen sich das Laufwerk.
+- `uploadLimit`: `SCHREIBZEUG_MAX_UPLOAD_MB` in Bytes.
 
-The app shows it at the foot of the navigation (a bar that turns yellow from 80 % and red from
-95 %, as Kontext's mailbox ring, and what the user's files take) and in the settings, split as
-above (`apps/web/src/storage`, `apps/web/src/settings/storage-section.tsx`). With less than 1 GB
-free, or less than the upload limit when that is larger, a notice above every file page says that
-saves may soon fail (`apps/web/src/lib/storage.ts`); a share of the drive would not do, as 5 % of
-a large one is still plenty. The desktop app's local server answers the same route with the drive
-of its folder and no `usage`, and the app shows only that notice ([desktop app](desktop.md)).
+Die App zeigt es unten in der Navigation (ein Balken, der ab 80 % gelb und ab 95 % rot wird, wie
+der Postfach-Ring von Kontext, und was die Dateien des Benutzers belegen) und in den
+Einstellungen, aufgeteilt wie oben (`apps/web/src/storage`,
+`apps/web/src/settings/storage-section.tsx`). Bei weniger als 1 GB frei, oder weniger als dem
+Upload-Limit, wenn das größer ist, sagt ein Hinweis über jeder Dateiseite, dass Speicherungen bald
+fehlschlagen können (`apps/web/src/lib/storage.ts`); ein Anteil am Laufwerk würde nicht taugen, denn
+5 % eines großen sind immer noch reichlich. Der lokale Server der Desktop-App beantwortet dieselbe
+Route mit dem Laufwerk seines Ordners und ohne `usage`, und die App zeigt nur diesen Hinweis
+([Desktop-App](desktop.md)).
 
-## Opening a file from another app
+## Eine Datei aus einer anderen App öffnen { #opening-a-file-from-another-app }
 
-Another app can hand over a file with a link, such as an archive's "Öffnen mit Schreibzeug" button.
-It opens `/open?url=<link>&name=<file name>` in the web app (both URL-encoded); the page asks to
-sign in first if needed, has the server fetch the file (`POST /api/files/import`) and opens the
-new file in its editor. Schreibzeug edits a copy in the user's files; the original stays in the
-other app. The archive's admin sets the address as `https://<schreibzeug>/open?url={url}&name={name}`.
+Eine andere App kann eine Datei mit einem Link übergeben, etwa der Knopf „Öffnen mit Schreibzeug“
+eines Archivs. Sie öffnet `/open?url=<Link>&name=<Dateiname>` in der Web-App (beides URL-kodiert);
+die Seite lässt, wenn nötig, zuerst anmelden, lässt den Server die Datei holen
+(`POST /api/files/import`) und öffnet die neue Datei in ihrem Editor. Schreibzeug bearbeitet eine
+Kopie in den Dateien des Benutzers; das Original bleibt in der anderen App. Wer das Archiv
+verwaltet, trägt als Adresse `https://<schreibzeug>/open?url={url}&name={name}` ein.
 
-The server only fetches links on an origin listed in `SCHREIBZEUG_IMPORT_ORIGINS`
-([installation](installation.md#settings)); without it the route answers `404` and fetches
-nothing. A link must be `http(s)`, without user name or password, and on exactly one of those
-origins (`src/files/import.ts`), so nobody can make the server fetch addresses in its own network.
-Redirects are not followed. The download may take 60 seconds and at most
-`SCHREIBZEUG_MAX_UPLOAD_MB`, counted as the bytes come, not by `Content-Length`. Then the file is
-stored as an upload is.
+Der Server holt nur Links auf einem Origin aus `SCHREIBZEUG_IMPORT_ORIGINS`
+([Installation](installation.md#settings)); ohne die Variable antwortet die Route `404` und holt
+nichts. Ein Link muss `http(s)` sein, ohne Benutzernamen oder Passwort, und genau auf einem dieser
+Origins liegen (`src/files/import.ts`), damit niemand den Server Adressen in seinem eigenen Netz
+abrufen lassen kann. Weiterleitungen werden nicht verfolgt. Der Download darf 60 Sekunden dauern
+und höchstens `SCHREIBZEUG_MAX_UPLOAD_MB` groß sein, gezählt, während die Bytes kommen, nicht nach
+`Content-Length`. Dann wird die Datei gespeichert wie ein Upload.
 
-The name is `name` when it is a valid name, else the one in the answer's `Content-Disposition`,
-else "Datei"; a name without a known extension gets the one of the `Content-Type`. When it is
-taken in the folder, the file becomes "Name (2).ext", "Name (3).ext" and so on.
+Der Name ist `name`, wenn er ein gültiger Name ist, sonst der aus `Content-Disposition` der
+Antwort, sonst „Datei“; ein Name ohne bekannte Endung bekommt die des `Content-Type`. Ist er im
+Ordner vergeben, wird die Datei zu „Name (2).ext“, „Name (3).ext“ und so weiter.
 
-| Answer | When |
+| Antwort | Wann |
 |---|---|
-| `201` with the new node | Stored |
-| `404 not_found` | `SCHREIBZEUG_IMPORT_ORIGINS` is not set |
-| `403 forbidden` | The link's origin is not allowed |
-| `410 link_expired` | The other app answered `404` or `410`: the link has expired or the file was deleted |
-| `413 too_large` | Larger than `SCHREIBZEUG_MAX_UPLOAD_MB` |
-| `502 upstream_failed` | Not reachable, too slow, a redirect or another error |
+| `201` mit dem neuen Knoten | Gespeichert |
+| `404 not_found` | `SCHREIBZEUG_IMPORT_ORIGINS` ist nicht gesetzt |
+| `403 forbidden` | Der Origin des Links ist nicht erlaubt |
+| `410 link_expired` | Die andere App antwortete `404` oder `410`: Der Link ist abgelaufen oder die Datei gelöscht |
+| `413 too_large` | Größer als `SCHREIBZEUG_MAX_UPLOAD_MB` |
+| `502 upstream_failed` | Nicht erreichbar, zu langsam, eine Weiterleitung oder ein anderer Fehler |
 
-## Saving to an archive
+## In einem Archiv ablegen { #saving-to-an-archive }
 
-A server can be set up with an archive that keeps finished documents as unalterable originals,
-such as a sent offer or a signed contract, e.g. [Belegt](https://github.com/Speicherstadt/belegt), a
-self-hosted archive for GoBD. Then the "Datei" menu of every editor that can make a PDF (documents,
-spreadsheets, presentations, PDFs) has "Im Archiv ablegen …" (`In <name> ablegen …` with
-`SCHREIBZEUG_ARCHIVE_NAME`) for those who may edit the file. The dialog sends the saved version as
-PDF/A, the same the "Als PDF/A herunterladen" item makes
-([PDF and printing](engine.md#pdf-and-printing)), and on request the Office file itself;
-afterwards it links to each new document in the archive. Changes not saved yet are saved first,
-so the archive gets a stored version, and that version is then [kept](#versions): thinning never
-removes what the archive holds.
+Ein Server kann mit einem Archiv eingerichtet sein, das fertige Dokumente als unveränderbare
+Originale aufbewahrt, etwa ein verschicktes Angebot oder einen unterschriebenen Vertrag, z. B.
+[Belegt](https://github.com/Speicherstadt/belegt), ein selbst gehostetes Archiv für die GoBD. Dann hat
+das Menü „Datei“ jedes Editors, der ein PDF erstellen kann (Dokumente, Tabellen, Präsentationen,
+PDFs), den Eintrag „Im Archiv ablegen …“ (`In <Name> ablegen …` mit `SCHREIBZEUG_ARCHIVE_NAME`) für
+alle, die die Datei bearbeiten dürfen. Der Dialog sendet die gespeicherte Version als PDF/A, dasselbe,
+das „Als PDF/A herunterladen“ erstellt ([PDF und Drucken](engine.md#pdf-and-printing)), und auf
+Wunsch die Office-Datei selbst;
+danach verlinkt er jedes neue Dokument im Archiv. Noch nicht gespeicherte Änderungen werden vorher
+gespeichert, damit das Archiv eine gespeicherte Version bekommt, und diese Version wird dann
+[behalten](#versions): Das Ausdünnen entfernt nie, was im Archiv liegt.
 
-The browser renders the PDF/A and sends it with the version's number to
-`POST /api/files/:id/archive` (multipart: `pdf`, `original=true`, `version`). The server checks the
-PDF lightly (it starts with `%PDF-`, at most `SCHREIBZEUG_MAX_UPLOAD_MB`), takes the original from
-the blob store, and sends each file as a document of its own to `<archive>/api/dokumente`
-(multipart field `datei`, `Authorization: Bearer <SCHREIBZEUG_ARCHIVE_TOKEN>`, 60 seconds each;
-`src/files/archive.ts`). Redirects are not followed, so the token only reaches
-`SCHREIBZEUG_ARCHIVE_URL`; it never goes to the browser, into an answer or into the log. The
-archive answers each document with JSON holding its `id`; its page is
-`<archive>/dokumente/<id>`. The answer to the browser is
-`{ "version", "documents": [{ "kind": "pdf" | "original", "name", "id", "url" }] }`. Each upload is
-a new document in the archive, also when the same version goes twice.
+Der Browser erstellt das PDF/A und sendet es mit der Nummer der Version an
+`POST /api/files/:id/archive` (multipart: `pdf`, `original=true`, `version`). Der Server prüft das
+PDF knapp (es beginnt mit `%PDF-`, höchstens `SCHREIBZEUG_MAX_UPLOAD_MB`), nimmt das Original aus
+dem Blob-Speicher und sendet jede Datei als eigenes Dokument an `<Archiv>/api/dokumente`
+(Multipart-Feld `datei`, `Authorization: Bearer <SCHREIBZEUG_ARCHIVE_TOKEN>`, je 60 Sekunden;
+`src/files/archive.ts`). Weiterleitungen werden nicht verfolgt, damit der Schlüssel nur
+`SCHREIBZEUG_ARCHIVE_URL` erreicht; er geht nie an den Browser, in eine Antwort oder ins Log. Das
+Archiv beantwortet jedes Dokument mit JSON, das seine `id` enthält; seine Seite ist
+`<Archiv>/dokumente/<id>`. Die Antwort an den Browser ist
+`{ "version", "documents": [{ "kind": "pdf" | "original", "name", "id", "url" }] }`. Jeder Upload
+ist ein neues Dokument im Archiv, auch wenn dieselbe Version zweimal geht.
 
-Edit is needed rather than view, as the version gets kept. In the archive the token needs the
-right "schreiben" (write); one that may only read is refused.
+Nötig ist Bearbeiten statt Ansehen, weil die Version behalten wird. Im Archiv braucht der Schlüssel
+das Recht „schreiben“; einer, der nur lesen darf, wird abgelehnt.
 
-| Answer | When |
+| Antwort | Wann |
 |---|---|
-| `201` | In the archive; the version is kept |
-| `400 invalid` | Nothing chosen, or the body is no PDF |
-| `403 forbidden`, `404 not_found` | The user may only look at the file, or not at all; `404` also without `SCHREIBZEUG_ARCHIVE_URL` and `_TOKEN` |
-| `409 conflict` | Someone saved a newer version in between; archiving again sends that one |
-| `413 too_large` | Larger than `SCHREIBZEUG_MAX_UPLOAD_MB`, or the archive answered `413` |
-| `502 upstream_refused` | The archive answered `401` or `403`: the admin must check the token |
-| `502 upstream_failed` | Not reachable, too slow, a redirect, an answer without `id` or another error |
+| `201` | Im Archiv; die Version ist behalten |
+| `400 invalid` | Nichts ausgewählt, oder der Body ist kein PDF |
+| `403 forbidden`, `404 not_found` | Der Benutzer darf die Datei nur ansehen oder gar nicht; `404` auch ohne `SCHREIBZEUG_ARCHIVE_URL` und `_TOKEN` |
+| `409 conflict` | Jemand hat inzwischen eine neuere Version gespeichert; erneutes Ablegen sendet diese |
+| `413 too_large` | Größer als `SCHREIBZEUG_MAX_UPLOAD_MB`, oder das Archiv antwortete `413` |
+| `502 upstream_refused` | Das Archiv antwortete `401` oder `403`: Wer den Server verwaltet, muss den Schlüssel prüfen |
+| `502 upstream_failed` | Nicht erreichbar, zu langsam, eine Weiterleitung, eine Antwort ohne `id` oder ein anderer Fehler |
 
-When the PDF went and the original then fails, the message says the PDF is in the archive, and the
-version is kept.
+Ging das PDF und scheitert danach das Original, sagt die Meldung, dass das PDF im Archiv liegt, und
+die Version ist behalten.
 
-## Templates
+## Vorlagen { #templates }
 
-"Neu → Aus Vorlage …" (`apps/web/src/files/template-dialog.tsx`) starts a file from a template:
+„Neu → Aus Vorlage …“ (`apps/web/src/files/template-dialog.tsx`) beginnt eine Datei aus einer
+Vorlage:
 
-- **Built in** (`packages/ooxml/src/templates.ts`): a letter after DIN 5008, an offer, an invoice
-  with what § 14 UStG asks of one, a calculation (formulas for the totals and the tax, euro
-  formats), a project plan and a presentation. They are written as Office XML there; square
-  brackets mark what to fill in.
-- **Own templates**: every document, spreadsheet and presentation in a folder named "Vorlagen" at
-  the top of the user's files. Nothing else needs setting up, on a server as on the computer.
+- **Eingebaut** (`packages/ooxml/src/templates.ts`): ein Brief nach DIN 5008, ein Angebot, eine
+  Rechnung mit dem, was § 14 UStG von einer verlangt, eine Kalkulation (Formeln für die Summen und
+  die Steuer, Euro-Formate), ein Projektplan und eine Präsentation. Sie sind dort als Office-XML
+  geschrieben; eckige Klammern markieren, was auszufüllen ist.
+- **Eigene Vorlagen**: jedes Dokument, jede Tabelle und jede Präsentation in einem Ordner namens
+  „Vorlagen“ auf der obersten Ebene der Dateien des Benutzers. Sonst muss nichts eingerichtet
+  werden, auf einem Server wie auf dem Rechner.
 
-The new file is the template's bytes uploaded under the name given (`POST /files`), so the API
-needs nothing of its own for it and an own template stays as it is.
+Die neue Datei sind die Bytes der Vorlage, hochgeladen unter dem angegebenen Namen
+(`POST /files`); die API braucht dafür also nichts Eigenes, und eine eigene Vorlage bleibt, wie sie
+ist.
 
-## Running it
+## Betrieb { #running-it }
 
-| Variable | Default |
+| Variable | Standard |
 |---|---|
-| `SCHREIBZEUG_DATA_DIR` | `data`: the database `schreibzeug.db`, the blobs in `blobs/`, the generated `auth-secret` |
+| `SCHREIBZEUG_DATA_DIR` | `data`: die Datenbank `schreibzeug.db`, die Blobs in `blobs/`, das erzeugte `auth-secret` |
 | `PORT` | `3000` |
 | `SCHREIBZEUG_MAX_UPLOAD_MB` | `512` |
-| `SCHREIBZEUG_IMPORT_ORIGINS` | unset: no file is fetched from a link, [above](#opening-a-file-from-another-app) |
-| `SCHREIBZEUG_ARCHIVE_URL`, `SCHREIBZEUG_ARCHIVE_TOKEN`, `SCHREIBZEUG_ARCHIVE_NAME` | unset: nothing is saved to an archive, [above](#saving-to-an-archive) |
-| `SCHREIBZEUG_OPEN_SIGNUP`, `SCHREIBZEUG_AUTH_SECRET`, `SCHREIBZEUG_TRUSTED_ORIGINS`, `SCHREIBZEUG_TRUSTED_PROXIES` | see [accounts](accounts.md) |
-| `SCHREIBZEUG_URL`, `SCHREIBZEUG_EMBED_ORIGIN`, `OIDC_ISSUER`, `OIDC_CLIENT_ID`, `OIDC_CLIENT_SECRET`, `OIDC_NAME` | see [Schreibzeug in Kontext](kontext.md#settings) |
-| `SCHREIBZEUG_WEB_DIR` | unset: the API only. The built web app (`apps/web/dist`, after `bun run build`) to serve beside it, so one address serves the app and the API (every file with `X-Content-Type-Options: nosniff`, so a browser never takes it for another type); the [desktop app](desktop.md) opens that address |
+| `SCHREIBZEUG_IMPORT_ORIGINS` | nicht gesetzt: Aus Links wird keine Datei geholt, [oben](#opening-a-file-from-another-app) |
+| `SCHREIBZEUG_ARCHIVE_URL`, `SCHREIBZEUG_ARCHIVE_TOKEN`, `SCHREIBZEUG_ARCHIVE_NAME` | nicht gesetzt: Nichts wird in einem Archiv abgelegt, [oben](#saving-to-an-archive) |
+| `SCHREIBZEUG_OPEN_SIGNUP`, `SCHREIBZEUG_AUTH_SECRET`, `SCHREIBZEUG_TRUSTED_ORIGINS`, `SCHREIBZEUG_TRUSTED_PROXIES` | siehe [Konten](accounts.md) |
+| `SCHREIBZEUG_URL`, `SCHREIBZEUG_EMBED_ORIGIN`, `OIDC_ISSUER`, `OIDC_CLIENT_ID`, `OIDC_CLIENT_SECRET`, `OIDC_NAME` | siehe [Schreibzeug in Kontext](kontext.md#settings) |
+| `SCHREIBZEUG_WEB_DIR` | nicht gesetzt: nur die API. Die gebaute Web-App (`apps/web/dist`, nach `bun run build`), die daneben ausgeliefert wird, sodass eine Adresse App und API ausliefert (jede Datei mit `X-Content-Type-Options: nosniff`, damit ein Browser sie nie für einen anderen Typ hält); die [Desktop-App](desktop.md) öffnet diese Adresse |
 
-The image `tristanteu/schreibzeug` (`docker/Dockerfile`) has the server and the built web app with
-its engine, with the data in `/data` (`SCHREIBZEUG_WEB_DIR=/app/web`, port 3000). **Actions →
-Release** publishes it on Docker Hub and as `ghcr.io/speicherstadt/schreibzeug` when a `v*` tag is
-pushed; to build it yourself, `docker build -f docker/Dockerfile .`
-([installation](installation.md)).
+Das Image `tristanteu/schreibzeug` (`docker/Dockerfile`) enthält den Server und die gebaute Web-App
+mit ihrer Engine, mit den Daten in `/data` (`SCHREIBZEUG_WEB_DIR=/app/web`, Port 3000). **Actions →
+Release** veröffentlicht es auf Docker Hub und als `ghcr.io/speicherstadt/schreibzeug`, wenn ein
+`v*`-Tag gepusht wird; zum Selberbauen `docker build -f docker/Dockerfile .`
+([Installation](installation.md)).
 
-`bun run server` starts it with reload; it applies the migrations in `apps/server/drizzle` on
-start. After a change to the schema, `bun run --filter @schreibzeug/server db:generate` writes the next
-migration. drizzle-kit 0.31 quotes the expressions of a SQLite index as column names; check
-generated indexes on expressions (as `nodes_name_per_parent` in `0000_init.sql`, fixed by hand).
+`bun run server` startet ihn mit Reload; er wendet beim Start die Migrationen in
+`apps/server/drizzle` an. Nach einer Änderung am Schema schreibt
+`bun run --filter @schreibzeug/server db:generate` die nächste Migration. drizzle-kit 0.31 setzt
+die Ausdrücke eines SQLite-Index in Anführungszeichen wie Spaltennamen; prüf erzeugte Indizes auf
+Ausdrücken (wie `nodes_name_per_parent` in `0000_init.sql`, von Hand korrigiert).
 
-## Tests
+## Tests { #tests }
 
-`apps/server/test/files.test.ts` signs up an account and runs the app with `app.request()` and Hono's typed test client
-against a real SQLite file: each test file gets a temporary data folder of its own
-(`test/harness.ts`), removed afterwards. Vitest runs on Bun (`bun --bun vitest`), which `bun:sqlite`
-needs. The E2E server starts on an empty `e2e/.data`; the screenshots pin their dates in its
-database through a small Bun script (`e2e/sqlite.ts`), since Playwright runs on Node.
-`apps/server/test/media.test.ts` covers images stored while editing, `storage.test.ts` what
-`/storage` counts, `units.test.ts` the settings,
-names and small helpers. Templates: `apps/web/src/files/templates.test.ts` (which files count, the
-names) and `e2e/templates.spec.ts` (a file from a built-in and from an own template, opened in its
-editor). `e2e/files.spec.ts` goes through the file list as a person does.
-Opening from a link: `apps/server/test/import.test.ts` against a Bun server on a free port as the
-other app (allowed origins, redirects, limits, expired links, names), and `e2e/open.spec.ts` with
-a stand-in archive (`e2e/fake-archive.ts`), signing in first included. Saving to an archive:
-`apps/server/test/archive.test.ts` against a stand-in archive on a free port (the token only in the
-Authorization header and never in an answer or the log, redirects, refused tokens, limits, the
-original, the kept version), `apps/web/src/editor/archive.test.ts` (save first, the steps, the
-texts) and `e2e/save-to-archive.spec.ts` with the same stand-in archive as above (a PDF/A and the
-original in the archive, a refused token).
+`apps/server/test/files.test.ts` registriert ein Konto und führt die App mit `app.request()` und
+dem typisierten Test-Client von Hono gegen eine echte SQLite-Datei aus: Jede Testdatei bekommt
+einen eigenen temporären Datenordner (`test/harness.ts`), der danach entfernt wird. Vitest läuft
+auf Bun (`bun --bun vitest`), was `bun:sqlite` braucht. Der E2E-Server startet auf einem leeren
+`e2e/.data`; die Screenshots legen ihre Datumsangaben in dessen Datenbank über ein kleines Bun-Skript
+fest (`e2e/sqlite.ts`), da Playwright auf Node läuft.
+`apps/server/test/media.test.ts` deckt beim Bearbeiten gespeicherte Bilder ab, `storage.test.ts`,
+was `/storage` zählt, `units.test.ts` die Einstellungen, Namen und kleine Hilfsfunktionen.
+Vorlagen: `apps/web/src/files/templates.test.ts` (welche Dateien zählen, die Namen) und
+`e2e/templates.spec.ts` (eine Datei aus einer eingebauten und aus einer eigenen Vorlage, in ihrem
+Editor geöffnet). `e2e/files.spec.ts` geht die Dateiliste durch, wie ein Mensch es tut.
+Öffnen aus einem Link: `apps/server/test/import.test.ts` gegen einen Bun-Server auf einem freien
+Port als andere App (erlaubte Origins, Weiterleitungen, Grenzen, abgelaufene Links, Namen) und
+`e2e/open.spec.ts` mit einem Ersatz-Archiv (`e2e/fake-archive.ts`), einschließlich der Anmeldung
+vorher. In einem Archiv ablegen: `apps/server/test/archive.test.ts` gegen ein Ersatz-Archiv auf
+einem freien Port (der Schlüssel nur in der Kopfzeile Authorization und nie in einer Antwort oder
+im Log, Weiterleitungen, abgelehnte Schlüssel, Grenzen, das Original, die behaltene Version),
+`apps/web/src/editor/archive.test.ts` (vorher speichern, die Schritte, die Texte) und
+`e2e/save-to-archive.spec.ts` mit demselben Ersatz-Archiv (ein PDF/A und das Original im Archiv,
+ein abgelehnter Schlüssel).

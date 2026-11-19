@@ -1,93 +1,96 @@
-# Installation
+# Installation { #installation }
 
-Schreibzeug is one server (Bun, `apps/server`) that serves the web app, the files API, the
-collaboration relay and the MCP endpoint from one port. Everything it keeps lives in one data
-folder: the SQLite database `schreibzeug.db`, the file contents under `blobs/`, and `auth-secret`.
+Schreibzeug ist ein Server (Bun, `apps/server`), der die Web-App, die Datei-API, das
+Relay für die Zusammenarbeit und den MCP-Endpunkt über einen Port ausliefert. Alles, was er
+speichert, liegt in einem Datenordner: die SQLite-Datenbank `schreibzeug.db`, die Dateiinhalte
+unter `blobs/` und `auth-secret`.
 
-No server or IT of your own? Schreibzeug is available hosted on request or through an IT service
-provider from the partner programme, see [Hosted or with a partner](hosted.md).
+Keinen eigenen Server oder keine eigene IT? Schreibzeug gibt es auf Anfrage gehostet oder über einen
+IT-Dienstleister aus dem Partnerprogramm, siehe [Gehostet oder mit Partner](hosted.md).
 
-## With Docker Compose
+## Mit Docker Compose { #with-docker-compose }
 
-The repository's `deploy/` folder holds what a server needs: `compose.yaml` (the Schreibzeug
-server and Caddy, which gets the HTTPS certificate from Let's Encrypt), `.env.example` and the
-`Caddyfile`. The programs come from Docker Hub; nothing is built on the server. On a server with
-Docker (or Podman), a DNS record for the address and the ports 80 and 443 open:
+Der Ordner `deploy/` im Repository enthält, was ein Server braucht: `compose.yaml` (der
+Schreibzeug-Server und Caddy, der das HTTPS-Zertifikat von Let's Encrypt holt), `.env.example` und
+das `Caddyfile`. Die Programme kommen von Docker Hub; auf dem Server wird nichts gebaut. Auf einem
+Server mit Docker (oder Podman), einem DNS-Eintrag für die Adresse und offenen Ports 80 und 443:
 
 ```bash
-# The configuration (compose.yaml, .env.example, Caddyfile); the programs come from Docker Hub
+# Die Konfiguration (compose.yaml, .env.example, Caddyfile); die Programme kommen von Docker Hub
 git clone https://github.com/Speicherstadt/schreibzeug /opt/schreibzeug && cd /opt/schreibzeug
 cp deploy/.env.example deploy/.env
-nano deploy/.env                                          # domain, mail for Let's Encrypt, version
-docker compose -f deploy/compose.yaml up -d schreibzeug   # Schreibzeug alone, on 127.0.0.1:3000
+nano deploy/.env                                          # Domain, Mail für Let's Encrypt, Version
+docker compose -f deploy/compose.yaml up -d schreibzeug   # nur Schreibzeug, auf 127.0.0.1:3000
 ```
 
-Create the first account before the server can be reached from outside: on a closed server only
-the first account can be made freely, by whoever comes first. It is an account like every other
-one: it takes over the files from before there were accounts, if any, and has no rights over the
-others; there is no administrator ([accounts for administrators](accounts.md#for-administrators)).
-Afterwards new accounts come through links: any link someone creates to share a file or folder
-opens the sign-up for the person who follows it. With `SCHREIBZEUG_OPEN_SIGNUP=true` anyone who
-reaches the server may sign up ([accounts](accounts.md#sign-up)). With the port on 127.0.0.1,
-open it through an SSH tunnel (`ssh -L 3000:127.0.0.1:3000 <server>`, then
-`http://localhost:3000`) and create the account, then start Caddy as well:
+Leg das erste Konto an, bevor der Server von außen erreichbar ist: Auf einem geschlossenen Server
+kann nur das erste Konto frei angelegt werden, und zwar von dem, der zuerst kommt. Es ist ein Konto
+wie jedes andere: Es übernimmt die Dateien aus der Zeit vor den Konten, falls es welche gibt, und
+hat keine Rechte über die anderen; einen Administrator gibt es nicht
+([Konten für Administratoren](accounts.md#for-administrators)). Danach kommen neue Konten über
+Links: Jeder Link, den jemand zum Teilen einer Datei oder eines Ordners erstellt, öffnet für die
+Person, die ihm folgt, die Registrierung. Mit `SCHREIBZEUG_OPEN_SIGNUP=true` darf sich jeder
+registrieren, der den Server erreicht ([Konten](accounts.md#sign-up)). Liegt der Port auf
+127.0.0.1, öffne ihn über einen SSH-Tunnel (`ssh -L 3000:127.0.0.1:3000 <server>`, dann
+`http://localhost:3000`), leg das Konto an und starte dann auch Caddy:
 
 ```bash
-docker compose -f deploy/compose.yaml up -d               # Caddy too: https://<domain>
+docker compose -f deploy/compose.yaml up -d               # auch Caddy: https://<domain>
 ```
 
-Caddy is the only proxy the server trusts (`SCHREIBZEUG_TRUSTED_PROXIES`, its fixed address in
-`compose.yaml`), so sign-ins count per client ([below](#behind-a-reverse-proxy)). Port 3000 stays
-on 127.0.0.1 for the tunnel.
+Caddy ist der einzige Proxy, dem der Server vertraut (`SCHREIBZEUG_TRUSTED_PROXIES`, seine feste
+Adresse in `compose.yaml`), damit Anmeldeversuche pro Client gezählt werden
+([unten](#behind-a-reverse-proxy)). Port 3000 bleibt für den Tunnel auf 127.0.0.1.
 
-With [Kontext](kontext.md) none of this is needed: Kontext's `deploy/compose.yaml` brings
-Schreibzeug as its "documents", signed in through Kontext.
+Mit [Kontext](kontext.md) ist nichts davon nötig: Kontexts `deploy/compose.yaml` bringt
+Schreibzeug als seine „Dokumente“ mit, angemeldet über Kontext.
 
-### The image
+### Das Image { #the-image }
 
-The image `tristanteu/schreibzeug` (Docker Hub, also `ghcr.io/speicherstadt/schreibzeug`) is published
-for amd64 with every release (`.github/workflows/release.yml`, from `docker/Dockerfile`).
-Releases from before the move to the Speicherstadt organization stay at
-`ghcr.io/firsttris/schreibzeug`, which gets no new versions; switch to Docker Hub or the new name.
-Each release is published under three tags (`firsttris/workflows` `docker-release.yml`): its
-version (`:0.1.7`), its minor version (`:0.1`, moved to the newest patch release) and `:latest`; a
-pre-release such as `0.2.0-rc.1` gets its version and `:next` instead. Pin a version, as
-`SCHREIBZEUG_VERSION` in `deploy/.env` does, rather than `:latest`: an update then happens when
-you choose it, after a look at the
-[changelog](https://github.com/Speicherstadt/schreibzeug/blob/main/CHANGELOG.md), and a backup
-([updates](#updates)).
+Das Image `tristanteu/schreibzeug` (Docker Hub, auch `ghcr.io/speicherstadt/schreibzeug`) wird mit
+jedem Release für amd64 veröffentlicht (`.github/workflows/release.yml`, aus `docker/Dockerfile`).
+Releases von vor dem Umzug in die Organisation Speicherstadt bleiben unter
+`ghcr.io/firsttris/schreibzeug`, das keine neuen Versionen mehr bekommt; stell auf Docker Hub oder den neuen Namen um.
+Jedes Release erscheint unter drei Tags (`firsttris/workflows` `docker-release.yml`): seiner
+Version (`:0.1.7`), seiner Minor-Version (`:0.1`, die mit dem neuesten Patch-Release mitwandert)
+und `:latest`; eine Vorabversion wie `0.2.0-rc.1` bekommt stattdessen ihre Version und `:next`.
+Leg eine Version fest, wie es `SCHREIBZEUG_VERSION` in `deploy/.env` tut, statt `:latest` zu
+nehmen: Ein Update passiert dann, wenn du es willst, nach einem Blick ins
+[Changelog](https://github.com/Speicherstadt/schreibzeug/blob/main/CHANGELOG.md) und einem Backup
+([Updates](#updates)).
 
-The server in the image runs as the unprivileged user `bun` (uid 1000) and writes only `/data`.
-Run one server per data folder: the collaboration sessions and the jobs for open documents live in
-the server's memory ([collaboration](collaboration.md#saving)), so a second instance on the
-same data would not see the first one's editors.
+Der Server im Image läuft als unprivilegierter Benutzer `bun` (uid 1000) und schreibt nur nach
+`/data`. Betreib einen Server pro Datenordner: Die Sitzungen der Zusammenarbeit und die Aufträge
+für offene Dokumente liegen im Speicher des Servers ([Zusammenarbeit](collaboration.md#saving)),
+eine zweite Instanz auf denselben Daten sähe also die Bearbeiter der ersten nicht.
 
-### Hardening { #hardening }
+### Härtung { #hardening }
 
-`deploy/compose.yaml` runs the server hardened, and the `docker run` examples below do the same:
-the container's file system is read-only except `/data` and `/tmp` (`--read-only --tmpfs /tmp`),
-the process has no capabilities (`--cap-drop ALL`) and cannot gain new privileges
-(`--security-opt no-new-privileges:true`); with Podman Quadlet `ReadOnly=true`,
-`DropCapability=ALL` and `NoNewPrivileges=true`. The image holds only the packages the server
-loads at runtime, no build tools; CI starts it hardened like this and checks that every import of
-the server resolves (`docker/check-imports.ts`).
-The image runs on [Wolfi](https://github.com/wolfi-dev/os) instead of
-Debian: current system packages and few known vulnerabilities; the user `bun` keeps uid 1000, so
-existing volumes stay readable.
+`deploy/compose.yaml` startet den Server gehärtet, die `docker run`-Beispiele unten ebenso: Das
+Dateisystem des Containers ist schreibgeschützt bis auf `/data` und `/tmp`
+(`--read-only --tmpfs /tmp`), der Prozess hat keine Capabilities (`--cap-drop ALL`) und kann
+keine neuen Rechte bekommen (`--security-opt no-new-privileges:true`); mit Podman Quadlet
+`ReadOnly=true`, `DropCapability=ALL` und `NoNewPrivileges=true`. Das Image enthält nur die
+Pakete, die der Server zur Laufzeit lädt, keine Build-Werkzeuge; die CI startet es so gehärtet und
+prüft, dass jeder Import des Servers auflöst (`docker/check-imports.ts`).
+Das Image läuft auf [Wolfi](https://github.com/wolfi-dev/os) statt
+Debian: aktuelle Systempakete und wenige bekannte Lücken; der Benutzer `bun` behält die uid 1000,
+bestehende Volumes bleiben lesbar.
 
-To build the image yourself from the repository:
+So baust du das Image selbst aus dem Repository:
 
 ```bash
 git clone https://github.com/Speicherstadt/schreibzeug && cd schreibzeug
 docker build -f docker/Dockerfile -t tristanteu/schreibzeug .
 ```
 
-The build downloads the pinned Euro-Office release and generates its fonts with a Linux x86_64
-tool, so it needs an amd64 machine (or emulation). Podman works the same way.
+Der Build lädt das festgelegte Euro-Office-Release herunter und erzeugt dessen Schriften mit einem
+Werkzeug für Linux x86_64, er braucht also eine amd64-Maschine (oder Emulation). Mit Podman geht es
+genauso.
 
-### Without Compose
+### Ohne Compose { #without-compose }
 
-One container, behind a reverse proxy of your own ([below](#behind-a-reverse-proxy)):
+Ein Container, hinter einem eigenen Reverse Proxy ([unten](#behind-a-reverse-proxy)):
 
 ```bash
 docker run -d --name schreibzeug --restart unless-stopped \
@@ -98,49 +101,49 @@ docker run -d --name schreibzeug --restart unless-stopped \
   tristanteu/schreibzeug:0.1
 ```
 
-The port is published on 127.0.0.1 only, for the proxy on the same machine, which adds HTTPS.
-Docker writes its own firewall rules for a published port, ahead of ufw or firewalld, so
-`-p 3000:3000` would put plain HTTP on the internet whatever the firewall says. Set
-`SCHREIBZEUG_URL` to the address people open: behind HTTPS the server refuses sign-in and changes
-without it, and sign-in through an OpenID Connect provider needs it.
-`SCHREIBZEUG_TRUSTED_PROXIES` names the proxy as the server in the container sees it, the Docker
-network ([below](#behind-a-reverse-proxy)). The first account comes first here too, through the
-tunnel, as above.
+Der Port wird nur auf 127.0.0.1 veröffentlicht, für den Proxy auf derselben Maschine, der HTTPS
+ergänzt. Docker schreibt für einen veröffentlichten Port eigene Firewall-Regeln, noch vor ufw oder
+firewalld; `-p 3000:3000` würde also einfaches HTTP ins Internet stellen, egal was die Firewall
+sagt. Setz `SCHREIBZEUG_URL` auf die Adresse, die die Leute öffnen: Hinter HTTPS lehnt der Server
+ohne sie Anmeldungen und Änderungen ab, und die Anmeldung über einen OpenID-Connect-Anbieter
+braucht sie. `SCHREIBZEUG_TRUSTED_PROXIES` nennt den Proxy so, wie ihn der Server im Container
+sieht: das Docker-Netz ([unten](#behind-a-reverse-proxy)). Auch hier kommt zuerst das erste Konto,
+über den Tunnel, wie oben.
 
-Only trying it on your own computer: `docker run -d -p 127.0.0.1:3000:3000 -v
-schreibzeug-data:/data tristanteu/schreibzeug`, then http://localhost:3000.
+Nur zum Ausprobieren auf dem eigenen Rechner: `docker run -d -p 127.0.0.1:3000:3000 -v
+schreibzeug-data:/data tristanteu/schreibzeug`, dann http://localhost:3000.
 
-## Settings
+## Einstellungen { #settings }
 
-All settings are environment variables (`apps/server/src/config.ts`); the image sets
-`PORT=3000`, `SCHREIBZEUG_DATA_DIR=/data` and `SCHREIBZEUG_WEB_DIR=/app/web`.
+Alle Einstellungen sind Umgebungsvariablen (`apps/server/src/config.ts`); das Image setzt
+`PORT=3000`, `SCHREIBZEUG_DATA_DIR=/data` und `SCHREIBZEUG_WEB_DIR=/app/web`.
 
-| Variable | Default | |
+| Variable | Standard | |
 |---|---|---|
-| `SCHREIBZEUG_DATA_DIR` | `data` | The data folder: database, file contents, secret |
-| `PORT` | `3000` | The port the server listens on |
-| `SCHREIBZEUG_URL` | – | The address people open, e.g. `https://office.example.org`: the base of the sign-in through Kontext (required with `OIDC_*`), the audience of Kontext's tokens, the links the MCP tools give, and the origin the browser's changes must come from. Set it behind an HTTPS proxy: the server itself sees `http://`, so without it the browser's `https://` origin is refused |
-| `SCHREIBZEUG_MAX_UPLOAD_MB` | `512` | The largest file that can be uploaded or saved |
-| `SCHREIBZEUG_AUTH_SECRET` | generated | Signs the session cookies (at least 32 characters); without it one is generated and kept in the data folder |
-| `SCHREIBZEUG_OPEN_SIGNUP` | `false` | `true`: anyone who reaches the server may create an account |
-| `SCHREIBZEUG_TRUSTED_ORIGINS` | – | More origins whose pages may sign in and, with a session, change things, separated by commas. Rarely needed: the origin a request is sent to and `SCHREIBZEUG_URL` are trusted anyway, and the desktop app shows the server's own pages |
-| `SCHREIBZEUG_TRUSTED_PROXIES` | – | The reverse proxies in front of the server, as the server sees them: IP addresses or CIDR ranges, separated by commas ([below](#behind-a-reverse-proxy)) |
-| `SCHREIBZEUG_WEB_DIR` | – | The built web app to serve beside the API (set in the image) |
-| `SCHREIBZEUG_EMBED_ORIGIN` | – | The one site that may show Schreibzeug in a frame ([Kontext](kontext.md)) |
-| `OIDC_ISSUER`, `OIDC_CLIENT_ID`, `OIDC_CLIENT_SECRET` | – | Sign-in through an OpenID Connect provider, all three together ([Kontext](kontext.md)) |
-| `OIDC_NAME` | `Kontext` | The name on the sign-in button |
-| `SCHREIBZEUG_IMPORT_ORIGINS` | – | The origins of other apps whose links may hand over a file, e.g. `https://archive.example.org`, separated by commas; Schreibzeug fetches only from these ([opening a file from another app](files.md#opening-a-file-from-another-app)) |
-| `SCHREIBZEUG_ARCHIVE_URL` | – | The origin of an archive documents can be saved to, e.g. `https://archive.example.org` (no path); together with `SCHREIBZEUG_ARCHIVE_TOKEN` ([saving to an archive](files.md#saving-to-an-archive)) |
-| `SCHREIBZEUG_ARCHIVE_TOKEN` | – | The archive's API token, with the right to write documents there (with [Belegt](https://github.com/Speicherstadt/belegt): a token with the right "schreiben" under "Quellen und Schnittstellen"); a secret, kept on the server |
-| `SCHREIBZEUG_ARCHIVE_NAME` | – | What the interface calls the archive (`In <name> ablegen …`); without it, "Archiv" |
-| `SCHREIBZEUG_VERSIONS` | `thin` | `thin`: older versions are thinned out with age, kept ones stay ([versions](files.md#versions)); `all`: every save stays as a version |
+| `SCHREIBZEUG_DATA_DIR` | `data` | Der Datenordner: Datenbank, Dateiinhalte, Secret |
+| `PORT` | `3000` | Der Port, auf dem der Server lauscht |
+| `SCHREIBZEUG_URL` | – | Die Adresse, die die Leute öffnen, z. B. `https://office.example.org`: die Basis der Anmeldung über Kontext (mit `OIDC_*` Pflicht), die Audience der Tokens von Kontext, die Links, die die MCP-Werkzeuge ausgeben, und der Origin, von dem die Änderungen des Browsers kommen müssen. Setz sie hinter einem HTTPS-Proxy: Der Server selbst sieht `http://`, ohne sie wird der `https://`-Origin des Browsers also abgelehnt |
+| `SCHREIBZEUG_MAX_UPLOAD_MB` | `512` | Die größte Datei, die hochgeladen oder gespeichert werden kann |
+| `SCHREIBZEUG_AUTH_SECRET` | erzeugt | Signiert die Sitzungs-Cookies (mindestens 32 Zeichen); ohne die Variable wird eins erzeugt und im Datenordner abgelegt |
+| `SCHREIBZEUG_OPEN_SIGNUP` | `false` | `true`: Jeder, der den Server erreicht, darf ein Konto anlegen |
+| `SCHREIBZEUG_TRUSTED_ORIGINS` | – | Weitere Origins, deren Seiten sich anmelden und mit einer Sitzung Änderungen vornehmen dürfen, durch Kommas getrennt. Selten nötig: Der Origin, an den eine Anfrage geht, und `SCHREIBZEUG_URL` gelten ohnehin als vertrauenswürdig, und die Desktop-App zeigt die eigenen Seiten des Servers |
+| `SCHREIBZEUG_TRUSTED_PROXIES` | – | Die Reverse Proxys vor dem Server, so wie der Server sie sieht: IP-Adressen oder CIDR-Bereiche, durch Kommas getrennt ([unten](#behind-a-reverse-proxy)) |
+| `SCHREIBZEUG_WEB_DIR` | – | Die gebaute Web-App, die neben der API ausgeliefert wird (im Image gesetzt) |
+| `SCHREIBZEUG_EMBED_ORIGIN` | – | Die eine Website, die Schreibzeug in einem Frame zeigen darf ([Kontext](kontext.md)) |
+| `OIDC_ISSUER`, `OIDC_CLIENT_ID`, `OIDC_CLIENT_SECRET` | – | Anmeldung über einen OpenID-Connect-Anbieter, alle drei zusammen ([Kontext](kontext.md)) |
+| `OIDC_NAME` | `Kontext` | Der Name auf dem Anmeldeknopf |
+| `SCHREIBZEUG_IMPORT_ORIGINS` | – | Die Origins anderer Apps, deren Links eine Datei übergeben dürfen, z. B. `https://archive.example.org`, durch Kommas getrennt; Schreibzeug holt nur von diesen ([Eine Datei aus einer anderen App öffnen](files.md#opening-a-file-from-another-app)) |
+| `SCHREIBZEUG_ARCHIVE_URL` | – | Der Origin eines Archivs, in dem sich Dokumente ablegen lassen, z. B. `https://archive.example.org` (ohne Pfad); zusammen mit `SCHREIBZEUG_ARCHIVE_TOKEN` ([In einem Archiv ablegen](files.md#saving-to-an-archive)) |
+| `SCHREIBZEUG_ARCHIVE_TOKEN` | – | Der API-Schlüssel des Archivs mit dem Recht, dort Dokumente zu schreiben (bei [Belegt](https://github.com/Speicherstadt/belegt): ein Token mit dem Recht „schreiben“ unter „Quellen und Schnittstellen“); ein Geheimnis, das auf dem Server bleibt |
+| `SCHREIBZEUG_ARCHIVE_NAME` | – | Wie die Oberfläche das Archiv nennt (`In <Name> ablegen …`); ohne die Variable „Archiv“ |
+| `SCHREIBZEUG_VERSIONS` | `thin` | `thin`: Ältere Versionen werden mit dem Alter ausgedünnt, behaltene bleiben ([Versionen](files.md#versions)); `all`: Jede Speicherung bleibt als Version erhalten |
 
-## Behind a reverse proxy
+## Hinter einem Reverse Proxy { #behind-a-reverse-proxy }
 
-With Compose, `deploy/` brings Caddy set up for this (`deploy/Caddyfile`); this section is for a
-proxy of your own. Put Schreibzeug behind a proxy that terminates HTTPS and passes WebSockets:
-editing goes over `/api/collab/<file>` and jobs for an open document over `/api/agent/<file>`.
-With Caddy:
+Mit Compose bringt `deploy/` dafür ein fertig eingerichtetes Caddy mit (`deploy/Caddyfile`); dieser
+Abschnitt ist für einen eigenen Proxy. Stell Schreibzeug hinter einen Proxy, der HTTPS terminiert
+und WebSockets durchreicht: Das Bearbeiten läuft über `/api/collab/<file>`, Aufträge für ein
+offenes Dokument über `/api/agent/<file>`. Mit Caddy:
 
 ```
 office.example.org {
@@ -148,8 +151,8 @@ office.example.org {
 }
 ```
 
-With nginx, forward `Upgrade` and `Connection`, append the address the request came from to
-`X-Forwarded-For`, and allow bodies as large as uploads may be:
+Mit nginx: `Upgrade` und `Connection` weiterreichen, die Adresse, von der die Anfrage kam, an
+`X-Forwarded-For` anhängen und Bodys so groß zulassen, wie Uploads sein dürfen:
 
 ```nginx
 location / {
@@ -164,32 +167,35 @@ location / {
 }
 ```
 
-Name the proxy in `SCHREIBZEUG_TRUSTED_PROXIES`, as the server sees it: `127.0.0.1` when it runs on
-the same machine, the Docker network (e.g. `172.16.0.0/12`) when the server runs in a container and
-the proxy reaches it through a published port. Sign-in and sign-up allow a few tries per client in
-ten seconds (Better Auth's rate limit). The server counts a client by the address of the connection
-and ignores what a client writes into `X-Forwarded-For` itself; only behind a proxy named here it
-takes the forwarded chain and counts by the first address in it, from the right, that is not one
-of the proxies (`apps/server/src/auth/client-ip.ts`). Without the setting behind a proxy, every
-client counts as the proxy, and all of them share those few tries. When a proxy is in front, publish
-the port only for it (`-p 127.0.0.1:3000:3000`), so nobody reaches the server around it.
+Nenn den Proxy in `SCHREIBZEUG_TRUSTED_PROXIES`, so wie der Server ihn sieht: `127.0.0.1`, wenn er
+auf derselben Maschine läuft, das Docker-Netz (z. B. `172.16.0.0/12`), wenn der Server in einem
+Container läuft und der Proxy ihn über einen veröffentlichten Port erreicht. Anmeldung und
+Registrierung erlauben pro Client ein paar Versuche in zehn Sekunden (das Rate-Limit von Better
+Auth). Der Server zählt einen Client nach der Adresse der Verbindung und ignoriert, was ein Client
+selbst in `X-Forwarded-For` schreibt; nur hinter einem hier genannten Proxy nimmt er die
+weitergereichte Kette und zählt nach der ersten Adresse darin, von rechts gesehen, die keiner der
+Proxys ist (`apps/server/src/auth/client-ip.ts`). Fehlt die Einstellung hinter einem Proxy, zählt
+jeder Client als der Proxy, und alle teilen sich diese paar Versuche. Steht ein Proxy davor,
+veröffentliche den Port nur für ihn (`-p 127.0.0.1:3000:3000`), damit niemand den Server an ihm
+vorbei erreicht.
 
-The server compresses the app and the editing engine itself (Brotli or gzip) and tells browsers to
-keep the engine for good ([opening fast](engine.md#opening-fast-on-a-phone-too)); the proxy needs no
-compression of its own and must pass `Cache-Control`, `ETag` and `Content-Encoding` on, as Caddy
-and nginx do with the settings above.
+Der Server komprimiert die App und die Bearbeitungs-Engine selbst (Brotli oder gzip) und sagt den
+Browsern, die Engine dauerhaft zu behalten
+([schnelles Öffnen](engine.md#opening-fast-on-a-phone-too)); der Proxy braucht keine eigene
+Kompression und muss `Cache-Control`, `ETag` und `Content-Encoding` weiterreichen, wie Caddy und
+nginx es mit den Einstellungen oben tun.
 
-`client_max_body_size` matches `SCHREIBZEUG_MAX_UPLOAD_MB` (512 by default); when the files are
-smaller, lower both, e.g. to `100m` and `100`, so the proxy turns away oversized bodies before they
-reach the server.
+`client_max_body_size` passt zu `SCHREIBZEUG_MAX_UPLOAD_MB` (standardmäßig 512); sind die Dateien
+kleiner, senk beide, z. B. auf `100m` und `100`, damit der Proxy zu große Bodys abweist, bevor sie
+den Server erreichen.
 
-## Backups
+## Backups { #backups }
 
-Back up the data folder; it holds everything. The database runs in WAL mode, so copy it while the
-server is stopped: a copy taken while it writes can miss what is still in `schreibzeug.db-wal`.
-The image has no `sqlite3`; archive the volume with a throwaway container instead, here into the
-current folder. With Compose the volume is `schreibzeug_schreibzeug-data` (the project's name
-first):
+Sichere den Datenordner; er enthält alles. Die Datenbank läuft im WAL-Modus, kopier sie also bei
+gestopptem Server: Einer Kopie, die während des Schreibens entsteht, kann fehlen, was noch in
+`schreibzeug.db-wal` steht. Das Image hat kein `sqlite3`; archivier das Volume stattdessen mit
+einem Wegwerf-Container, hier in den aktuellen Ordner. Mit Compose heißt das Volume
+`schreibzeug_schreibzeug-data` (der Name des Projekts zuerst):
 
 ```bash
 cd /opt/schreibzeug
@@ -199,18 +205,19 @@ docker run --rm -v schreibzeug_schreibzeug-data:/data:ro -v "$PWD":/backup alpin
 docker compose -f deploy/compose.yaml start schreibzeug
 ```
 
-Without Compose the same with `docker stop schreibzeug`, the volume `schreibzeug-data` and
-`docker start schreibzeug`. A folder mounted from the host (`-v /srv/schreibzeug:/data`) the same
-way, with the container stopped: `sudo tar -czf schreibzeug-$(date +%F).tar.gz -C /srv/schreibzeug .`
+Ohne Compose dasselbe mit `docker stop schreibzeug`, dem Volume `schreibzeug-data` und
+`docker start schreibzeug`. Ein vom Host eingebundener Ordner (`-v /srv/schreibzeug:/data`)
+genauso, bei gestopptem Container: `sudo tar -czf schreibzeug-$(date +%F).tar.gz -C /srv/schreibzeug .`
 
-Keep `auth-secret` (or `SCHREIBZEUG_AUTH_SECRET`) with the backup: it signs the session cookies,
-and without it everyone has to sign in again.
+Bewahr `auth-secret` (oder `SCHREIBZEUG_AUTH_SECRET`) mit dem Backup auf: Es signiert die
+Sitzungs-Cookies, und ohne es muss sich jeder neu anmelden.
 
-### Restore
+### Wiederherstellen { #restore }
 
-With Compose the volume is the one named in `compose.yaml`, so the archive goes into it: back up
-what is there now first (above), then empty it and unpack, with the server stopped. The `chown`
-hands everything, the volume's top folder included, to uid 1000, which the server runs as:
+Mit Compose ist das Volume das in `compose.yaml` genannte, das Archiv kommt also dort hinein:
+Sichere zuerst, was jetzt darin liegt (oben), leere es dann und pack aus, bei gestopptem Server.
+Das `chown` gibt alles, den obersten Ordner des Volumes eingeschlossen, an uid 1000, als die der
+Server läuft:
 
 ```bash
 cd /opt/schreibzeug
@@ -220,9 +227,9 @@ docker run --rm -v schreibzeug_schreibzeug-data:/data -v "$PWD":/backup alpine \
 docker compose -f deploy/compose.yaml start schreibzeug
 ```
 
-Without Compose, unpack the archive into a new, empty volume and start the container on it; the
-old volume stays until you remove it. The `chown` hands everything, the volume's top folder included, to uid 1000,
-which the server runs as:
+Ohne Compose pack das Archiv in ein neues, leeres Volume aus und start den Container darauf; das
+alte Volume bleibt, bis du es entfernst. Das `chown` gibt alles, den obersten Ordner des Volumes
+eingeschlossen, an uid 1000, als die der Server läuft:
 
 ```bash
 docker rm -f schreibzeug
@@ -231,31 +238,32 @@ docker run --rm -v schreibzeug-restored:/data -v "$PWD":/backup alpine \
   sh -c 'tar -xzf /backup/schreibzeug-2026-10-27.tar.gz -C /data && chown -R 1000:1000 /data'
 ```
 
-Then start it as under [without Compose](#without-compose), with `-v schreibzeug-restored:/data`.
-Either way, use the same image version the backup was made with or a newer one (the schema is brought forward at start, never
-back).
+Dann start ihn wie unter [Ohne Compose](#without-compose), mit `-v schreibzeug-restored:/data`.
+In beiden Fällen: Nimm dieselbe Image-Version, mit der das Backup gemacht wurde, oder eine neuere
+(das Schema wird beim Start nach vorn gebracht, nie zurück).
 
-## Updates
+## Updates { #updates }
 
-What changed and which updates need a step of their own is in the
-[changelog](https://github.com/Speicherstadt/schreibzeug/blob/main/CHANGELOG.md). Make a
-[backup](#backups) first: the database schema is brought up to date at start
-(`apps/server/drizzle`) and never back, so the backup is the way back to the older version.
+Was sich geändert hat und welche Updates einen eigenen Schritt brauchen, steht im
+[Changelog](https://github.com/Speicherstadt/schreibzeug/blob/main/CHANGELOG.md). Mach zuerst ein
+[Backup](#backups): Das Datenbankschema wird beim Start auf den neuesten Stand gebracht
+(`apps/server/drizzle`) und nie zurück, das Backup ist also der Weg zurück zur älteren Version.
 
-With Compose, `git pull` brings what changed in `deploy/`, and the version in `.env` chooses the
-image:
+Mit Compose holt `git pull`, was sich in `deploy/` geändert hat, und die Version in `.env` wählt
+das Image:
 
 ```bash
 cd /opt/schreibzeug && git pull
-nano deploy/.env    # SCHREIBZEUG_VERSION to the new version, e.g. 0.1.9; new lines from .env.example
+nano deploy/.env    # SCHREIBZEUG_VERSION auf die neue Version, z. B. 0.1.9; neue Zeilen aus .env.example
 docker compose -f deploy/compose.yaml pull && docker compose -f deploy/compose.yaml up -d
 ```
 
-`deploy/.env` is your own copy and does not change with `git pull`; `git diff ORIG_HEAD --
-deploy/` shows what changed there. Caddy has a fixed version in `compose.yaml`; a new one comes
-with `git pull`.
+`deploy/.env` ist deine eigene Kopie und ändert sich mit `git pull` nicht; `git diff ORIG_HEAD --
+deploy/` zeigt, was sich dort geändert hat. Caddy hat in `compose.yaml` eine feste Version; eine
+neue kommt mit `git pull`.
 
-Without Compose, pull the new version and start the container again, with the same settings:
+Ohne Compose holst du die neue Version und startest den Container neu, mit denselben
+Einstellungen:
 
 ```bash
 docker pull tristanteu/schreibzeug:0.1
@@ -268,47 +276,49 @@ docker run -d --name schreibzeug --restart unless-stopped \
   tristanteu/schreibzeug:0.1
 ```
 
-For a move to another minor version, change the tag in both places (e.g. to `:0.2`).
+Für den Wechsel auf eine andere Minor-Version änderst du das Tag an beiden Stellen (z. B. auf
+`:0.2`).
 
-Images up to 0.1.3 ran the server as root; since 0.1.4 it runs as `bun` (uid 1000). A data volume
-from an older image belongs to root, and the server cannot write it. Hand it to uid 1000 once, with
-the container stopped:
+Images bis 0.1.3 ließen den Server als root laufen; seit 0.1.4 läuft er als `bun` (uid 1000). Ein
+Daten-Volume aus einem älteren Image gehört root, und der Server kann nicht hineinschreiben. Gib es
+einmal an uid 1000, bei gestopptem Container:
 
 ```bash
 docker stop schreibzeug
 docker run --rm --user root -v schreibzeug-data:/data tristanteu/schreibzeug:0.1 chown -R 1000:1000 /data
 ```
 
-A folder mounted from the host (`-v /srv/schreibzeug:/data`) the same way:
+Ein vom Host eingebundener Ordner (`-v /srv/schreibzeug:/data`) genauso:
 `sudo chown -R 1000:1000 /srv/schreibzeug`.
 
-## Your own changes
+## Eigene Änderungen { #your-own-changes }
 
-The AGPL asks that people who use a changed Schreibzeug over the network can get its source. The
-app links to the source in **Hilfe → Über Schreibzeug** in the editor, and that link is fixed in the
-code: `SOURCE_URL` in `apps/web/src/editor/help-dialogs.tsx` points at this repository. When you
-run a version with changes of your own, point it at your source (your fork, at the version you run)
-before you build the image.
+Die AGPL verlangt, dass Leute, die ein geändertes Schreibzeug über das Netz nutzen, an seinen
+Quellcode kommen. Die App verlinkt den Quellcode im Editor unter **Hilfe → Über Schreibzeug**, und
+dieser Link steht fest im Code: `SOURCE_URL` in `apps/web/src/editor/help-dialogs.tsx` zeigt auf
+dieses Repository. Betreibst du eine Version mit eigenen Änderungen, lass ihn auf deinen Quellcode
+zeigen (deinen Fork, in der Version, die du betreibst), bevor du das Image baust.
 
-## Troubleshooting
+## Fehlersuche { #troubleshooting }
 
-The server writes to its log what makes it stop: `docker logs schreibzeug`.
+Was den Server anhalten lässt, schreibt er in sein Log: `docker logs schreibzeug`.
 
-- **Sign-in fails, or saving, uploading and sharing answer 403** ("Invalid origin", "Diese Anfrage
-  kommt nicht von Schreibzeug."): behind an HTTPS proxy the server sees `http://`, so the browser's
-  `https://` origin is not its own. Set `SCHREIBZEUG_URL` to the address people open
-  (`apps/server/src/auth/origin.ts`).
-- **The file list works, but documents do not open** ("Der Server ist nicht erreichbar." in the
-  editor): the proxy does not pass WebSockets on, which editing needs (`/api/collab/<file>`). Pass
-  `Upgrade` and `Connection` on as in the [nginx example](#behind-a-reverse-proxy).
-- **The container stops at start, or keeps restarting**, with "attempt to write a readonly
-  database" or "unable to open database file" in the log: the data volume belongs to root, from an
-  image before 0.1.4, or the folder mounted from the host does. Hand it to uid 1000
-  ([updates](#updates)).
-- **The server refuses to start** with "Invalid configuration" and "Signing in through OIDC
-  (OIDC_ISSUER, OIDC_CLIENT_ID, OIDC_CLIENT_SECRET) needs SCHREIBZEUG_URL": set `SCHREIBZEUG_URL`
-  (`apps/server/src/config.ts`). An invalid value of any other setting stops it the same way and
-  names the setting.
-- **Sign-in fails for everyone after a few tries** (429, "Too many requests. Please try again
-  later."): the proxy is not named in `SCHREIBZEUG_TRUSTED_PROXIES`, so every client counts as
-  the proxy ([above](#behind-a-reverse-proxy)).
+- **Die Anmeldung schlägt fehl, oder Speichern, Hochladen und Teilen antworten mit 403**
+  („Invalid origin“, „Diese Anfrage kommt nicht von Schreibzeug.“): Hinter einem HTTPS-Proxy sieht
+  der Server `http://`, der `https://`-Origin des Browsers ist also nicht sein eigener. Setz
+  `SCHREIBZEUG_URL` auf die Adresse, die die Leute öffnen (`apps/server/src/auth/origin.ts`).
+- **Die Dateiliste funktioniert, aber Dokumente öffnen sich nicht** („Der Server ist nicht
+  erreichbar.“ im Editor): Der Proxy reicht keine WebSockets durch, die das Bearbeiten braucht
+  (`/api/collab/<file>`). Reich `Upgrade` und `Connection` weiter wie im
+  [nginx-Beispiel](#behind-a-reverse-proxy).
+- **Der Container hält beim Start an oder startet immer wieder neu**, mit „attempt to write a
+  readonly database“ oder „unable to open database file“ im Log: Das Daten-Volume gehört root, aus
+  einem Image vor 0.1.4, oder der vom Host eingebundene Ordner tut es. Gib es an uid 1000
+  ([Updates](#updates)).
+- **Der Server startet nicht** mit „Invalid configuration“ und „Signing in through OIDC
+  (OIDC_ISSUER, OIDC_CLIENT_ID, OIDC_CLIENT_SECRET) needs SCHREIBZEUG_URL“: Setz `SCHREIBZEUG_URL`
+  (`apps/server/src/config.ts`). Ein ungültiger Wert einer anderen Einstellung hält ihn genauso an
+  und nennt die Einstellung.
+- **Die Anmeldung schlägt nach ein paar Versuchen für alle fehl** (429, „Too many requests. Please
+  try again later.“ – zu viele Anfragen): Der Proxy ist nicht in `SCHREIBZEUG_TRUSTED_PROXIES`
+  genannt, also zählt jeder Client als der Proxy ([oben](#behind-a-reverse-proxy)).

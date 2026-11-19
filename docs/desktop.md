@@ -1,14 +1,15 @@
-# The desktop app
+# Die Desktop-App { #the-desktop-app }
 
-`apps/desktop` is Schreibzeug as a desktop app for Windows, macOS and Linux, built with Tauri 3 (alpha). It works
-in one of two places, chosen on its start page and remembered for the next start:
+`apps/desktop` ist Schreibzeug als Desktop-App für Windows, macOS und Linux, gebaut mit Tauri 3
+(Alpha). Sie arbeitet an einem von zwei Orten, gewählt auf ihrer Startseite und für den nächsten
+Start gemerkt:
 
-- **On this computer**: the files in the documents folder (or another folder), through a small
-  server the app starts beside its window ([below](#files-on-this-computer)). No account, no
-  network.
-- **On a Schreibzeug server**: the app asks for the server's address once, remembers the last ones, and
-  then shows the server's own web app. Everything the browser can do works the same, and an update
-  of the server updates the app's pages too.
+- **Auf diesem Computer**: die Dateien im Dokumente-Ordner (oder einem anderen Ordner), über einen
+  kleinen Server, den die App neben ihrem Fenster startet ([unten](#files-on-this-computer)). Kein
+  Konto, kein Netzwerk.
+- **Auf einem Schreibzeug-Server**: Die App fragt einmal nach der Adresse des Servers, merkt sich die
+  letzten und zeigt dann die eigene Web-App des Servers. Alles, was der Browser kann, funktioniert
+  genauso, und ein Update des Servers aktualisiert auch die Seiten der App.
 
 ```
                       ┌─▶ http://127.0.0.1:<port> (apps/local + the web app inside the app) ─▶ ~/Documents
@@ -16,174 +17,192 @@ Schreibzeug window (Tauri) ┤
   start page          └─▶ https://your-server (apps/server + apps/web/dist)
 ```
 
-## How it fits together
+## Wie es zusammenpasst { #how-it-fits-together }
 
-- **The start page** (`apps/desktop/index.html`, `src/main.ts`, `src/servers.ts`, `src/start.ts`)
-  is the app's own page. "Öffnen" starts the local server and opens the folder; "Ordner ändern …"
-  picks another one. For a server it completes what is typed (`schreibzeug.example.org` gets `https://`, `localhost:3000` or an
-  address in the local network `http://`), checks that something answers at `/api/health`, keeps
-  the last five servers in its own storage. The next start goes back to where the app was last: the
-  folder or the newest server.
-- **The server serves the web app**: with `SCHREIBZEUG_WEB_DIR` pointing at `apps/web/dist`, the API
-  server answers every path that is not `/api` with the built app, and unknown paths with
-  `index.html` (`apps/server/src/web.ts`). The window loads the server's address directly, so
-  sessions, the collaboration socket and the engine work exactly as in a browser on that server; no
-  cross-origin requests, no second copy of the interface in the app.
-- **The window** (`src-tauri/src/lib.rs`): downloads go to the download folder ("Downloads" at
-  home where Linux has none configured) without overwriting a file (`downloads.rs`). A page of the
-  same server that opens a new window (a new or copied document) gets a window of the app, where
-  the session holds; any other link (Strg+click on a link in a document) opens in the system's
-  browser, for http, https and mailto only. "Auf diesem Computer", "Ordner wählen …" and "Mit
-  Server verbinden …" (back to the start page) are in the ⋮ menu beside the name at the bottom
-  left; the window has no menu bar of its own, only macOS keeps one at the top of the screen. The
-  app marks every page it shows (`window.schreibzeugDesktop`), and a command is a navigation to
-  `https://desktop.schreibzeug.invalid/<command>`, which the window catches before it loads
-  (`windows.rs` `desktop_action`), so neither the local nor a server's pages need native calls for it
-  (`apps/web/src/desktop.ts`).
-- **The local server** (`local.rs`): started on first use with a random key, stopped with the app;
-  it also ends when its stdin closes, so a crashed app leaves nothing running. A new folder
-  restarts it and closes the windows that showed the old one. The folder is kept in `settings.json`
-  in the app's config folder (`settings.rs`); without one it is the system's documents folder
-  (Windows' known folder, `~/Documents` on macOS, XDG's on Linux), called "Dokumente" in the app.
-- **Native calls only from the start page**: its three commands (`open_local`, `local_folder`,
-  `choose_folder`) are the app's own; the pages of a server or of the local server get none
-  (`capabilities/default.json` grants only the core defaults to the app's own window content).
+- **Die Startseite** (`apps/desktop/index.html`, `src/main.ts`, `src/servers.ts`, `src/start.ts`)
+  ist die eigene Seite der App. „Öffnen“ startet den lokalen Server und öffnet den Ordner; „Ordner
+  ändern …“ wählt einen anderen. Für einen Server ergänzt sie, was eingetippt wird
+  (`schreibzeug.example.org` bekommt `https://`, `localhost:3000` oder eine Adresse im lokalen Netz
+  `http://`), prüft, dass unter `/api/health` etwas antwortet, und behält die letzten fünf Server in
+  ihrem eigenen Speicher. Der nächste Start geht dorthin zurück, wo die App zuletzt war: zum Ordner
+  oder zum neuesten Server.
+- **Der Server liefert die Web-App aus**: Wenn `SCHREIBZEUG_WEB_DIR` auf `apps/web/dist` zeigt,
+  beantwortet der API-Server jeden Pfad, der nicht `/api` ist, mit der gebauten App und unbekannte
+  Pfade mit `index.html` (`apps/server/src/web.ts`). Das Fenster lädt die Adresse des Servers
+  direkt, sodass Sitzungen, der Socket der Zusammenarbeit und die Engine genau wie in einem Browser
+  auf diesem Server funktionieren; keine Cross-Origin-Anfragen, keine zweite Kopie der Oberfläche in
+  der App.
+- **Das Fenster** (`src-tauri/src/lib.rs`): Downloads gehen in den Download-Ordner („Downloads“ im
+  Home-Verzeichnis, wo Linux keinen eingerichtet hat), ohne eine Datei zu überschreiben
+  (`downloads.rs`). Eine Seite desselben Servers, die ein neues Fenster öffnet (ein neues oder
+  kopiertes Dokument), bekommt ein Fenster der App, in dem die Sitzung gilt; jeder andere Link
+  (Strg+Klick auf einen Link in einem Dokument) öffnet sich im Browser des Systems, nur für http,
+  https und mailto. „Auf diesem Computer“, „Ordner wählen …“ und „Mit Server verbinden …“ (zurück
+  zur Startseite) stehen im ⋮-Menü neben dem Namen unten links; das Fenster hat keine eigene
+  Menüleiste, nur macOS behält eine oben am Bildschirm. Die App markiert jede Seite, die sie zeigt
+  (`window.schreibzeugDesktop`), und ein Befehl ist eine Navigation zu
+  `https://desktop.schreibzeug.invalid/<command>`, die das Fenster abfängt, bevor sie lädt
+  (`windows.rs` `desktop_action`), sodass weder die lokalen noch die Seiten eines Servers dafür
+  native Aufrufe brauchen (`apps/web/src/desktop.ts`).
+- **Der lokale Server** (`local.rs`): beim ersten Gebrauch mit einem zufälligen Schlüssel gestartet,
+  mit der App beendet; er endet auch, wenn sein stdin schließt, sodass eine abgestürzte App nichts
+  laufen lässt. Ein neuer Ordner startet ihn neu und schließt die Fenster, die den alten zeigten.
+  Der Ordner wird in `settings.json` im Konfigurationsordner der App gespeichert (`settings.rs`);
+  ohne Eintrag ist es der Dokumente-Ordner des Systems (der Known Folder von Windows, `~/Documents`
+  auf macOS, der von XDG auf Linux), in der App „Dokumente“ genannt.
+- **Native Aufrufe nur von der Startseite**: Ihre drei Befehle (`open_local`, `local_folder`,
+  `choose_folder`) gehören der App selbst; die Seiten eines Servers oder des lokalen Servers
+  bekommen keine (`capabilities/default.json` gewährt nur die Core-Standards, und nur dem eigenen
+  Fensterinhalt der App).
 
-The browser engine is the system's on Windows (WebView2, Chromium) and macOS (WebKit). On Linux the
-app brings Chromium itself (CEF, Tauri 3's `tauri-runtime-cef`) instead of WebKitGTK, which is slow
-with the editors' canvas and differs from the browsers the web app is tested in. That makes the
-Linux packages about 170 MB larger. Only one engine can be in a Linux build (WebKitGTK's runtime
-builds on GTK 3, CEF on GTK 4), so the folder dialog there goes through the XDG desktop portal
-(the desktop's own dialog) instead of GTK 3. Tauri 3 and its CEF runtime are alpha releases.
+Die Browser-Engine ist auf Windows (WebView2, Chromium) und macOS (WebKit) die des Systems. Auf
+Linux bringt die App Chromium selbst mit (CEF, `tauri-runtime-cef` von Tauri 3) statt WebKitGTK,
+das mit dem Canvas der Editoren langsam ist und sich von den Browsern unterscheidet, in denen die
+Web-App getestet wird. Das macht die Linux-Pakete um etwa 170 MB größer. In einem Linux-Build kann
+nur eine Engine stecken (die Runtime von WebKitGTK baut auf GTK 3, CEF auf GTK 4), deshalb läuft
+der Ordnerdialog dort über das XDG Desktop Portal (den eigenen Dialog des Desktops) statt über
+GTK 3. Tauri 3 und seine CEF-Runtime sind Alpha-Versionen.
 
-Chromium as CEF builds it talks to Google on its own: secure DNS probes, sign-in state, search,
-the translation model, network time and component updates. The app switches all of that off
-(`runtime()` in `src-tauri/src/lib.rs`); a net log of the app (`--log-net-log`) then shows only
-requests to the app's own pages and server. In the Linux packages the bundler moves the app's binary
-to `/usr/share/Schreibzeug/` and leaves the local server in `/usr/bin/`; the app looks in both places
-(`local.rs`).
+Chromium, wie CEF es baut, spricht von sich aus mit Google: Secure-DNS-Proben, Anmeldestatus,
+Suche, das Übersetzungsmodell, Netzwerkzeit und Komponenten-Updates. Die App schaltet all das ab
+(`runtime()` in `src-tauri/src/lib.rs`); ein Net-Log der App (`--log-net-log`) zeigt dann nur
+Anfragen an die eigenen Seiten und den Server der App. In den Linux-Paketen verschiebt der Bundler
+das Binary der App nach `/usr/share/Schreibzeug/` und lässt den lokalen Server in `/usr/bin/`; die
+App sucht an beiden Stellen (`local.rs`).
 
-## Files on this computer
+## Dateien auf diesem Computer { #files-on-this-computer }
 
-`apps/local` is a small server for working without a Schreibzeug server: it speaks the part of the
-files API a single person needs (the same routes and shapes as `apps/server`, from
-`@schreibzeug/files-api`) over a folder on the computer, the system's documents folder by default. The web app is the same; it asks `/api/info`
-which kind of server it talks to and, for `local`, names the root after the folder ("Dokumente")
-and leaves out what only makes sense with accounts.
+`apps/local` ist ein kleiner Server, um ohne Schreibzeug-Server zu arbeiten: Er spricht den Teil der
+Dateien-API, den eine einzelne Person braucht (dieselben Routen und Formen wie `apps/server`, aus
+`@schreibzeug/files-api`), über einem Ordner auf dem Computer, standardmäßig dem Dokumente-Ordner
+des Systems. Die Web-App ist dieselbe; sie fragt `/api/info`, mit welcher Art Server sie spricht,
+benennt bei `local` die oberste Ebene nach dem Ordner („Dokumente“) und lässt weg, was nur mit
+Konten sinnvoll ist.
 
-- **Files are the files**: a folder in the app is a folder on disk, a file is a file. New
-  documents, uploads, copies, renames and moves happen there; a save overwrites the file (written
-  to a temporary name beside it first, then renamed). Hidden files, Office's `~$` lock files and
-  `desktop.ini`/`Thumbs.db` are not listed, and a new file, folder or name the list would hide is
-  refused (400) before anything happens on disk.
-- **Ids**: the API names nodes by UUID; here a node's id is a UUID v5 of its path below the root,
-  so a link stays the same after a restart. A rename or move keeps the id for as long as the server
-  runs (`src/ids.ts`), so an open editor stays on its file.
-- **Deleting** moves into the system's trash (`gio trash` on Linux, the Finder on macOS, the
-  recycle bin on Windows; `src/trash.ts`) and only counts as done when the file is gone. There is no
-  trash page of its own, no sharing, no links, no versions to go back to, no search and no jobs for
-  an open document; those routes answer "Das gibt es nur auf einem Schreibzeug-Server"
-  (`src/app.ts`). The version number only counts the saves since the server started, which the
-  editing session needs.
-- **Storage**: `/api/storage` names the room on the folder's drive and no usage of its own; the app
-  shows no bar for it, the system's file manager does that, only the notice when less than 1 GB is
-  left ([files](files.md#storage)).
-- **Markdown and text files** open in the text editor ([Markdown and text files](text.md)): a
-  save goes through only while the file on disk is still the bytes it was made from, so a change
-  by another program (an editor, a sync tool) is not overwritten; the editor asks instead.
-- **Editing** uses the same relay as the server (`apps/server/src/collab`), so two windows on the
-  same file edit together. A session opens the version it started at and replays its changes on
-  it, also after saves moved the file on; the folder keeps no older versions, so the server keeps
-  the bytes of each session's first version while the session lasts (`src/session-bases.ts`) and
-  serves them for `?version=` (a file written from outside before the session's first load, with
-  no change made yet, starts the session as it is). Images added while editing wait in a cache folder until the file is
-  saved with them inside.
-- **Only for this computer** (`src/gate.ts`): the server listens on 127.0.0.1 and wants the key the
-  app made at start. The app opens `/api/local/unlock?token=…`, which leaves an HttpOnly,
-  SameSite=Strict cookie; a request with a foreign host name (DNS rebinding) or a change sent from
-  another site's page is refused.
-- **MCP** (`src/mcp.ts`): `/mcp` serves the same tools as a server ([MCP server](mcp.md#on-this-computer)),
-  without a key, behind the same check of host and origin; its tools reach the local API with the
-  app's own key. The app starts the local server on a free port (`PORT=0`, `src-tauri/src/local.rs`),
-  a different one on every start, so an MCP client set up with the app's address stops working when
-  the app restarts.
+- **Dateien sind die Dateien**: Ein Ordner in der App ist ein Ordner auf der Festplatte, eine Datei
+  ist eine Datei. Neue Dokumente, Uploads, Kopien, Umbenennen und Verschieben geschehen dort; ein
+  Speichern überschreibt die Datei (zuerst unter einem temporären Namen daneben geschrieben, dann
+  umbenannt). Versteckte Dateien, die `~$`-Sperrdateien von Office und `desktop.ini`/`Thumbs.db`
+  werden nicht gelistet, und eine neue Datei, ein Ordner oder ein Name, den die Liste verstecken
+  würde, wird abgelehnt (400), bevor auf der Festplatte etwas geschieht.
+- **IDs**: Die API benennt Knoten per UUID; hier ist die ID eines Knotens eine UUID v5 seines Pfads
+  unterhalb der obersten Ebene, sodass ein Link nach einem Neustart gleich bleibt. Ein Umbenennen
+  oder Verschieben behält die ID, solange der Server läuft (`src/ids.ts`), sodass ein offener Editor
+  bei seiner Datei bleibt.
+- **Löschen** verschiebt in den Papierkorb des Systems (`gio trash` auf Linux, der Finder auf macOS,
+  der Papierkorb auf Windows; `src/trash.ts`) und gilt erst als erledigt, wenn die Datei weg ist. Es
+  gibt keine eigene Papierkorb-Seite, kein Teilen, keine Links, keine Versionen zum Zurückgehen,
+  keine Suche und keine Jobs für ein offenes Dokument; diese Routen antworten „Das gibt es nur auf
+  einem Schreibzeug-Server“ (`src/app.ts`). Die Versionsnummer zählt nur die Speichervorgänge seit
+  dem Start des Servers, die die Bearbeitungssitzung braucht.
+- **Speicherplatz**: `/api/storage` nennt den Platz auf dem Laufwerk des Ordners und keine eigene
+  Belegung; die App zeigt dafür keinen Balken, das übernimmt der Dateimanager des Systems, nur den
+  Hinweis, wenn weniger als 1 GB frei ist ([Dateien](files.md#storage)).
+- **Markdown- und Textdateien** öffnen sich im Texteditor ([Markdown- und Textdateien](text.md)):
+  Ein Speichern geht nur durch, solange die Datei auf der Festplatte noch die Bytes sind, aus denen
+  es entstand, sodass eine Änderung durch ein anderes Programm (einen Editor, ein Sync-Werkzeug)
+  nicht überschrieben wird; der Editor fragt stattdessen.
+- **Bearbeiten** nutzt dasselbe Relay wie der Server (`apps/server/src/collab`), sodass zwei
+  Fenster auf derselben Datei gemeinsam bearbeiten. Eine Sitzung öffnet die Version, bei der sie
+  begann, und spielt ihre Änderungen darauf ab, auch nachdem Speichervorgänge die Datei
+  weitergebracht haben; der Ordner behält keine älteren Versionen, deshalb hält der Server die
+  Bytes der ersten Version jeder Sitzung, solange die Sitzung dauert (`src/session-bases.ts`), und
+  liefert sie für `?version=` aus (eine Datei, die vor dem ersten Laden der Sitzung von außen
+  geschrieben wurde, ohne dass schon eine Änderung gemacht ist, startet die Sitzung, wie sie ist).
+  Bilder, die beim Bearbeiten eingefügt werden, warten in einem Cache-Ordner, bis die Datei mit
+  ihnen gespeichert ist.
+- **Nur für diesen Computer** (`src/gate.ts`): Der Server lauscht auf 127.0.0.1 und will den
+  Schlüssel, den die App beim Start erzeugt hat. Die App öffnet `/api/local/unlock?token=…`, das ein
+  HttpOnly-Cookie mit SameSite=Strict hinterlässt; eine Anfrage mit fremdem Hostnamen (DNS
+  Rebinding) oder eine Änderung, die von der Seite einer anderen Site geschickt wird, wird
+  abgelehnt.
+- **MCP** (`src/mcp.ts`): `/mcp` bietet dieselben Werkzeuge wie ein Server
+  ([MCP-Server](mcp.md#on-this-computer)), ohne Schlüssel, hinter derselben Prüfung von Host und
+  Origin; seine Werkzeuge erreichen die lokale API mit dem eigenen Schlüssel der App. Die App
+  startet den lokalen Server auf einem freien Port (`PORT=0`, `src-tauri/src/local.rs`), bei jedem
+  Start einem anderen, sodass ein MCP-Client, der mit der Adresse der App eingerichtet ist, nach
+  einem Neustart der App nicht mehr funktioniert.
 
-| Variable | Meaning |
+| Variable | Bedeutung |
 |---|---|
-| `SCHREIBZEUG_LOCAL_ROOT` | The folder shown; `~/Documents`, else the home folder, when absent |
-| `SCHREIBZEUG_LOCAL_ROOT_NAME` | What the app calls it; the folder's own name when absent |
-| `SCHREIBZEUG_LOCAL_TOKEN` | The key (at least 16 characters); a random one, printed with the unlock address, when absent |
-| `PORT` | 0 (default): any free port |
-| `SCHREIBZEUG_WEB_DIR` | The built web app to serve beside the API |
-| `SCHREIBZEUG_LOCAL_CACHE` | Where images wait until saved; a folder in the system's temp folder by default |
-| `SCHREIBZEUG_MAX_UPLOAD_MB` | The largest file to upload or save; 512 by default |
-| `SCHREIBZEUG_LOCAL_EXIT_WITH_STDIN` | `1`: stop when stdin closes, which the desktop app sets so the server ends with it (`src-tauri/src/local.rs`) |
-| `USER`, `USERNAME` | The name shown for the one person; the system account's name |
+| `SCHREIBZEUG_LOCAL_ROOT` | Der gezeigte Ordner; ohne Angabe `~/Documents`, sonst das Home-Verzeichnis |
+| `SCHREIBZEUG_LOCAL_ROOT_NAME` | Wie die App ihn nennt; ohne Angabe der eigene Name des Ordners |
+| `SCHREIBZEUG_LOCAL_TOKEN` | Der Schlüssel (mindestens 16 Zeichen); ohne Angabe ein zufälliger, ausgegeben mit der Entsperr-Adresse |
+| `PORT` | 0 (Standard): irgendein freier Port |
+| `SCHREIBZEUG_WEB_DIR` | Die gebaute Web-App, die neben der API ausgeliefert wird |
+| `SCHREIBZEUG_LOCAL_CACHE` | Wo Bilder warten, bis sie gespeichert sind; standardmäßig ein Ordner im Temp-Ordner des Systems |
+| `SCHREIBZEUG_MAX_UPLOAD_MB` | Die größte Datei zum Hochladen oder Speichern; standardmäßig 512 |
+| `SCHREIBZEUG_LOCAL_EXIT_WITH_STDIN` | `1`: beenden, wenn stdin schließt; das setzt die Desktop-App, damit der Server mit ihr endet (`src-tauri/src/local.rs`) |
+| `USER`, `USERNAME` | Der Name, der für die eine Person gezeigt wird; der Name des Systemkontos |
 
-Once it listens it prints `SCHREIBZEUG_LOCAL_READY http://127.0.0.1:<port>`. By hand, with the web
-app's dev server in front of it:
+Sobald er lauscht, gibt er `SCHREIBZEUG_LOCAL_READY http://127.0.0.1:<port>` aus. Von Hand, mit dem
+Dev-Server der Web-App davor:
 
 ```sh
 SCHREIBZEUG_LOCAL_ROOT=~/Dokumente PORT=3300 bun run --filter @schreibzeug/local start
 SCHREIBZEUG_API_URL=http://localhost:3300 bun run --filter @schreibzeug/web dev
-# then open http://localhost:5173/api/local/unlock?token=<the printed token>
+# dann http://localhost:5173/api/local/unlock?token=<das ausgegebene Token> öffnen
 ```
 
-## Building
+## Bauen { #building }
 
-The app carries the built web app (`apps/web/dist`, the engine included) and the local server,
-compiled with `bun build --compile` into one executable per platform (`scripts/sidecar.ts`, run by
-Tauri before every build into `src-tauri/binaries/`). So build the web app first:
+Die App enthält die gebaute Web-App (`apps/web/dist`, mit der Engine) und den lokalen Server,
+mit `bun build --compile` zu einem Executable pro Plattform kompiliert (`scripts/sidecar.ts`, von
+Tauri vor jedem Build nach `src-tauri/binaries/` ausgeführt). Also zuerst die Web-App bauen:
 
 ```sh
-bun run engine:prepare && bun run build          # apps/web/dist (Linux x86_64 for the engine's fonts)
-bun run --filter @schreibzeug/desktop desktop:dev     # the app against the start page's dev server
-bun run --filter @schreibzeug/desktop desktop:build   # installers for this machine
+bun run engine:prepare && bun run build          # apps/web/dist (Linux x86_64 für die Schriften der Engine)
+bun run --filter @schreibzeug/desktop desktop:dev     # die App gegen den Dev-Server der Startseite
+bun run --filter @schreibzeug/desktop desktop:build   # Installer für diesen Rechner
 ```
 
-The engine's fonts and the Bun runtime make the installers large (about 200 MB); slimming the
-fonts is for later.
+Die Schriften der Engine und die Bun-Runtime machen die Installer groß (etwa 200 MB); die Schriften
+zu verschlanken kommt später.
 
-Linux needs GTK 4.14 or newer (`libgtk-4-dev librsvg2-dev`; Ubuntu 24.04, Debian 13); Chromium
-(CEF, about 1 GB) is downloaded by the first build, to `CEF_PATH` if set. The workflow **Actions → Desktop app** builds the web app once on Linux and then all
-three platforms: AppImage, .deb and .rpm; .msi and a setup .exe; a .dmg for Intel and Apple silicon. Run
-by hand it keeps them as artifacts; every release (**Actions → Bump version**, see
-[Development](development.md#releases)) builds them too and attaches them to the GitHub release. The
-version comes from `apps/desktop/package.json`, which the bump keeps at the version of the release.
-The .rpm is compressed with zstd at level 3 and the setup .exe with zlib (`tauri.conf.json`)
-instead of the bundler's defaults, zstd at level 19 and LZMA, which took about four minutes each,
-for a somewhat larger file.
+Linux braucht GTK 4.14 oder neuer (`libgtk-4-dev librsvg2-dev`; Ubuntu 24.04, Debian 13); Chromium
+(CEF, etwa 1 GB) lädt der erste Build herunter, nach `CEF_PATH`, falls gesetzt. Der Workflow
+**Actions → Desktop app** baut die Web-App einmal auf Linux und dann alle drei Plattformen:
+AppImage, .deb und .rpm; .msi und eine Setup-.exe; eine .dmg für Intel und Apple Silicon. Von Hand
+gestartet behält er sie als Artefakte; jedes Release (**Actions → Bump version**, siehe
+[Entwicklung](development.md#releases)) baut sie ebenfalls und hängt sie an das GitHub-Release. Die
+Version kommt aus `apps/desktop/package.json`, das der Bump auf der Version des Releases hält. Die
+.rpm wird mit zstd auf Stufe 3 komprimiert und die Setup-.exe mit zlib (`tauri.conf.json`) statt
+mit den Standards des Bundlers, zstd auf Stufe 19 und LZMA, die jeweils etwa vier Minuten
+brauchten, für eine etwas größere Datei.
 
-### Patched Tauri CLI
+### Gepatchte Tauri-CLI { #patched-tauri-cli }
 
-Temporary, until Tauri fixes it ([#12](https://github.com/Speicherstadt/schreibzeug/issues/12)): the
-bundler of Tauri 3 alpha copies `libEGL.so` and `libGLESv2.so` from CEF into every Linux package,
-and CEF 154 no longer ships them, so every Linux package fails. On Linux,
-`apps/desktop/scripts/tauri.ts` therefore builds the Tauri CLI of the version in `package.json` from
-Tauri's sources with `apps/desktop/patches/*.patch` applied (once, into
-`src-tauri/target/patched-cli/`), and the desktop package's scripts use it: `tauri`
-(`cd apps/desktop && bun run tauri …`; the root has no such script), `desktop:dev` and `desktop:build`
-(CI's `desktop` job builds it on `main`, so a release, which runs on its tag and reads `main`'s
-cache, finds it there instead of spending four minutes on it; both run on Ubuntu 24.04 and the cache
-key names the runner image, since a CLI built on a newer Ubuntu needs a newer glibc);
-Windows and macOS use the published CLI. The script stops when a patch no longer applies to a new
-version: then check whether that release fixes it and remove the patch as described in
-`apps/desktop/patches/README.md`.
+Vorübergehend, bis Tauri es behebt ([#12](https://github.com/Speicherstadt/schreibzeug/issues/12)): Der
+Bundler von Tauri 3 Alpha kopiert `libEGL.so` und `libGLESv2.so` aus CEF in jedes Linux-Paket, und
+CEF 154 liefert sie nicht mehr mit, also scheitert jedes Linux-Paket. Auf Linux baut
+`apps/desktop/scripts/tauri.ts` deshalb die Tauri-CLI der Version in `package.json` aus den Quellen
+von Tauri, mit `apps/desktop/patches/*.patch` angewendet (einmal, nach
+`src-tauri/target/patched-cli/`), und die Skripte des Desktop-Pakets nutzen sie: `tauri`
+(`cd apps/desktop && bun run tauri …`; die Wurzel hat kein solches Skript), `desktop:dev` und
+`desktop:build` (der `desktop`-Job der CI baut sie auf `main`, sodass ein Release, das auf seinem
+Tag läuft und den Cache von `main` liest, sie dort findet, statt vier Minuten dafür zu brauchen;
+beide laufen auf Ubuntu 24.04, und der Cache-Schlüssel nennt das Runner-Image, denn eine auf einem
+neueren Ubuntu gebaute CLI braucht ein neueres glibc);
+Windows und macOS nutzen die veröffentlichte CLI. Das Skript bricht ab, wenn ein Patch auf eine
+neue Version nicht mehr passt: Dann prüfen, ob dieses Release den Fehler behebt, und den Patch
+entfernen, wie in `apps/desktop/patches/README.md` beschrieben.
 
-The builds are not signed yet. Windows SmartScreen shows "unknown publisher" (More info → Run
-anyway). macOS Gatekeeper refuses to open the app the first time; since macOS 15 (Sequoia), right
-click → Open no longer gets past it: try to open the app once, then allow it under System Settings
-→ Privacy & Security → "Open Anyway". Linux packages need no signature.
+Die Builds sind noch nicht signiert. Windows SmartScreen zeigt „Unbekannter Herausgeber“
+(„Weitere Informationen“ → „Trotzdem ausführen“). macOS Gatekeeper verweigert beim ersten Mal das
+Öffnen der App; seit macOS 15 (Sequoia) kommt Rechtsklick → „Öffnen“ nicht mehr daran vorbei:
+Versuche die App einmal zu öffnen und erlaube sie dann unter „Systemeinstellungen“ → „Datenschutz &
+Sicherheit“ → „Dennoch öffnen“. Linux-Pakete brauchen keine Signatur.
 
-## Tests
+## Tests { #tests }
 
-`apps/local/test/files.test.ts` runs the local API over a temporary folder, `gate.test.ts` the
-check of host, origin and key, `mcp.test.ts` the MCP endpoint, `units.test.ts` the settings and the
-ids. `e2e/local.spec.ts` opens the app on the local server and works on files in its folder;
-`apps/desktop/src/*.test.ts` covers the start page.
+`apps/local/test/files.test.ts` führt die lokale API über einem temporären Ordner aus,
+`gate.test.ts` die Prüfung von Host, Origin und Schlüssel, `mcp.test.ts` den MCP-Endpunkt,
+`units.test.ts` die Einstellungen und die IDs. `e2e/local.spec.ts` öffnet die App auf dem lokalen
+Server und arbeitet mit Dateien in seinem Ordner; `apps/desktop/src/*.test.ts` deckt die Startseite
+ab.
 
-## Next
+## Als Nächstes { #next }
 
-- Local and server files side by side, several folders.
-- Schreibzeug as the default app for .docx, .xlsx and .pptx.
-- Signing and updates through the Tauri updater.
+- Lokale und Server-Dateien nebeneinander, mehrere Ordner.
+- Schreibzeug als Standard-App für .docx, .xlsx und .pptx.
+- Signieren und Updates über den Tauri-Updater.

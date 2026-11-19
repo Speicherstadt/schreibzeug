@@ -1,8 +1,8 @@
-# MCP server
+# MCP-Server { #mcp-server }
 
-Claude Code, and any other client of the [Model Context Protocol](https://modelcontextprotocol.io),
-works in Schreibzeug as a person would: it finds and manages files, reads them and creates new ones,
-always with the rights of the person whose access token it uses.
+Claude Code und jeder andere Client des [Model Context Protocol](https://modelcontextprotocol.io)
+arbeitet in Schreibzeug wie ein Mensch: Er findet und verwaltet Dateien, liest sie und legt neue
+an, immer mit den Rechten der Person, deren Zugangsschlüssel er benutzt.
 
 ```
 MCP client ──POST /mcp (Bearer token)──▶ apps/server src/mcp.ts ──▶ packages/mcp (tools)
@@ -11,162 +11,176 @@ MCP client ──POST /mcp (Bearer token)──▶ apps/server src/mcp.ts ──
                                                               the files API (src/app.ts)
 ```
 
-## Connecting
+## Verbinden { #connecting }
 
-In the app, **Einstellungen → Zugangsschlüssel**: name the token, choose its scope and how long it
-holds, and create it. The token is shown once, with the command for Claude Code:
+In der App unter **Einstellungen → Zugangsschlüssel**: Gib dem Schlüssel einen Namen, wähl seinen
+Umfang und wie lange er gilt, und leg ihn an. Der Schlüssel wird einmal angezeigt, zusammen mit
+dem Befehl für Claude Code:
 
 ```sh
 claude mcp add --transport http schreibzeug https://<server>/mcp --header "Authorization: Bearer sz_…"
 ```
 
-`SCHREIBZEUG_URL`, the server's address (also the sign-in callback's base, [Kontext](kontext.md)),
-is what the tools put into links (e.g. `https://office.example.org`); without it they use the address the request came to, honouring
-`X-Forwarded-Proto` and `X-Forwarded-Host` behind a reverse proxy. In development the Vite server
-forwards `/mcp` to the API server like `/api`.
+`SCHREIBZEUG_URL`, die Adresse des Servers (auch die Basis des Rückrufs nach der Anmeldung,
+[Kontext](kontext.md)), ist das, was die Werkzeuge in Links schreiben (z. B.
+`https://office.example.org`); ohne sie nehmen sie die Adresse, an die die Anfrage ging, und
+berücksichtigen hinter einem Reverse Proxy `X-Forwarded-Proto` und `X-Forwarded-Host`. In der
+Entwicklung leitet der Vite-Server `/mcp` wie `/api` an den API-Server weiter.
 
-### On this computer
+### Auf diesem Rechner { #on-this-computer }
 
-The desktop app's local server (`apps/local src/mcp.ts`) has `/mcp` too, for the files in its folder.
-There is one person and no account, so there is no token: like the rest of the local server it only
-answers requests for 127.0.0.1 and refuses one a web page sends from another origin (`gate.ts`). Its
-tools call the local API with the app's own key; what only a server has (sharing, links, versions,
-the trash, `search_files`, and the tools for an open document: `outline`, `replace_text`,
-`insert_content`, `set_cells`, `export_pdf`) they answer with the local server's "Das gibt es nur
-auf einem Schreibzeug-Server".
-The desktop app starts the local server on a free port, a different one on every start, so an MCP
-client set up with that address stops working when the app restarts. Started by hand with a fixed
-one:
+Der lokale Server der Desktop-App (`apps/local src/mcp.ts`) hat ebenfalls `/mcp`, für die Dateien
+in seinem Ordner. Es gibt eine Person und kein Konto, also auch keinen Schlüssel: Wie der Rest des
+lokalen Servers beantwortet er nur Anfragen an 127.0.0.1 und lehnt eine ab, die eine Webseite von
+einem anderen Origin schickt (`gate.ts`). Seine Werkzeuge rufen die lokale API mit dem eigenen
+Schlüssel der App auf; was nur ein Server hat (Teilen, Links, Versionen, der Papierkorb,
+`search_files` und die Werkzeuge für ein offenes Dokument: `outline`, `replace_text`,
+`insert_content`, `set_cells`, `export_pdf`), beantworten sie mit der Meldung des lokalen Servers
+„Das gibt es nur auf einem Schreibzeug-Server“.
+Die Desktop-App startet den lokalen Server auf einem freien Port, bei jedem Start einem anderen;
+ein MCP-Client, der mit dieser Adresse eingerichtet ist, funktioniert also nicht mehr, sobald die
+App neu startet. Von Hand gestartet, mit einem festen Port:
 
 ```sh
 SCHREIBZEUG_LOCAL_ROOT=~/Dokumente PORT=3300 bun run --filter @schreibzeug/local start
 claude mcp add --transport http schreibzeug-lokal http://127.0.0.1:3300/mcp
 ```
 
-A fixed port in the desktop app's settings comes later.
+Ein fester Port in den Einstellungen der Desktop-App kommt später.
 
-## Access tokens
+## Zugangsschlüssel { #access-tokens }
 
-A personal access token (`src/auth/tokens.ts`, table `access_tokens`) is `sz_` and 32 random bytes in
-base64url. The server keeps only its SHA-256: the token has too much entropy to guess, so a slow
-password hash would add nothing. Each has a name, a scope, an optional expiry (30, 90 or 365 days, or
-none) and the time it was last used.
+Ein persönlicher Zugangsschlüssel (`src/auth/tokens.ts`, Tabelle `access_tokens`) ist `sz_` und 32
+zufällige Bytes in base64url. Der Server speichert nur seinen SHA-256: Der Schlüssel hat zu viel
+Entropie, um ihn zu erraten, ein langsamer Passwort-Hash brächte also nichts. Jeder hat einen
+Namen, einen Umfang, ein optionales Ablaufdatum (30, 90 oder 365 Tage, oder keins) und den
+Zeitpunkt, an dem er zuletzt benutzt wurde.
 
-| Scope | What it may do |
+| Umfang | Was er darf |
 |---|---|
-| `read` | Only `GET` requests, and not the links of a node (`GET /api/nodes/:id/invites`, `refuseReadToken`): their secret would let another account edit; over MCP it does not even see the tools that write |
-| `write` | What its user may do |
+| `read` | Nur `GET`-Anfragen, und nicht die Links eines Knotens (`GET /api/nodes/:id/invites`, `refuseReadToken`): Ihr Geheimnis ließe ein anderes Konto bearbeiten; über MCP sieht er die schreibenden Werkzeuge gar nicht erst |
+| `write` | Was sein Benutzer darf |
 
-`requireUser` (`src/auth/middleware.ts`) takes a session cookie or `Authorization: Bearer <token>`;
-a token starting with `sz_` is a personal access token, any other one is Kontext's (with a sign-in
-provider configured, [Kontext](kontext.md#tokens-from-kontext)). A request with a personal access
-token is judged by it alone: a wrong, revoked or expired token is `401` with
-`WWW-Authenticate: Bearer`, even with a valid cookie alongside. Three things need the person in the app
-with a session (`requireSession`): managing tokens (`GET/POST /api/tokens`, `DELETE /api/tokens/:id`),
-joining a live editing session (`/api/collab`) and taking jobs for an open document (`/api/agent`).
-Neither a personal access token nor a token Kontext sends on someone's behalf will do, so a token
-cannot make another and a short-lived one cannot become a lasting one. When Kontext ends someone's
-sessions (`DELETE /api/sessions`), their personal access tokens end with them.
+`requireUser` (`src/auth/middleware.ts`) nimmt ein Sitzungs-Cookie oder
+`Authorization: Bearer <token>`; ein Token, das mit `sz_` beginnt, ist ein persönlicher
+Zugangsschlüssel, jedes andere eines von Kontext (wenn ein Anmeldeanbieter eingerichtet ist,
+[Kontext](kontext.md#tokens-from-kontext)). Eine Anfrage mit einem persönlichen Zugangsschlüssel
+wird allein nach ihm beurteilt: Ein falscher, widerrufener oder abgelaufener Schlüssel ergibt
+`401` mit `WWW-Authenticate: Bearer`, auch wenn daneben ein gültiges Cookie mitkommt. Drei Dinge
+brauchen die Person in der App mit einer Sitzung (`requireSession`): Schlüssel verwalten
+(`GET/POST /api/tokens`, `DELETE /api/tokens/:id`), einer laufenden Bearbeitungssitzung beitreten
+(`/api/collab`) und Aufträge für ein offenes Dokument annehmen (`/api/agent`). Weder ein
+persönlicher Zugangsschlüssel noch ein Token, das Kontext im Auftrag von jemandem schickt, reicht
+dafür; ein Schlüssel kann also keinen weiteren erzeugen, und ein kurzlebiger kann nicht zu einem
+dauerhaften werden. Wenn Kontext die Sitzungen von jemandem beendet (`DELETE /api/sessions`),
+enden seine persönlichen Zugangsschlüssel mit ihnen.
 
-Later, OAuth as the MCP specification describes it for remote servers, so a client connects without
-a copied token.
+Später kommt OAuth, wie die MCP-Spezifikation es für entfernte Server beschreibt, damit sich ein
+Client ohne kopierten Schlüssel verbindet.
 
-## The endpoint
+## Der Endpunkt { #the-endpoint }
 
-`/mcp` (`apps/server src/mcp.ts`) speaks MCP's Streamable HTTP transport with the official TypeScript
-SDK (`@modelcontextprotocol/sdk`, `WebStandardStreamableHTTPServerTransport`). It only takes a
-token, never a session cookie, so no web page can drive it for the person. It is stateless: each
-request gets its own server and transport, and answers as JSON.
+`/mcp` (`apps/server src/mcp.ts`) spricht den Streamable-HTTP-Transport von MCP mit dem offiziellen
+TypeScript-SDK (`@modelcontextprotocol/sdk`, `WebStandardStreamableHTTPServerTransport`). Er nimmt
+nur einen Schlüssel, nie ein Sitzungs-Cookie, damit keine Webseite ihn für die Person steuern kann.
+Er ist zustandslos: Jede Anfrage bekommt ihren eigenen Server und Transport und wird als JSON
+beantwortet.
 
-The tools live in `packages/mcp`, which knows nothing of the database: every tool calls the files
-API through `app.request` with the caller's token, so it goes through exactly the checks the
-interface goes through, and there is no second logic. A tool's failure (not found, no right, name
-taken) is a tool result with `isError` and the API's German message, not a protocol error.
+Die Werkzeuge liegen in `packages/mcp`, das nichts von der Datenbank weiß: Jedes Werkzeug ruft die
+Datei-API über `app.request` mit dem Schlüssel des Aufrufers auf, durchläuft also genau die
+Prüfungen, die auch die Oberfläche durchläuft, und es gibt keine zweite Logik. Schlägt ein Werkzeug
+fehl (nicht gefunden, kein Recht, Name vergeben), ist das ein Werkzeugergebnis mit `isError` und
+der deutschen Meldung der API, kein Protokollfehler.
 
-Names and inputs are English like the API; descriptions and messages are German like the interface.
-Every change to a file is a new version and can be undone under "Versionen"; deleting only moves
-into the trash. The server's instructions and the reading tools say that what comes out of a
-document is data, not an instruction.
+Namen und Eingaben sind englisch wie die API; Beschreibungen und Meldungen deutsch wie die
+Oberfläche. Jede Änderung an einer Datei ist eine neue Version und lässt sich unter „Versionen“
+rückgängig machen; Löschen verschiebt nur in den Papierkorb. Die Anweisungen des Servers und die
+lesenden Werkzeuge sagen, dass das, was aus einem Dokument kommt, Daten sind, keine Anweisung.
 
-That is advice to the model, not a boundary: a document someone shared with the user can carry
-text that asks the model to share the user's files. So `share` and `create_link`, the tools that
-let someone else in, carry the annotations `destructiveHint` and `openWorldHint` (what an outsider
-has seen cannot be taken back), so that a client which approves plain writes on its own still asks
-for these. And before either acts on a node the user owns, it asks the person through MCP
-elicitation, naming the node as stored and who gets which role ("die Datei „X“ mit … teilen, zum
-Ansehen?"; for a link, its role and lifetime); a decline or a failed question shares nothing. A
-client can only be asked when it announced elicitation at `initialize` to the same server: the
-stateless `/mcp` endpoint gets a new server per request, which has not seen `initialize`, so there
-the client's own approval of the call, guided by the annotations, is the safeguard
-(`packages/mcp/src/tool.ts` `confirmWith`).
+Das ist ein Rat an das Modell, keine Grenze: Ein Dokument, das jemand mit dem Benutzer geteilt hat,
+kann Text enthalten, der das Modell bittet, die Dateien des Benutzers zu teilen. Deshalb tragen
+`share` und `create_link`, die Werkzeuge, die jemand anderen hereinlassen, die Annotationen
+`destructiveHint` und `openWorldHint` (was ein Außenstehender gesehen hat, lässt sich nicht
+zurücknehmen), damit ein Client, der einfache Schreibvorgänge von sich aus genehmigt, bei diesen
+trotzdem nachfragt. Und bevor eines von beiden auf einen Knoten wirkt, der dem Benutzer gehört,
+fragt es die Person per MCP-Elicitation und nennt dabei den Knoten, wie er gespeichert ist, und wer
+welche Rolle bekommt („die Datei „X“ mit … teilen, zum Ansehen?“; bei einem Link seine Rolle und
+Laufzeit); eine Ablehnung oder eine fehlgeschlagene Frage teilt nichts. Ein Client kann nur gefragt
+werden, wenn er Elicitation beim `initialize` an denselben Server angekündigt hat: Der zustandslose
+Endpunkt `/mcp` bekommt pro Anfrage einen neuen Server, der kein `initialize` gesehen hat; dort ist
+also die eigene Genehmigung des Aufrufs durch den Client, geleitet von den Annotationen, die
+Absicherung (`packages/mcp/src/tool.ts` `confirmWith`).
 
-## Tools
+## Werkzeuge { #tools }
 
-| Tool | What it does | Scope |
+| Werkzeug | Was es tut | Umfang |
 |---|---|---|
-| `list_folder` | A folder, or `root`, `shared`, `recent`, `trash`: id, kind, size, change, role and link of each entry | read |
-| `search_files` | Files and folders by part of their name, own and shared (`GET /api/search?q=`) | read |
-| `get_file` | A node with its path, its link, and who it is shared with (owner only) | read |
-| `list_versions` | The versions of a file | read |
-| `create_folder`, `rename`, `move`, `copy` | As in the file list | write |
-| `trash`, `restore` | Into the trash and back | write |
-| `restore_version` | An older version as the newest, as a new version | write |
-| `share`, `create_link` | Share with an account (or, with Kontext, an address that has none yet: the share is marked `pending`; an account whose address nobody confirmed is marked `unverified`), or a link to view or edit; asks the person first where the client can be asked (see above) | write |
-| `read_document` | A .docx as Markdown (headings, lists, paragraphs, tables; headers and footers after), or a plain text file | read |
-| `read_sheet` | One sheet of an .xlsx by name, optionally a range like `A1:D20`, as a Markdown table with column letters and row numbers; values as the sheet shows them in German | read |
-| `read_presentation` | A .pptx slide by slide: title, text, notes | read |
-| `read_pdf` | A PDF's text page by page (`pages`: `1-3`, `2,5`), its form fields, its digital signatures and whether they hold (each with its issuer, or "self-signed", and that the trust chain is not checked, so the name is not confirmed), and the e-invoice it carries | read |
-| `list_templates` | The built-in templates and the user's own in the folder "Vorlagen", each with its placeholders | read |
-| `create_document` | A .docx from Markdown | write |
-| `create_from_template` | A file from a template with its placeholders (`[Nr.]`, `[Datum]` …) filled; says which are still open | write |
-| `create_sheet` | An .xlsx from sheets of rows: numbers, texts, formulas, with the formats bold, currency, date, percent | write |
-| `create_presentation` | A .pptx from slides (title, content, title only, blank) | write |
-| `append_rows` | Rows below the last row of a sheet, as a new version | write |
-| `einvoice_xml` | Factur-X XML (EN 16931) from an invoice's data, checked first (`draftProblems`) | write |
-| `upload_file` | A small file from the conversation (up to 1 MB), as text or base64; with `text` and a name ending in `.md` a Markdown note | write |
-| `write_text` | The text of a Markdown note or text file, replaced or appended to, in the file's own encoding and line endings; made over the version it read, so a save in between is not overwritten ([Markdown and text files](text.md)) | write |
-| `outline` | The open document as it is in the editor: numbered paragraphs (with their style) and tables, sheets with their used range, slides with their text | read |
-| `replace_text` | Find and replace in an open .docx; answers how often | write |
-| `insert_content` | Markdown (headings, paragraphs, lists, bold, italic) into an open .docx, before or after element n of the outline, or at the end | write |
-| `set_cells` | Values and formulas into an open .xlsx from the top left cell of a range | write |
-| `export_pdf` | An open document as PDF or PDF/A, stored beside it | write |
+| `list_folder` | Ein Ordner, oder `root`, `shared`, `recent`, `trash`: ID, Art, Größe, Änderung, Rolle und Link jedes Eintrags | read |
+| `search_files` | Dateien und Ordner nach einem Teil ihres Namens, eigene und geteilte (`GET /api/search?q=`) | read |
+| `get_file` | Ein Knoten mit seinem Pfad, seinem Link und mit wem er geteilt ist (nur für den Eigentümer) | read |
+| `list_versions` | Die Versionen einer Datei | read |
+| `create_folder`, `rename`, `move`, `copy` | Wie in der Dateiliste | write |
+| `trash`, `restore` | In den Papierkorb und zurück | write |
+| `restore_version` | Eine ältere Version als neueste, als neue Version | write |
+| `share`, `create_link` | Mit einem Konto teilen (oder, mit Kontext, mit einer Adresse, die noch keins hat: Die Freigabe wird als `pending` markiert; ein Konto, dessen Adresse niemand bestätigt hat, als `unverified`), oder ein Link zum Ansehen oder Bearbeiten; fragt vorher die Person, wo der Client gefragt werden kann (siehe oben) | write |
+| `read_document` | Eine .docx als Markdown (Überschriften, Listen, Absätze, Tabellen; Kopf- und Fußzeilen danach) oder eine einfache Textdatei | read |
+| `read_sheet` | Ein Blatt einer .xlsx nach Namen, optional ein Bereich wie `A1:D20`, als Markdown-Tabelle mit Spaltenbuchstaben und Zeilennummern; Werte so, wie das Blatt sie auf Deutsch zeigt | read |
+| `read_presentation` | Eine .pptx Folie für Folie: Titel, Text, Notizen | read |
+| `read_pdf` | Der Text eines PDFs Seite für Seite (`pages`: `1-3`, `2,5`), seine Formularfelder, seine digitalen Signaturen und ob sie gültig sind (jede mit ihrem Aussteller, oder „selbstsigniert“, und dem Hinweis, dass die Vertrauenskette nicht geprüft wird, der Name also nicht bestätigt ist), und die E-Rechnung, die es enthält | read |
+| `list_templates` | Die eingebauten Vorlagen und die eigenen des Benutzers im Ordner „Vorlagen“, jede mit ihren Platzhaltern | read |
+| `create_document` | Eine .docx aus Markdown | write |
+| `create_from_template` | Eine Datei aus einer Vorlage mit ausgefüllten Platzhaltern (`[Nr.]`, `[Datum]` …); sagt, welche noch offen sind | write |
+| `create_sheet` | Eine .xlsx aus Blättern mit Zeilen: Zahlen, Texte, Formeln, mit den Formaten fett, Währung, Datum, Prozent | write |
+| `create_presentation` | Eine .pptx aus Folien (Titel, Inhalt, nur Titel, leer) | write |
+| `append_rows` | Zeilen unter der letzten Zeile eines Blatts, als neue Version | write |
+| `einvoice_xml` | Factur-X-XML (EN 16931) aus den Daten einer Rechnung, vorher geprüft (`draftProblems`) | write |
+| `upload_file` | Eine kleine Datei aus dem Gespräch (bis 1 MB), als Text oder base64; mit `text` und einem Namen auf `.md` eine Markdown-Notiz | write |
+| `write_text` | Der Text einer Markdown-Notiz oder Textdatei, ersetzt oder ergänzt, in der Kodierung und mit den Zeilenenden der Datei; auf Grundlage der Version, die es gelesen hat, sodass eine Speicherung dazwischen nicht überschrieben wird ([Markdown- und Textdateien](text.md)) | write |
+| `outline` | Das offene Dokument so, wie es im Editor ist: nummerierte Absätze (mit ihrer Formatvorlage) und Tabellen, Blätter mit ihrem benutzten Bereich, Folien mit ihrem Text | read |
+| `replace_text` | Suchen und Ersetzen in einer offenen .docx; antwortet, wie oft | write |
+| `insert_content` | Markdown (Überschriften, Absätze, Listen, fett, kursiv) in eine offene .docx, vor oder nach Element n der Gliederung oder am Ende | write |
+| `set_cells` | Werte und Formeln in eine offene .xlsx, ab der linken oberen Zelle eines Bereichs | write |
+| `export_pdf` | Ein offenes Dokument als PDF oder PDF/A, daneben gespeichert | write |
 
-The reading tools read the file itself, without the engine: `packages/ooxml` (`docxContent` with
-heading levels from the styles' outline level and list levels from `w:numPr`, `xlsxSheets`,
-`pptxSlides`), pdf.js (`pdfjs-dist`, its legacy build, which runs on Bun) for the text and form fields
-of a PDF, `packages/pdf-sign` for signatures and `packages/einvoice` for the e-invoice. A text longer
-than 20 000 characters comes in parts: the answer ends with the `offset` to ask for next, so a
-document does not fill the conversation. An Office file is unpacked with a budget
-(`packages/ooxml` `boundedUnzip`): the parts it needs may hold at most 128 MiB together, by the
-sizes the zip declares, and each part stops inflating as soon as it gives more than it declared, so
-a small zip bomb cannot block the server; the tool answers that the file is too large. The same
-holds for `list_templates`, `create_from_template` and `append_rows`. A scan without a text layer reads as empty; text
-recognition in the app gives it one. ODT and the older formats need x2t, which runs in the browser:
-open them in Schreibzeug first.
+Die lesenden Werkzeuge lesen die Datei selbst, ohne die Engine: `packages/ooxml` (`docxContent` mit
+Überschriftenebenen aus der Gliederungsebene der Formatvorlagen und Listenebenen aus `w:numPr`,
+`xlsxSheets`, `pptxSlides`), pdf.js (`pdfjs-dist`, dessen Legacy-Build, der auf Bun läuft) für Text
+und Formularfelder eines PDFs, `packages/pdf-sign` für Signaturen und `packages/einvoice` für die
+E-Rechnung. Ein Text, der länger als 20 000 Zeichen ist, kommt in Teilen: Die Antwort endet mit
+dem `offset`, nach dem als Nächstes zu fragen ist, damit ein Dokument nicht das Gespräch füllt.
+Eine Office-Datei wird mit einem Budget entpackt (`packages/ooxml` `boundedUnzip`): Die Teile, die
+es braucht, dürfen zusammen höchstens 128 MiB groß sein, nach den Größen, die das Zip angibt, und
+jeder Teil hört auf zu entpacken, sobald er mehr liefert als angegeben, damit eine kleine Zip-Bombe
+den Server nicht blockieren kann; das Werkzeug antwortet, dass die Datei zu groß ist. Dasselbe gilt
+für `list_templates`, `create_from_template` und `append_rows`. Ein Scan ohne Textebene liest sich
+als leer; die Texterkennung in der App gibt ihm eine. ODT und die älteren Formate brauchen x2t, das
+im Browser läuft: Öffne sie zuerst in Schreibzeug.
 
-The creating tools write the file on the server, without an editor open, and store it as an upload
-from the interface would (`POST /api/files`; `append_rows` saves a new version with `PUT`):
+Die erzeugenden Werkzeuge schreiben die Datei auf dem Server, ohne offenen Editor, und speichern
+sie, wie es ein Upload aus der Oberfläche täte (`POST /api/files`; `append_rows` speichert mit
+`PUT` eine neue Version):
 
-- `create_document` turns Markdown into WordprocessingML (`packages/ooxml` `markdownDocx`): ATX
-  headings become Word's own styles "heading 1"–"heading 6" with their outline level, so the
-  navigation and a table of contents find them; bullet and numbered lists get a numbering part,
-  each numbered list starting at 1; pipe tables, block quotes, fenced code, rules, bold, italic,
-  code and links (as `w:hyperlink` with an external relationship).
-- `create_from_template` fills placeholders in the text of the document, sheet or slide parts
-  (`fillPlaceholders`). A placeholder Word split across runs is not found; the answer lists what is
-  still open. Formulas stay as they are: the brackets of a structured reference such as
-  `=SUM(Tabelle1[Betrag])` are no placeholder.
-- `append_rows` writes plain values below the last row (`appendRows`), and the used range grows
-  with them; the workbook's own styles stay as they are.
-- `einvoice_xml` takes amounts as a person states them (euros, percent) and reckons in integers as
-  `packages/einvoice` does. The ZUGFeRD PDF needs the engine for the PDF/A and comes with editing
-  in an open tab.
+- `create_document` macht aus Markdown WordprocessingML (`packages/ooxml` `markdownDocx`):
+  ATX-Überschriften werden zu Words eigenen Formatvorlagen „heading 1“–„heading 6“ mit ihrer
+  Gliederungsebene, damit die Navigation und ein Inhaltsverzeichnis sie finden; Aufzählungen und
+  nummerierte Listen bekommen einen Nummerierungsteil, jede nummerierte Liste beginnt bei 1;
+  Pipe-Tabellen, Blockzitate, umzäunter Code, Trennlinien, fett, kursiv, Code und Links (als
+  `w:hyperlink` mit einer externen Beziehung).
+- `create_from_template` füllt Platzhalter im Text der Dokument-, Blatt- oder Folienteile
+  (`fillPlaceholders`). Einen Platzhalter, den Word auf mehrere Runs verteilt hat, findet es nicht;
+  die Antwort listet auf, was noch offen ist. Formeln bleiben, wie sie sind: Die Klammern eines
+  strukturierten Verweises wie `=SUM(Tabelle1[Betrag])` sind kein Platzhalter.
+- `append_rows` schreibt einfache Werte unter die letzte Zeile (`appendRows`), und der benutzte
+  Bereich wächst mit; die eigenen Formatvorlagen der Arbeitsmappe bleiben, wie sie sind.
+- `einvoice_xml` nimmt Beträge so, wie ein Mensch sie angibt (Euro, Prozent), und rechnet in
+  Ganzzahlen, wie es `packages/einvoice` tut. Das ZUGFeRD-PDF braucht die Engine für das PDF/A und
+  kommt mit dem Bearbeiten im offenen Tab.
 
-## Editing in the open tab
+## Bearbeiten im offenen Tab { #editing-in-the-open-tab }
 
-What changes an existing document runs where the engine is: in the browser tab that has the
-document open. The person sees the change, can undo it, and whoever edits along gets it through the
-relay; it is saved as a new version at once.
+Was ein vorhandenes Dokument ändert, läuft dort, wo die Engine ist: in dem Browser-Tab, der das
+Dokument offen hat. Die Person sieht die Änderung, kann sie rückgängig machen, und wer mitbearbeitet,
+bekommt sie über das Relay; sie wird sofort als neue Version gespeichert.
 
 ```
 MCP client ─▶ /mcp edit tool ─▶ POST /api/files/:id/agent ─▶ agent hub (src/agent/hub.ts)
@@ -176,64 +190,79 @@ MCP client ─▶ /mcp edit tool ─▶ POST /api/files/:id/agent ─▶ agent h
                                           └─ editor-core agent.ts ─▶ engine (builder API) ─▶ save
 ```
 
-- **The hub** (`apps/server src/agent`): every editor with a document open for editing joins
-  `/api/agent/:fileId` (WebSocket, session only, the right to edit checked when it opens and again
-  after every change to shares, the trash or a move; a tab that lost it is closed with 4403). A job for a user and
-  file goes to that user's tab that joined last and waits up to two minutes for its answer.
-  Without a tab the answer is `Das Dokument ist gerade in keinem Tab geöffnet.`, and the tool adds
-  the link to open it. `POST /api/files/:id/agent` checks "edit", `GET /api/files/:id/outline`
-  "view", so a read-only token may read the outline.
-- **Consent**: the first job that changes something asks the person in the tab ("Claude möchte
-  dieses Dokument bearbeiten": Erlauben, Ablehnen), once per document and tab. Afterwards a bar says
-  "Claude darf dieses Dokument bearbeiten." with "Anhalten"; stopped, the tab refuses every job until
-  "Wieder zulassen". Reading the outline needs no consent.
-- **The engine** (`packages/editor-core src/agent.ts`): jobs are scripts against the engine's
-  builder API (`Api.GetDocument()`, `Api.GetSheet()`, `Api.GetPresentation()`), run through its
-  plugin command (`common/apiBase.js callCommand` → `common/plugins.js callCommandInternal`), which
-  wraps them in one action (`canRunBuilderScript`: `StartAction`, `CheckActionLock`;
-  `_onEndBuilderScript`: `Recalculate`, `FinalizeAction`). One job is one step of the history.
-  Its input goes in as a JSON literal; it returns plain data, which becomes the answer.
-- **Replacing** uses the search bar's `asc_replaceText`, not the builder's `SearchAndReplace`. In
-  a shared session `ReplaceSearchElement` asks the relay for its locks and holds the global lock
-  until the answer comes; a builder action around it would see that lock and undo itself
-  (`private_CheckActionLock`, `StartSelectionLockCheck`).
-- **Cells**: `ApiRange.SetValue` writes every value as text the sheet reads in its language
-  (`checkFormat`, `Range.setValue`), so numbers go in with the document's decimal separator
-  (`AscCommon.g_oDefaultCultureInfo`), and true and false as `=TRUE()` and `=FALSE()`.
-- **Inserting** gets paragraphs, not Markdown: `packages/mcp` turns the Markdown into them with
-  `markdownParagraphs` (`packages/ooxml`), so the engine binding needs no parser. Headings get
-  Word's "Heading n" style, list items a numbering of their own per list.
+- **Der Hub** (`apps/server src/agent`): Jeder Editor, der ein Dokument zum Bearbeiten offen hat,
+  tritt `/api/agent/:fileId` bei (WebSocket, nur mit Sitzung; das Recht zum Bearbeiten wird beim
+  Öffnen geprüft und erneut nach jeder Änderung an Freigaben, am Papierkorb oder nach einem
+  Verschieben; ein Tab, der es verloren hat, wird mit 4403 geschlossen). Ein Auftrag für einen
+  Benutzer und eine Datei geht an den Tab dieses Benutzers, der zuletzt beigetreten ist, und wartet
+  bis zu zwei Minuten auf dessen Antwort. Ohne Tab lautet die Antwort
+  `Das Dokument ist gerade in keinem Tab geöffnet.`, und das Werkzeug fügt den Link zum Öffnen
+  hinzu. `POST /api/files/:id/agent` prüft „bearbeiten“, `GET /api/files/:id/outline` „ansehen“,
+  sodass ein Schlüssel nur zum Lesen die Gliederung lesen darf.
+- **Zustimmung**: Der erste Auftrag, der etwas ändert, fragt die Person im Tab („Claude möchte
+  dieses Dokument bearbeiten“: Erlauben, Ablehnen), einmal pro Dokument und Tab. Danach sagt eine
+  Leiste „Claude darf dieses Dokument bearbeiten.“ mit „Anhalten“; angehalten, lehnt der Tab jeden
+  Auftrag ab, bis „Wieder zulassen“. Die Gliederung zu lesen braucht keine Zustimmung.
+- **Die Engine** (`packages/editor-core src/agent.ts`): Aufträge sind Skripte gegen die
+  Builder-API der Engine (`Api.GetDocument()`, `Api.GetSheet()`, `Api.GetPresentation()`),
+  ausgeführt über deren Plugin-Befehl (`common/apiBase.js callCommand` → `common/plugins.js
+  callCommandInternal`), der sie in eine Aktion einschließt (`canRunBuilderScript`: `StartAction`,
+  `CheckActionLock`; `_onEndBuilderScript`: `Recalculate`, `FinalizeAction`). Ein Auftrag ist ein
+  Schritt im Verlauf. Seine Eingabe geht als JSON-Literal hinein; er gibt einfache Daten zurück,
+  die zur Antwort werden.
+- **Ersetzen** benutzt `asc_replaceText` der Suchleiste, nicht `SearchAndReplace` des Builders. In
+  einer gemeinsamen Sitzung fragt `ReplaceSearchElement` das Relay nach seinen Sperren und hält die
+  globale Sperre, bis die Antwort kommt; eine Builder-Aktion darum herum sähe diese Sperre und
+  machte sich selbst rückgängig (`private_CheckActionLock`, `StartSelectionLockCheck`).
+- **Zellen**: `ApiRange.SetValue` schreibt jeden Wert als Text, den das Blatt in seiner Sprache
+  liest (`checkFormat`, `Range.setValue`); Zahlen gehen also mit dem Dezimaltrennzeichen des
+  Dokuments hinein (`AscCommon.g_oDefaultCultureInfo`), wahr und falsch als `=TRUE()` und
+  `=FALSE()`.
+- **Einfügen** bekommt Absätze, kein Markdown: `packages/mcp` macht aus dem Markdown mit
+  `markdownParagraphs` (`packages/ooxml`) Absätze, damit die Anbindung an die Engine keinen Parser
+  braucht. Überschriften bekommen Words Formatvorlage „Heading n“, Listeneinträge eine eigene
+  Nummerierung pro Liste.
 
-The engine's builder runs scripts with only a light sandbox (`common/macros.js` `_safePluginEval`
-hides `window` and `document` but not `fetch`), so a free `run_script` tool is not offered; the
-fixed tools are what an assistant can do. ZUGFeRD PDFs, the mail merge and formatting come next,
-then editing without an open tab (a headless browser on the server).
+Der Builder der Engine führt Skripte nur mit einer leichten Sandbox aus (`common/macros.js`
+`_safePluginEval` verbirgt `window` und `document`, aber nicht `fetch`), deshalb gibt es kein
+freies Werkzeug `run_script`; die festen Werkzeuge sind das, was ein Assistent tun kann.
+ZUGFeRD-PDFs, der Serienbrief und Formatierung kommen als Nächstes, dann das Bearbeiten ohne
+offenen Tab (ein Headless-Browser auf dem Server).
 
-Links point into the app: `/edit/<id>` for a file, `/folders/<id>` for a folder, `/invite/<token>`
-for a link.
+Links zeigen in die App: `/edit/<id>` für eine Datei, `/folders/<id>` für einen Ordner,
+`/invite/<token>` für einen Link.
 
-## Tests
+## Tests { #tests }
 
-`apps/server/test/tokens.test.ts`: a token is shown once and kept as a hash, acts for its user,
-`read` only reads, revoked, expired and wrong tokens are refused, tokens cannot manage tokens,
-someone else cannot revoke one. `apps/server/test/mcp.test.ts` connects the SDK's own client to
-`/mcp` in memory: no token, the tools a read token sees, the same checks as the app (a taken name,
-someone else's folder), a revoked token. `apps/server/test/mcp-read.test.ts` reads the test files
-(`hello.docx`, `preise.xlsx`, `vortrag.pptx`, `formular.pdf`, `rechnung.pdf`) and documents written
-in the test: headings and lists as Markdown, a long text in parts, a sheet by name and range, a
-PDF's form fields and e-invoice, and a zip bomb refused as too large. `apps/local/test/mcp.test.ts` uses the local endpoint without a token,
-gets the local server's answer for sharing, and is refused for a foreign host or origin. `apps/server/test/mcp-create.test.ts` creates every kind and reads it back: Markdown to .docx and back,
-a built-in and an own template, a sheet with appended rows as version 2, a presentation, an
-e-invoice read back with `readInvoiceXml`, small uploads. The readers and writers have their own tests
-in `packages/ooxml` and `packages/mcp`; `packages/mcp/test/confirm.test.ts` connects a client that
-can be asked in memory: sharing and a link after a yes, nothing after a no, and without the question
-for a client that cannot be asked. `mcp.test.ts` checks the annotations of `share` and `create_link`. `e2e/mcp.spec.ts` opens what the tools made in the editor,
-saves the document through the engine and finds its heading style and table again.
-`apps/server/test/mcp-edit.test.ts` stands in for the tab on the hub: the link when nothing is open,
-the job and its answer, a refusal, the newest tab of the same person only, a tab that does not
-answer, the outline for a read-only token. `packages/editor-core/test/agent.test.ts` covers the
-scripts' input and answers. `e2e/mcp-edit.spec.ts` runs it with the engine: a document open in two
-tabs, the outline, replacing after consent, inserting, the first tab getting both through the relay,
-undo taking the insert back, "Anhalten", and the answer once no tab is open; and cells set in an
-open spreadsheet, read back as numbers and a formula's result. `e2e/mcp.spec.ts` creates a token in the settings, calls
-the endpoint as a client would, sees the folder it made in the file list, and revokes the token.
+`apps/server/test/tokens.test.ts`: Ein Schlüssel wird einmal gezeigt und als Hash gespeichert,
+handelt für seinen Benutzer, `read` liest nur, widerrufene, abgelaufene und falsche Schlüssel
+werden abgelehnt, Schlüssel können keine Schlüssel verwalten, jemand anderes kann keinen
+widerrufen. `apps/server/test/mcp.test.ts` verbindet den eigenen Client des SDK im Speicher mit
+`/mcp`: kein Schlüssel, die Werkzeuge, die ein Lese-Schlüssel sieht, dieselben Prüfungen wie in der
+App (ein vergebener Name, der Ordner eines anderen), ein widerrufener Schlüssel.
+`apps/server/test/mcp-read.test.ts` liest die Testdateien (`hello.docx`, `preise.xlsx`,
+`vortrag.pptx`, `formular.pdf`, `rechnung.pdf`) und im Test geschriebene Dokumente: Überschriften
+und Listen als Markdown, ein langer Text in Teilen, ein Blatt nach Name und Bereich, die
+Formularfelder und die E-Rechnung eines PDFs, und eine Zip-Bombe, die als zu groß abgelehnt wird.
+`apps/local/test/mcp.test.ts` benutzt den lokalen Endpunkt ohne Schlüssel, bekommt beim Teilen die
+Antwort des lokalen Servers und wird für einen fremden Host oder Origin abgelehnt.
+`apps/server/test/mcp-create.test.ts` erzeugt jede Art und liest sie zurück: Markdown zu .docx und
+zurück, eine eingebaute und eine eigene Vorlage, ein Blatt mit angehängten Zeilen als Version 2,
+eine Präsentation, eine E-Rechnung, mit `readInvoiceXml` zurückgelesen, kleine Uploads. Die Leser
+und Schreiber haben ihre eigenen Tests in `packages/ooxml` und `packages/mcp`;
+`packages/mcp/test/confirm.test.ts` verbindet im Speicher einen Client, der gefragt werden kann:
+Teilen und ein Link nach einem Ja, nichts nach einem Nein, und ohne die Frage für einen Client, der
+nicht gefragt werden kann. `mcp.test.ts` prüft die Annotationen von `share` und `create_link`.
+`e2e/mcp.spec.ts` öffnet, was die Werkzeuge erzeugt haben, im Editor, speichert das Dokument über
+die Engine und findet seine Überschrift-Formatvorlage und seine Tabelle wieder.
+`apps/server/test/mcp-edit.test.ts` vertritt den Tab am Hub: der Link, wenn nichts offen ist, der
+Auftrag und seine Antwort, eine Ablehnung, nur der neueste Tab derselben Person, ein Tab, der nicht
+antwortet, die Gliederung für einen Schlüssel nur zum Lesen.
+`packages/editor-core/test/agent.test.ts` deckt Eingabe und Antworten der Skripte ab.
+`e2e/mcp-edit.spec.ts` führt es mit der Engine aus: ein Dokument in zwei Tabs offen, die
+Gliederung, Ersetzen nach Zustimmung, Einfügen, der erste Tab bekommt beides über das Relay,
+Rückgängig nimmt das Einfügen zurück, „Anhalten“, und die Antwort, sobald kein Tab mehr offen ist;
+außerdem Zellen, die in einer offenen Tabelle gesetzt und als Zahlen und als Ergebnis einer Formel
+zurückgelesen werden. `e2e/mcp.spec.ts` legt in den Einstellungen einen Schlüssel an, ruft den
+Endpunkt auf, wie es ein Client täte, sieht den angelegten Ordner in der Dateiliste und widerruft
+den Schlüssel.

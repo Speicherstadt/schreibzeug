@@ -3,19 +3,18 @@
 # Locally: pip install -r requirements-docs.txt && mkdocs serve
 site_name: Schreibzeug
 site_description: >-
-  Schreibzeug, the self-hosted open-source office suite: edit Word, Excel, PowerPoint and PDF files
-  together in the browser or as a desktop app, without a document server. An alternative to Microsoft
-  365 on your own server.
+  Schreibzeug, das selbst gehostete Open-Source-Office: Word-, Excel-, PowerPoint- und PDF-Dateien
+  gemeinsam im Browser oder als Desktop-App bearbeiten, ohne Dokumentenserver. Eine Alternative zu
+  Microsoft 365 auf dem eigenen Server.
 site_url: https://schreibzeug.app/
 repo_url: https://github.com/Speicherstadt/schreibzeug
 repo_name: Speicherstadt/schreibzeug
 edit_uri: edit/main/docs/
-# The German pages have their own (plugins → i18n → languages → de → copyright).
 copyright: >-
-  License AGPL-3.0 · © Tristan Teufel and contributors · Schreibzeug builds on the open-source
-  Euro-Office engine and is not affiliated with Euro-Office, ONLYOFFICE, Microsoft or Google.
-  · <a href="https://teufel-it.de/de/impressum/">Legal notice</a>
-  · <a href="https://speicherstadt.app/en/privacy/">Privacy</a>
+  Lizenz AGPL-3.0 · © Tristan Teufel und Mitwirkende · Schreibzeug baut auf der Open-Source-Engine
+  Euro-Office auf und steht in keiner Verbindung zu Euro-Office, ONLYOFFICE, Microsoft oder Google.
+  · <a href="https://teufel-it.de/de/impressum/">Impressum</a>
+  · <a href="https://speicherstadt.app/datenschutz/">Datenschutz</a>
 
 docs_dir: docs
 # Pages as installation.html rather than installation/: the README links to them so, and relative
@@ -23,32 +22,32 @@ docs_dir: docs
 use_directory_urls: false
 
 nav:
-  - Home: index.md
-  - Overview: overview.md
-  - Running it:
+  - Start: index.md
+  - Überblick: overview.md
+  - Betrieb:
       - Installation: installation.md
-      - Accounts and sharing: accounts.md
-      - Sign-in through Kontext: kontext.md
-      - Desktop app: desktop.md
-      - Hosted or with a partner: hosted.md
-  - Working with it:
-      - Files and versions: files.md
-      - Collaboration: collaboration.md
+      - Konten und Teilen: accounts.md
+      - Anmeldung über Kontext: kontext.md
+      - Desktop-App: desktop.md
+      - Gehostet oder mit Partner: hosted.md
+  - Arbeiten damit:
+      - Dateien und Versionen: files.md
+      - Zusammenarbeit: collaboration.md
       - PDFs: pdf.md
-      - Markdown and text files: text.md
-      - E-invoices: e-invoice.md
-      - MCP server (AI assistants): mcp.md
-      - Accessibility: accessibility.md
-  - Behind it:
-      - Architecture: architecture.md
-      - The editing engine: engine.md
-      - Development: development.md
+      - Markdown und Textdateien: text.md
+      - E-Rechnungen: e-invoice.md
+      - MCP-Server (KI-Assistenten): mcp.md
+      - Barrierefreiheit: accessibility.md
+  - Technik:
+      - Architektur: architecture.md
+      - Die Engine: engine.md
+      - Entwicklung: development.md
 
 theme:
   name: material
   # Link previews for pages with an image (overrides/main.html)
   custom_dir: overrides
-  language: en
+  language: de
   icon:
     repo: fontawesome/brands/github
   palette:
@@ -57,13 +56,13 @@ theme:
       primary: black
       toggle:
         icon: material/weather-night
-        name: Dark mode
+        name: Dunkles Design
     - media: "(prefers-color-scheme: dark)"
       scheme: slate
       primary: black
       toggle:
         icon: material/weather-sunny
-        name: Light mode
+        name: Helles Design
   features:
     - navigation.sections
     - navigation.top
@@ -76,47 +75,29 @@ plugins:
   # Fonts (Google Fonts) and other external assets are downloaded at build time and served from
   # this site, so a reader's browser contacts no third party. Cache in .cache/ (git-ignored).
   - privacy
-  # English at /, German at /de/. Every page has its translation next to it with .de.md
-  # (index.de.md), headings with the same anchor ids. A first visit opens the browser's language
-  # (overrides/partials/language-redirect.html).
-  - i18n:
-      docs_structure: suffix
-      fallback_to_default: true
-      languages:
-        - locale: en
-          name: English
-          default: true
-        - locale: de
-          name: Deutsch
-          copyright: >-
-            Lizenz AGPL-3.0 · © Tristan Teufel und Mitwirkende · Schreibzeug baut auf der
-            Open-Source-Engine Euro-Office auf und steht in keiner Verbindung zu Euro-Office,
-            ONLYOFFICE, Microsoft oder Google.
-            · <a href="https://teufel-it.de/de/impressum/">Impressum</a>
-            · <a href="https://speicherstadt.app/datenschutz/">Datenschutz</a>
-          site_description: >-
-            Schreibzeug, das selbst gehostete Open-Source-Office: Word-, Excel-, PowerPoint- und
-            PDF-Dateien gemeinsam im Browser oder als Desktop-App bearbeiten, ohne
-            Dokumentenserver. Eine Alternative zu Microsoft 365 auf dem eigenen
-            Server.
-          nav_translations:
-            Home: Start
-            Overview: Überblick
-            Running it: Betrieb
-            Accounts and sharing: Konten und Teilen
-            Sign-in through Kontext: Anmeldung über Kontext
-            Desktop app: Desktop-App
-            Hosted or with a partner: Gehostet oder mit Partner
-            Working with it: Arbeiten damit
-            Files and versions: Dateien und Versionen
-            Collaboration: Zusammenarbeit
-            Markdown and text files: Markdown und Textdateien
-            E-invoices: E-Rechnungen
-            MCP server (AI assistants): MCP-Server (KI-Assistenten)
-            Behind it: Technik
-            Architecture: Architektur
-            The editing engine: Die Engine
-            Development: Entwicklung
+  # The documentation was English at / and German at /de/ until it became German only; links
+  # already shared to /de/ and to the old German tour (entdecken.html) keep working.
+  - redirects:
+      redirect_maps:
+        entdecken.md: index.md
+        de/entdecken.md: index.md
+        de/index.md: index.md
+        de/overview.md: overview.md
+        de/installation.md: installation.md
+        de/accounts.md: accounts.md
+        de/kontext.md: kontext.md
+        de/desktop.md: desktop.md
+        de/hosted.md: hosted.md
+        de/files.md: files.md
+        de/collaboration.md: collaboration.md
+        de/pdf.md: pdf.md
+        de/text.md: text.md
+        de/e-invoice.md: e-invoice.md
+        de/mcp.md: mcp.md
+        de/accessibility.md: accessibility.md
+        de/architecture.md: architecture.md
+        de/engine.md: engine.md
+        de/development.md: development.md
 
 extra_css:
   - assets/entdecken.css

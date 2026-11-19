@@ -1,152 +1,168 @@
-# Accounts
+# Konten { #accounts }
 
-Everyone signs in with an email address and a password, or, where the server has it, through
-another service such as Kontext ([Schreibzeug in Kontext](kontext.md)). The accounts are
-[Better Auth](https://www.better-auth.com/) on the Schreibzeug server (`apps/server/src/auth`), stored
-in the app's own SQLite database through Better Auth's Drizzle adapter.
+Alle melden sich mit E-Mail-Adresse und Passwort an oder, wo der Server es anbietet, über einen
+anderen Dienst wie Kontext ([Schreibzeug in Kontext](kontext.md)). Die Konten sind
+[Better Auth](https://www.better-auth.com/) auf dem Schreibzeug-Server (`apps/server/src/auth`),
+gespeichert in der eigenen SQLite-Datenbank der App über den Drizzle-Adapter von Better Auth.
 
-## Server
+## Server { #server }
 
-| Piece | Where |
+| Teil | Wo |
 |---|---|
-| Better Auth's routes: sign-up, sign-in, sign-out, session | `/api/auth/*`, mounted in `src/app.ts` |
-| Its tables `user`, `session`, `account`, `verification` | `src/db/auth-schema.ts`, as Better Auth's Drizzle schema generator writes them |
-| The session check in front of every other route | `src/auth/middleware.ts` (`requireUser`); without a session the answer is `401` with `kind: "unauthorized"`. A bearer token from Kontext counts as well ([Schreibzeug in Kontext](kontext.md#tokens-from-kontext)) |
-| Personal access tokens, for MCP clients | `src/auth/tokens.ts`, `/api/tokens`; a request with `Authorization: Bearer sz_…` acts for the token's user, see [the MCP server](mcp.md#access-tokens) |
+| Die Routen von Better Auth: Registrierung, Anmeldung, Abmeldung, Sitzung | `/api/auth/*`, eingehängt in `src/app.ts` |
+| Seine Tabellen `user`, `session`, `account`, `verification` | `src/db/auth-schema.ts`, so wie der Drizzle-Schema-Generator von Better Auth sie schreibt |
+| Die Sitzungsprüfung vor jeder anderen Route | `src/auth/middleware.ts` (`requireUser`); ohne Sitzung lautet die Antwort `401` mit `kind: "unauthorized"`. Ein Bearer-Token von Kontext zählt ebenfalls ([Schreibzeug in Kontext](kontext.md#tokens-from-kontext)) |
+| Persönliche Zugriffstokens für MCP-Clients | `src/auth/tokens.ts`, `/api/tokens`; eine Anfrage mit `Authorization: Bearer sz_…` handelt für den Benutzer des Tokens, siehe [den MCP-Server](mcp.md#access-tokens) |
 
-The session is a cookie, named `schreibzeug.session_token` (and so on, `advanced.cookiePrefix`):
-beside Kontext on one host, as `localhost` in development, Better Auth's default names would make
-each sign-in replace the other's, since cookies know no ports. Better Auth checks the `Origin` of requests that carry it against its
-trusted origins; Schreibzeug trusts its own origin, whatever host name the server is reached by, and
-the ones in `SCHREIBZEUG_TRUSTED_ORIGINS`. The desktop app needs none: its window shows the
-server's own pages ([desktop app](desktop.md#how-it-fits-together)).
+Die Sitzung ist ein Cookie namens `schreibzeug.session_token` (und so weiter,
+`advanced.cookiePrefix`): Neben Kontext auf einem Host, als `localhost` in der Entwicklung, würden
+die Standardnamen von Better Auth jede Anmeldung die andere ersetzen lassen, denn Cookies kennen
+keine Ports. Better Auth prüft den `Origin` von Anfragen, die einen mitbringen, gegen seine
+vertrauenswürdigen Origins; Schreibzeug vertraut seinem eigenen Origin, unter welchem Hostnamen der
+Server auch erreicht wird, und denen in `SCHREIBZEUG_TRUSTED_ORIGINS`. Die Desktop-App braucht
+keinen: Ihr Fenster zeigt die eigenen Seiten des Servers ([Desktop-App](desktop.md#how-it-fits-together)).
 
-The rest of the API checks the same for requests that come with the session cookie: what changes
-something (every method but `GET`, `HEAD` and `OPTIONS`) and the WebSocket upgrades of the relay
-(`/api/collab`) and of the editor jobs (`/api/agent`) must come from the request's own origin,
-`SCHREIBZEUG_URL` or `SCHREIBZEUG_TRUSTED_ORIGINS`, else the answer is `403`
-(`src/auth/origin.ts`). The cookie is `SameSite=Lax`, so the browser also sends it from another
-origin of the same site, such as another subdomain beside Kontext or another port of the host;
-without the check, a page there could upload, trash or join a live session as the person. Without
-an `Origin` header the browser's `Sec-Fetch-Site` decides; a request with neither comes from no
-page. Personal access tokens and Kontext's tokens are not checked: a browser never sends them by
-itself.
+Der Rest der API prüft dasselbe für Anfragen, die mit dem Sitzungs-Cookie kommen: Was etwas ändert
+(jede Methode außer `GET`, `HEAD` und `OPTIONS`) und die WebSocket-Upgrades des Relays
+(`/api/collab`) und der Editor-Jobs (`/api/agent`) müssen vom eigenen Origin der Anfrage kommen,
+von `SCHREIBZEUG_URL` oder `SCHREIBZEUG_TRUSTED_ORIGINS`, sonst lautet die Antwort `403`
+(`src/auth/origin.ts`). Das Cookie ist `SameSite=Lax`, also schickt der Browser es auch von einem
+anderen Origin derselben Site, etwa einer anderen Subdomain neben Kontext oder einem anderen Port
+des Hosts; ohne die Prüfung könnte eine Seite dort als die Person hochladen, in den Papierkorb
+verschieben oder einer laufenden Sitzung beitreten. Ohne `Origin`-Header entscheidet
+`Sec-Fetch-Site` des Browsers; eine Anfrage ohne beides kommt von keiner Seite. Persönliche
+Zugriffstokens und die Tokens von Kontext werden nicht geprüft: Ein Browser schickt sie nie von
+sich aus.
 
-Every node has an `owner_id`. Every query in `src/files/repository.ts` takes the signed-in user and
-asks `src/files/access.ts` what they may do with the node; a file they have no access to is "not
-found", the same as one that does not exist. Names are unique per owner at the top level.
+Jeder Knoten hat eine `owner_id`. Jede Abfrage in `src/files/repository.ts` nimmt den angemeldeten
+Benutzer entgegen und fragt `src/files/access.ts`, was er mit dem Knoten darf; eine Datei, auf die
+er keinen Zugriff hat, ist „nicht gefunden“, genau wie eine, die es nicht gibt. Namen sind auf der
+obersten Ebene pro Eigentümer eindeutig.
 
-The collaboration relay needs a session too: the WebSocket upgrade carries the cookie. Every
-connection is checked against the file, also when the file's session is already open, and the
-relay replaces the user that the engine announces in `auth` with the signed-in one, so names at
-cursors and on comments are real. The socket stays bound to the sign-in session it came with
-(`src/sockets.ts`): when that session ends (sign-out, a revoked session, a password change that
-signs out the other devices; Better Auth's `databaseHooks.session.delete`), or Kontext signs the
-person out everywhere, the relay and the jobs socket close the person's sockets (code 4401) and the
-engine shows that the session ended. A change to shares, the trash or a move checks every open
-socket against the file again ([collaboration](collaboration.md#messages)).
+Auch das Relay für die Zusammenarbeit braucht eine Sitzung: Das WebSocket-Upgrade trägt das Cookie.
+Jede Verbindung wird gegen die Datei geprüft, auch wenn die Sitzung der Datei schon offen ist, und
+das Relay ersetzt den Benutzer, den die Engine in `auth` ankündigt, durch den angemeldeten, sodass
+die Namen an Cursorn und Kommentaren echt sind. Der Socket bleibt an die Anmeldesitzung gebunden,
+mit der er kam (`src/sockets.ts`): Wenn diese Sitzung endet (Abmeldung, eine widerrufene Sitzung,
+eine Passwortänderung, die die anderen Geräte abmeldet; `databaseHooks.session.delete` von Better
+Auth) oder Kontext die Person überall abmeldet, schließen das Relay und der Job-Socket die Sockets
+der Person (Code 4401), und die Engine zeigt, dass die Sitzung beendet ist. Eine Änderung an
+Freigaben, am Papierkorb oder ein Verschieben prüft jeden offenen Socket erneut gegen die Datei
+([Zusammenarbeit](collaboration.md#messages)).
 
-## Sharing
+## Teilen { #sharing }
 
-The owner shares a folder or a file with the account behind an e-mail address, as `edit` or
-`view` (table `shares`; `src/files/shares.ts`). The person needs an account, unless the server
-signs in through Kontext: then a share with an address without an account waits (table
-`pending_shares`; the share dialog says "Noch ohne Konto") and becomes a share when that address
-gets an account the provider confirmed, at its first sign-in through Kontext or with Kontext's
-first token for it (`claimPendingShares`). A sign-up with a password never gets it, since anyone
-could sign up with anybody's address. Kontext uses this when a document goes into a chat, a task or
-an appointment ([Schreibzeug in Kontext](kontext.md#files-in-kontext)).
+Der Eigentümer teilt einen Ordner oder eine Datei mit dem Konto hinter einer E-Mail-Adresse, als
+`edit` oder `view` (Tabelle `shares`; `src/files/shares.ts`). Die Person braucht ein Konto, außer
+der Server meldet über Kontext an: Dann wartet eine Freigabe an eine Adresse ohne Konto (Tabelle
+`pending_shares`; der Freigabedialog sagt „Noch ohne Konto“) und wird zur Freigabe, sobald diese
+Adresse ein Konto bekommt, das der Anbieter bestätigt hat, bei ihrer ersten Anmeldung über Kontext
+oder mit dem ersten Token von Kontext für sie (`claimPendingShares`). Eine Registrierung mit
+Passwort bekommt sie nie, denn jeder könnte sich mit der Adresse eines anderen registrieren. Kontext
+nutzt das, wenn ein Dokument in einen Chat, eine Aufgabe oder einen Termin kommt
+([Schreibzeug in Kontext](kontext.md#files-in-kontext)).
 
-An address is not an identity until someone confirmed it. A password sign-up stores any address
-unconfirmed, also a colleague's who has no account yet, so a share by address must not silently
-reach whoever registered it first:
+Eine Adresse ist keine Identität, bis jemand sie bestätigt hat. Eine Registrierung mit Passwort
+speichert jede Adresse unbestätigt, auch die einer Kollegin, die noch kein Konto hat; eine Freigabe
+per Adresse darf also nicht stillschweigend bei dem landen, der sie zuerst registriert hat:
 
-- Where the server signs in through Kontext, a share only goes to an account whose address is
-  confirmed. An account with a password under that address does not get it; the share waits as
-  above ("Noch ohne Konto") until the address is confirmed, by linking the account with Kontext
-  ([sign-up](#sign-up)). A share such an account already has keeps changing its role in place.
-- On a server with passwords only, nothing is confirmed, so a share goes to the account with the
-  address as before, but the share list marks it (`unverified` in `GET /api/nodes/:id/shares`; the
-  dialog says "Adresse nicht bestätigt"), so the owner sees that the account is not known to be
-  the person.
+- Wo der Server über Kontext anmeldet, geht eine Freigabe nur an ein Konto, dessen Adresse bestätigt
+  ist. Ein Konto mit Passwort unter dieser Adresse bekommt sie nicht; die Freigabe wartet wie oben
+  („Noch ohne Konto“), bis die Adresse bestätigt ist, indem das Konto mit Kontext verknüpft wird
+  ([Registrierung](#sign-up)). Eine Freigabe, die ein solches Konto schon hat, ändert ihre Rolle
+  weiterhin an Ort und Stelle.
+- Auf einem Server nur mit Passwörtern ist nichts bestätigt, also geht eine Freigabe wie bisher an
+  das Konto mit der Adresse, aber die Freigabeliste markiert sie (`unverified` in
+  `GET /api/nodes/:id/shares`; der Dialog sagt „Adresse nicht bestätigt“), sodass der Eigentümer
+  sieht, dass das Konto nicht nachweislich die Person ist.
 
-A share on a folder holds for everything below it; the user's role on a node is "owner",
-or the strongest share on the node or on any folder above it, found with one recursive query
-(`roleOf`).
+Eine Freigabe auf einen Ordner gilt für alles darunter; die Rolle des Benutzers auf einem Knoten ist
+„owner“ oder die stärkste Freigabe auf dem Knoten oder auf einem Ordner darüber, gefunden mit einer
+rekursiven Abfrage (`roleOf`).
 
 | | view | edit | owner |
 |---|:-:|:-:|:-:|
-| Open, download, see versions | ✓ | ✓ | ✓ |
-| Save, restore a version, rename, create in a folder | | ✓ | ✓ |
-| Move, trash, share | | | ✓ |
+| Öffnen, herunterladen, Versionen sehen | ✓ | ✓ | ✓ |
+| Speichern, eine Version wiederherstellen, umbenennen, in einem Ordner anlegen | | ✓ | ✓ |
+| Verschieben, in den Papierkorb, teilen | | | ✓ |
 
-Everything stays its owner's: what an editor creates in a shared folder belongs to the folder's
-owner, and moving only happens within the owner's own folders. A weaker role than needed answers
-`403 forbidden`. Renaming also needs the folder the node lies in (the top level counts as its
-owner's): names are unique per folder, so a clash would tell someone with a share on a single node
-which names lie next to it. A node shared on its own keeps its name for the other person; only a
-change of case goes through. Trash and recent files list only the user's own nodes; "Für mich freigegeben"
-(`GET /api/shared`) lists what was shared with them, and the path of a shared folder starts at the
-folder that was shared, each folder in it with the role the user has on it.
+Alles bleibt Eigentum seines Eigentümers: Was ein Bearbeiter in einem geteilten Ordner anlegt,
+gehört dem Eigentümer des Ordners, und Verschieben geschieht nur innerhalb der eigenen Ordner des
+Eigentümers. Eine schwächere Rolle als nötig wird mit `403 forbidden` beantwortet. Umbenennen
+braucht auch den Ordner, in dem der Knoten liegt (die oberste Ebene zählt als die ihres
+Eigentümers): Namen sind pro Ordner eindeutig, eine Kollision würde also jemandem mit einer Freigabe
+auf einen einzelnen Knoten verraten, welche Namen daneben liegen. Ein einzeln geteilter Knoten
+behält für die andere Person seinen Namen; nur eine Änderung der Groß- und Kleinschreibung geht
+durch. Papierkorb und zuletzt geöffnete Dateien listen nur die eigenen Knoten des Benutzers; „Für
+mich freigegeben“ (`GET /api/shared`) listet, was mit ihm geteilt wurde, und der Pfad eines
+geteilten Ordners beginnt bei dem Ordner, der geteilt wurde, jeder Ordner darin mit der Rolle, die
+der Benutzer darauf hat.
 
-### Links
+### Links { #links }
 
-Instead of an address, the owner can create a link (`src/files/invites.ts`, table `invites`): a
-random 24-byte token, a role and an expiry of 1, 7 or 30 days. It holds for everyone who opens
-it until it expires or the owner deletes it, and stops when the node goes to the trash.
+Statt einer Adresse kann der Eigentümer einen Link anlegen (`src/files/invites.ts`, Tabelle
+`invites`): ein zufälliges 24-Byte-Token, eine Rolle und ein Ablauf nach 1, 7 oder 30 Tagen. Er
+gilt für alle, die ihn öffnen, bis er abläuft oder der Eigentümer ihn löscht, und endet, wenn der
+Knoten in den Papierkorb kommt.
 
-The link opens `/invite/<token>` in the web app, which shows who shares what (`GET
-/api/invites/:token` needs no session). Someone without a session signs in or creates an account
-and comes back; "Einladung annehmen" adds a share with the link's role, or keeps a stronger one the
-user already has. A link that holds also opens a closed sign-up: the page sends its token in the
-`x-schreibzeug-invite` header, and the sign-up hook in `src/auth/auth.ts` lets that one account in.
-That account is made for the link: the hook accepts the link with the sign-up, so the person lands
-with the share ("Einladung annehmen" afterwards changes nothing). The address it was registered
-with is not confirmed by the link, which names no address; it counts as above.
+Der Link öffnet `/invite/<token>` in der Web-App, die zeigt, wer was teilt (`GET
+/api/invites/:token` braucht keine Sitzung). Wer keine Sitzung hat, meldet sich an oder legt ein
+Konto an und kommt zurück; „Einladung annehmen“ fügt eine Freigabe mit der Rolle des Links hinzu
+oder behält eine stärkere, die der Benutzer schon hat. Ein gültiger Link öffnet auch eine
+geschlossene Registrierung: Die Seite schickt sein Token im Header `x-schreibzeug-invite`, und der
+Registrierungs-Hook in `src/auth/auth.ts` lässt dieses eine Konto herein. Dieses Konto ist für den
+Link gemacht: Der Hook nimmt den Link mit der Registrierung an, sodass die Person mit der Freigabe
+ankommt („Einladung annehmen“ ändert danach nichts). Die Adresse, mit der es registriert wurde, ist
+durch den Link nicht bestätigt, denn er nennt keine Adresse; sie zählt wie oben.
 
-In the editor the relay takes the role from the database for every connection. A viewer joins
-with `mode: "view"` whatever the client says, and the relay drops what would change the document
-(`getLock`, `saveChanges`, `isSaveLock`, the save messages; DocsCoServer refuses the first three
-from viewers too). The web app opens the file read-only (`put_Mode("view")`, `asc_setViewMode`)
-without toolbar or saving; with fast co-editing the engine is then a live viewer and shows the
-others' changes as they come.
+Im Editor nimmt das Relay die Rolle für jede Verbindung aus der Datenbank. Ein Betrachter tritt mit
+`mode: "view"` bei, egal was der Client sagt, und das Relay verwirft, was das Dokument ändern würde
+(`getLock`, `saveChanges`, `isSaveLock`, die Speicher-Nachrichten; DocsCoServer weist die ersten
+drei von Betrachtern ebenfalls ab). Die Web-App öffnet die Datei schreibgeschützt
+(`put_Mode("view")`, `asc_setViewMode`), ohne Werkzeugleiste und Speichern; mit schneller
+gemeinsamer Bearbeitung ist die Engine dann ein Live-Betrachter und zeigt die Änderungen der anderen,
+sobald sie kommen.
 
-## Sign-up
+## Registrierung { #sign-up }
 
-| Variable | Default | |
+| Variable | Standard | |
 |---|---|---|
-| `SCHREIBZEUG_OPEN_SIGNUP` | `false` | `true`: anyone who reaches the server may create an account. Otherwise only the first account can be created there. |
-| `SCHREIBZEUG_AUTH_SECRET` | generated | Signs the session cookies, at least 32 characters. Without it the server generates one on first start and keeps it in `SCHREIBZEUG_DATA_DIR/auth-secret` (mode 600). |
-| `SCHREIBZEUG_TRUSTED_ORIGINS` | – | More origins that may sign in and, with a session, change things, separated by commas. |
-| `SCHREIBZEUG_TRUSTED_PROXIES` | – | The reverse proxies in front of the server (addresses or CIDR ranges). Sign-in and sign-up allow a few tries per client in ten seconds; a client is the connection's address, behind these proxies the first forwarded address that is not one of them, never an `X-Forwarded-For` a client sends itself (`src/auth/client-ip.ts`, [installation](installation.md#behind-a-reverse-proxy)). |
+| `SCHREIBZEUG_OPEN_SIGNUP` | `false` | `true`: Jeder, der den Server erreicht, darf ein Konto anlegen. Sonst kann dort nur das erste Konto angelegt werden. |
+| `SCHREIBZEUG_AUTH_SECRET` | erzeugt | Signiert die Sitzungs-Cookies, mindestens 32 Zeichen. Ohne ihn erzeugt der Server beim ersten Start einen und bewahrt ihn in `SCHREIBZEUG_DATA_DIR/auth-secret` auf (Modus 600). |
+| `SCHREIBZEUG_TRUSTED_ORIGINS` | – | Weitere Origins, die sich anmelden und mit einer Sitzung Dinge ändern dürfen, durch Kommas getrennt. |
+| `SCHREIBZEUG_TRUSTED_PROXIES` | – | Die Reverse Proxys vor dem Server (Adressen oder CIDR-Bereiche). Anmeldung und Registrierung erlauben ein paar Versuche pro Client in zehn Sekunden; ein Client ist die Adresse der Verbindung, hinter diesen Proxys die erste weitergeleitete Adresse, die keiner von ihnen ist, nie ein `X-Forwarded-For`, das ein Client selbst schickt (`src/auth/client-ip.ts`, [Installation](installation.md#behind-a-reverse-proxy)). |
 
-The first account takes over the files from before there were accounts (nodes without an owner),
-so an existing installation keeps its files.
+Das erste Konto übernimmt die Dateien aus der Zeit vor den Konten (Knoten ohne Eigentümer), sodass
+eine bestehende Installation ihre Dateien behält.
 
-Signing in through Kontext also opens a closed sign-up: whoever Kontext knows belongs to the company
-(the sign-up hook lets Better Auth's callback `/callback/:id` in). Someone who signs in through it
-with the address of an existing account gets that account when its address is confirmed (Better
-Auth's account linking with Kontext as a trusted provider, `requireLocalEmailVerified`). An account
-with a password has an address nobody confirmed: Better Auth answers `account_not_linked`, the
-sign-in page says so, and signing in with the password links Kontext right after (`linkSocial`,
-only for the same address). When Kontext confirms the address (`email_verified: true` in its id
-token or userinfo, nothing else counts), it counts as confirmed and what was shared with it waits
-no longer; an address the provider does not confirm stays unconfirmed and gets nothing by it. One account has one person at Kontext: a second `sub` is not linked (the account
-hook in `src/auth/auth.ts`), so an address given to someone new does not hand on the former
-person's files. From then on the account is found by Kontext's `sub`, so a changed address keeps
-it. The variables are in [Schreibzeug in Kontext](kontext.md#settings).
+Die Anmeldung über Kontext öffnet ebenfalls eine geschlossene Registrierung: für alle, von denen
+Kontext weiß, dass sie zur Firma gehören (der Registrierungs-Hook lässt den Callback
+`/callback/:id` von Better Auth herein). Wer sich darüber mit der Adresse eines bestehenden Kontos
+anmeldet, bekommt dieses Konto, wenn dessen Adresse bestätigt ist (das Account Linking von Better
+Auth mit Kontext als vertrauenswürdigem Anbieter, `requireLocalEmailVerified`). Ein Konto mit
+Passwort hat eine Adresse, die niemand bestätigt hat: Better Auth antwortet `account_not_linked`,
+die Anmeldeseite sagt das, und eine Anmeldung mit dem Passwort verknüpft Kontext gleich danach
+(`linkSocial`, nur für dieselbe Adresse). Wenn Kontext die Adresse bestätigt (`email_verified:
+true` in seinem ID-Token oder Userinfo, nichts anderes zählt), gilt sie als bestätigt, und was mit
+ihr geteilt wurde, wartet nicht länger; eine Adresse, die der Anbieter nicht bestätigt, bleibt
+unbestätigt und bekommt dadurch nichts. Ein Konto hat genau eine Person bei Kontext: Ein zweites
+`sub` wird nicht verknüpft (der Account-Hook in `src/auth/auth.ts`), damit eine Adresse, die an
+jemand Neues vergeben wird, nicht die Dateien der früheren Person weitergibt. Von da an wird das
+Konto über das `sub` von Kontext gefunden, eine geänderte Adresse behält es also. Die Variablen
+stehen in [Schreibzeug in Kontext](kontext.md#settings).
 
-## For administrators
+## Für Administratoren { #for-administrators }
 
-Schreibzeug has no administrator: no admin interface, and no account with rights over the others.
-The first account is an account like every other one; it only takes over the files from before
-there were accounts ([sign-up](#sign-up)). What that leaves to whoever runs the server:
+Schreibzeug hat keinen Administrator: keine Admin-Oberfläche und kein Konto mit Rechten über die
+anderen. Das erste Konto ist ein Konto wie jedes andere; es übernimmt nur die Dateien aus der Zeit
+vor den Konten ([Registrierung](#sign-up)). Was das dem überlässt, der den Server betreibt:
 
-- **No "Passwort vergessen"**: the sign-in page has no password reset, the server sends no e-mail,
-  and the app has no page to change a password. Someone who forgot theirs needs the operator, who
-  can set a new one in the container. The script hashes it the way Better Auth does
-  (`better-auth/crypto` `hashPassword`) and writes it into the `account` row of the address with
-  the provider `credential` (`src/db/auth-schema.ts`); Better Auth keeps addresses in lower case:
+- **Kein „Passwort vergessen“**: Die Anmeldeseite hat kein Zurücksetzen des Passworts, der Server
+  verschickt keine E-Mail, und die App hat keine Seite, um ein Passwort zu ändern. Wer seines
+  vergessen hat, braucht den Betreiber, der im Container ein neues setzen kann. Das Skript hasht es
+  so, wie Better Auth es tut (`better-auth/crypto` `hashPassword`), und schreibt es in die Zeile
+  der Tabelle `account` zur Adresse mit dem Anbieter `credential` (`src/db/auth-schema.ts`); Better
+  Auth speichert Adressen in Kleinbuchstaben:
 
   ```bash
   read -rsp "New password: " PASSWORD && export PASSWORD
@@ -165,37 +181,41 @@ there were accounts ([sign-up](#sign-up)). What that leaves to whoever runs the 
   unset PASSWORD
   ```
 
-  `-w /app/apps/server` runs it where `better-auth` is installed; the password is read from the
-  terminal, so it stays out of the shell's history. Devices that are signed in stay signed in. An
-  account that signs in only through Kontext has no password; the script says so and changes
-  nothing.
-- **No deleting accounts**: neither the person nor the operator can delete an account in the app.
-- **Files are not deleted for good**: the trash is never emptied, so a trashed file keeps its bytes
-  and its versions. Versions go only by [thinning](files.md#versions); the newest version and the
-  kept ones stay. A request to erase someone's data (GDPR Art. 17) therefore needs the operator,
-  and there is no tool for it yet: an account's files, their versions and images, its shares,
-  links, tokens and sessions are rows in several tables and blobs in the data folder, and a
-  procedure that removes all of them consistently is not written yet.
+  `-w /app/apps/server` führt es dort aus, wo `better-auth` installiert ist; das Passwort wird vom
+  Terminal gelesen und bleibt so aus der Shell-History heraus. Angemeldete Geräte bleiben
+  angemeldet. Ein Konto, das sich nur über Kontext anmeldet, hat kein Passwort; das Skript sagt das
+  und ändert nichts.
+- **Kein Löschen von Konten**: Weder die Person noch der Betreiber kann ein Konto in der App
+  löschen.
+- **Dateien werden nicht endgültig gelöscht**: Der Papierkorb wird nie geleert, eine Datei im
+  Papierkorb behält also ihre Bytes und ihre Versionen. Versionen gehen nur durch das
+  [Ausdünnen](files.md#versions); die neueste Version und die aufbewahrten bleiben. Ein Antrag auf
+  Löschung der Daten einer Person (DSGVO Art. 17) braucht deshalb den Betreiber, und dafür gibt es
+  noch kein Werkzeug: Die Dateien eines Kontos, ihre Versionen und Bilder, seine Freigaben, Links,
+  Tokens und Sitzungen sind Zeilen in mehreren Tabellen und Blobs im Datenordner, und ein Verfahren,
+  das alles davon stimmig entfernt, ist noch nicht geschrieben.
 
-## Web app
+## Web-App { #web-app }
 
-`src/api/account.ts` wraps Better Auth's client (`better-auth/client`); TanStack Query keeps who is
-signed in. Every page but `/login` sits under a route that reads the session first and sends
-everyone without one to `/login?redirect=…` (`src/router.tsx`). A `401` from any request later
-does the same. The editor opens documents as the signed-in user; the navigation shows the name
-and the way out.
+`src/api/account.ts` umhüllt den Client von Better Auth (`better-auth/client`); TanStack Query
+behält, wer angemeldet ist. Jede Seite außer `/login` liegt unter einer Route, die zuerst die
+Sitzung liest und alle ohne Sitzung nach `/login?redirect=…` schickt (`src/router.tsx`). Ein `401`
+auf eine spätere Anfrage tut dasselbe. Der Editor öffnet Dokumente als der angemeldete Benutzer;
+die Navigation zeigt den Namen und den Weg hinaus.
 
-## Tests
+## Tests { #tests }
 
-`apps/server/test/accounts.test.ts`: no session, no API; each person sees only their files; closed
-sign-up and the takeover of old files; the secret file. The server tests sign up an account in
-their harness. In the E2E run (`SCHREIBZEUG_OPEN_SIGNUP=true`) every test signs up an account of its own
-through the API (`e2e/app.ts`); `e2e/accounts.spec.ts` goes through the form, signs out and back in,
-and checks that someone else's folder is not found. `apps/server/test/shares.test.ts` covers the
-roles, shares on folders, taking a share back, the trash and the mark on an unconfirmed address;
-`apps/server/test/edge.test.ts` the body limits, the address the sign-in rate limit counts, and
-the origin check for cookie requests and WebSocket upgrades; `e2e/sharing.spec.ts` shares a
-folder between two accounts: read-only with live changes, and editing; and someone without an
-account follows a link, signs up and accepts it. `apps/server/test/invites.test.ts` covers links:
-reading one without a session, accepting, roles that never get weaker, deleting, expiry, the trash,
-and a closed sign-up opened only by a link that holds, which accepts that link.
+`apps/server/test/accounts.test.ts`: keine Sitzung, keine API; jede Person sieht nur ihre Dateien;
+geschlossene Registrierung und die Übernahme alter Dateien; die Secret-Datei. Die Server-Tests
+registrieren in ihrem Harness ein Konto. Im E2E-Lauf (`SCHREIBZEUG_OPEN_SIGNUP=true`) registriert
+jeder Test über die API ein eigenes Konto (`e2e/app.ts`); `e2e/accounts.spec.ts` geht durch das
+Formular, meldet sich ab und wieder an und prüft, dass der Ordner eines anderen nicht gefunden
+wird. `apps/server/test/shares.test.ts` deckt die Rollen ab, Freigaben auf Ordner, das
+Zurücknehmen einer Freigabe, den Papierkorb und die Markierung einer unbestätigten Adresse;
+`apps/server/test/edge.test.ts` die Größengrenzen für Bodys, die Adresse, die das Rate Limit der
+Anmeldung zählt, und die Origin-Prüfung für Cookie-Anfragen und WebSocket-Upgrades;
+`e2e/sharing.spec.ts` teilt einen Ordner zwischen zwei Konten: schreibgeschützt mit Live-Änderungen
+und zum Bearbeiten; und jemand ohne Konto folgt einem Link, registriert sich und nimmt ihn an.
+`apps/server/test/invites.test.ts` deckt Links ab: einen ohne Sitzung lesen, annehmen, Rollen, die
+nie schwächer werden, Löschen, Ablauf, den Papierkorb und eine geschlossene Registrierung, die nur
+ein gültiger Link öffnet und die diesen Link annimmt.

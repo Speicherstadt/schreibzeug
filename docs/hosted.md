@@ -1,26 +1,26 @@
 ---
 description: >-
-  Schreibzeug hosted or with a partner: hosted operation on request, a partner for setup and care,
-  and the partner programme for IT service providers and hosters.
+  Schreibzeug gehostet oder mit Partner: gehosteter Betrieb auf Anfrage, ein Partner für Einrichtung
+  und Betreuung und das Partnerprogramm für IT-Dienstleister und Hoster.
 ---
 
-# Hosted or with a partner { #hosted-or-partner }
+# Gehostet oder mit Partner { #hosted-or-partner }
 
-These docs cover running Schreibzeug yourself.
+Diese Doku beschreibt, wie du Schreibzeug selbst betreibst.
 
-## Hosted { #hosted }
+## Gehostet { #hosted }
 
-Schreibzeug is available as a hosted service, without a server of your own, on request to
-[info@teufel-it.de](mailto:info@teufel-it.de). If you'd rather have an IT service provider set it up
-and look after it, ask us for a partner or for hosted operation (info@teufel-it.de).
+Schreibzeug gibt es auf Anfrage an [info@teufel-it.de](mailto:info@teufel-it.de) als gehosteten
+Dienst, ohne eigenen Server. Wer Einrichtung und Betreuung lieber einem IT-Dienstleister überlässt,
+fragt nach einem Partner oder dem gehosteten Betrieb (info@teufel-it.de).
 
-## Partner programme { #partner-programme }
+## Partnerprogramm { #partner-programme }
 
-IT service providers and hosters who want to set up and look after Schreibzeug for their customers
-can become partners: see the [partner programme](https://speicherstadt.app/en/partner/).
+IT-Dienstleister und Hoster, die Schreibzeug für ihre Kunden einrichten und betreuen wollen, werden
+Partner: siehe [Partnerprogramm](https://speicherstadt.app/partner/).
 
-## Questions { #questions }
+## Fragen { #questions }
 
-We answer questions about using Schreibzeug in public, in the
-[GitHub issues](https://github.com/Speicherstadt/schreibzeug/issues), so everyone benefits. Larger
-rollouts we also take on as a paid project.
+Fragen zur Nutzung beantworten wir öffentlich in den
+[GitHub-Issues](https://github.com/Speicherstadt/schreibzeug/issues), damit alle etwas davon haben.
+Größere Einführungen übernehmen wir auch als bezahltes Projekt.

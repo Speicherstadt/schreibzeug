@@ -1,80 +1,84 @@
 ---
 description: >-
-  Accessibility in Schreibzeug: WCAG 2.2 AA as the goal for the interface, the engine's screen
-  reader support (off unless switched on, Strg+Alt+Z), keyboard use, how it is checked and where a
-  document drawn on a canvas falls short.
+  Barrierefreiheit in Schreibzeug: WCAG 2.2 AA als Ziel für die Oberfläche, die
+  Screenreader-Unterstützung der Engine (aus, solange nicht eingeschaltet, Strg+Alt+Z), Bedienung per
+  Tastatur, wie es geprüft wird und wo ein auf einen Canvas gezeichnetes Dokument an Grenzen stößt.
 ---
 
-# Accessibility
+# Barrierefreiheit { #accessibility }
 
-Schreibzeug should be usable with a screen reader, with the keyboard alone and with large text. The
-goal is **WCAG 2.2 level AA**, the core of the European standard EN 301 549 and of the German BITV
-2.0 for public bodies. The interface around the document meets the automatic checks of it; the
-document itself is drawn on a canvas by the engine, which sets limits described below.
+Schreibzeug soll mit einem Screenreader, allein mit der Tastatur und mit großer Schrift benutzbar
+sein. Das Ziel ist **WCAG 2.2 Stufe AA**, der Kern der europäischen Norm EN 301 549 und der
+deutschen BITV 2.0 für öffentliche Stellen. Die Oberfläche um das Dokument besteht deren
+automatische Prüfungen; das Dokument selbst zeichnet die Engine auf einen Canvas, was Grenzen
+setzt, die unten beschrieben sind.
 
-## The interface
+## Die Oberfläche { #the-interface }
 
-- Every button without text has a name ("Fett", "Kommentare"), icons beside text are hidden from
-  screen readers, and messages such as "Gespeichert" or an error are read out (`role="status"`,
-  `role="alert"`). The page is marked as German.
-- **Menu bar** as the [ARIA menu bar pattern](https://www.w3.org/WAI/ARIA/apg/patterns/menubar/)
-  has it: left and right go along the menus (and switch an open one), Enter, Space or down open a
-  menu at its first entry, up and down go through it, Home and End to the first and last, Escape
-  back to the menu bar (`src/ui/menu-bar.tsx`, `src/ui/menu-keys.ts`).
-- **F6 and Umschalt+F6** move between the document, the menu bar and the toolbar, as in Word and
-  LibreOffice. In the document Tab is a tab (a cell, a form field), so F6 is the way out; it comes
-  back to the cursor where it was.
-- **Toolbars** are one stop for Tab each, as the
-  [ARIA toolbar pattern](https://www.w3.org/WAI/ARIA/apg/patterns/toolbar/) has it: Tab reaches the
-  button last used, the arrow keys, Home and End go along the buttons; lists such as the font keep
-  their own stop and arrow keys (`src/ui/roving-toolbar.ts`).
-- **Keyboard shortcuts** of each editor are under *Hilfe → Tastenkürzel*.
-- The engine's input has the file's name, so a screen reader says which document has the focus.
+- Jeder Button ohne Text hat einen Namen („Fett“, „Kommentare“), Icons neben Text sind vor
+  Screenreadern verborgen, und Meldungen wie „Gespeichert“ oder ein Fehler werden vorgelesen
+  (`role="status"`, `role="alert"`). Die Seite ist als Deutsch ausgezeichnet.
+- **Menüleiste** nach dem [ARIA-Menüleisten-Muster](https://www.w3.org/WAI/ARIA/apg/patterns/menubar/):
+  Links und rechts gehen die Menüs entlang (und wechseln ein offenes), Enter, Leertaste oder unten
+  öffnen ein Menü bei seinem ersten Eintrag, oben und unten gehen hindurch, Pos1 und Ende zum ersten
+  und letzten, Escape zurück zur Menüleiste (`src/ui/menu-bar.tsx`, `src/ui/menu-keys.ts`).
+- **F6 und Umschalt+F6** wechseln zwischen dem Dokument, der Menüleiste und der Werkzeugleiste, wie
+  in Word und LibreOffice. Im Dokument ist Tab ein Tabulator (eine Zelle, ein Formularfeld), also
+  ist F6 der Weg hinaus; er führt zurück zum Cursor, wo er war.
+- **Werkzeugleisten** sind je ein Halt für Tab, wie es das
+  [ARIA-Toolbar-Muster](https://www.w3.org/WAI/ARIA/apg/patterns/toolbar/) vorsieht: Tab erreicht
+  den zuletzt genutzten Button, die Pfeiltasten, Pos1 und Ende gehen die Buttons entlang; Listen wie
+  die Schriftart behalten ihren eigenen Halt und ihre Pfeiltasten (`src/ui/roving-toolbar.ts`).
+- Die **Tastenkürzel** jedes Editors stehen unter *Hilfe → Tastenkürzel*.
+- Die Eingabe der Engine trägt den Namen der Datei, sodass ein Screenreader sagt, welches Dokument
+  den Fokus hat.
 
-## Screen reader support
+## Screenreader-Unterstützung { #screen-reader-support }
 
-The engine can read out what happens in the document (`common/workerspeech.js`): it writes into an
-`aria-live` region beside its input, which a screen reader announces. **It is off unless switched
-on**, under *Hilfe → Unterstützung für Screenreader* or with **Strg+Alt+Z** in the document (on a
-Mac also Strg+Umschalt+Z). Off, the engine does not even listen for it, so it costs nothing; on, it
-compares the selection once per cursor move. The choice is kept in the browser
-(`schreibzeug.screenreader`), as web-apps keeps it.
+Die Engine kann vorlesen, was im Dokument geschieht (`common/workerspeech.js`): Sie schreibt in
+einen `aria-live`-Bereich neben ihrer Eingabe, den ein Screenreader ansagt. **Sie ist aus, solange
+sie nicht eingeschaltet wird**, unter *Hilfe → Unterstützung für Screenreader* oder mit
+**Strg+Alt+Z** im Dokument (auf einem Mac auch Strg+Umschalt+Z). Ausgeschaltet hört die Engine nicht
+einmal darauf, es kostet also nichts; eingeschaltet vergleicht sie die Auswahl einmal pro
+Cursorbewegung. Die Wahl wird im Browser gespeichert (`schreibzeug.screenreader`), wie web-apps sie
+speichert.
 
-What it reads:
+Was sie vorliest:
 
 | | |
 | --- | --- |
-| Text documents | with the arrow keys the character, with Strg the word, up and down the line; a selection with "ausgewählt" |
-| Spreadsheets | the cell's value and address, a selected range from its first to its last cell, the sheet on switching |
-| Presentations | the slide's number, a selected object with its alternative text |
-| Pictures and shapes | their kind, text, title and description (alternative text) |
+| Textdokumente | mit den Pfeiltasten das Zeichen, mit Strg das Wort, oben und unten die Zeile; eine Auswahl mit „ausgewählt“ |
+| Tabellen | Wert und Adresse der Zelle, einen ausgewählten Bereich von seiner ersten bis zu seiner letzten Zelle, das Blatt beim Wechsel |
+| Präsentationen | die Nummer der Folie, ein ausgewähltes Objekt mit seinem Alternativtext |
+| Bilder und Formen | ihre Art, Text, Titel und Beschreibung (Alternativtext) |
 
-The words around the text ("ausgewählt", "leere Zelle", "Folie") are German
-(`packages/editor-core/src/screen-reader.ts`); the engine would say them in English.
+Die Wörter um den Text („ausgewählt“, „leere Zelle“, „Folie“) sind Deutsch
+(`packages/editor-core/src/screen-reader.ts`); die Engine würde sie auf Englisch sagen.
 
-## How it is checked
+## Wie es geprüft wird { #how-it-is-checked }
 
-`e2e/accessibility.spec.ts` checks the sign-in, the file list and every editor (document,
-spreadsheet, presentation, note) with [axe-core](https://github.com/dequelabs/axe-core) against the
-rules of WCAG 2.2 AA, in light and dark; a single violation fails it. It also goes through the menu
-bar with the keyboard and checks that the screen reader support reads a selection out in German,
-is remembered and follows Strg+Alt+Z, that F6 leads out of a document and a spreadsheet and back,
-and that a toolbar is one stop for Tab. The other end-to-end tests find elements as a screen reader
-does, by role and name.
+`e2e/accessibility.spec.ts` prüft die Anmeldung, die Dateiliste und jeden Editor (Dokument,
+Tabelle, Präsentation, Notiz) mit [axe-core](https://github.com/dequelabs/axe-core) gegen die Regeln
+von WCAG 2.2 AA, hell und dunkel; ein einziger Verstoß lässt es scheitern. Es geht außerdem mit der
+Tastatur durch die Menüleiste und prüft, dass die Screenreader-Unterstützung eine Auswahl auf
+Deutsch vorliest, gemerkt wird und auf Strg+Alt+Z reagiert, dass F6 aus einem Dokument und einer
+Tabelle hinaus und wieder zurück führt und dass eine Werkzeugleiste ein Halt für Tab ist. Die
+anderen End-to-End-Tests finden Elemente so, wie ein Screenreader es tut, nach Rolle und Name.
 
-A machine finds only part of the problems: whether a label makes sense and a task can be done with
-a screen reader needs a person.
+Eine Maschine findet nur einen Teil der Probleme: Ob eine Beschriftung Sinn ergibt und eine Aufgabe
+mit einem Screenreader zu erledigen ist, braucht einen Menschen.
 
-## Where it falls short
+## Wo es an Grenzen stößt { #where-it-falls-short }
 
-- **The document is a canvas.** A screen reader hears what the engine announces, but cannot browse
-  the document: no reading mode, no "read all", no jumping between headings. Headings, list levels
-  and the place in a table are not announced, nor is typed text.
-- **PDFs** are read out not at all; the engine has no descriptions for them.
-- **Alternative text** that a document brings is read out and kept on saving; there is no dialog yet
-  to add it to a picture.
-- **Exported PDFs** are not tagged (PDF/UA).
-- A full run with NVDA, VoiceOver and TalkBack is still to be done.
+- **Das Dokument ist ein Canvas.** Ein Screenreader hört, was die Engine ansagt, kann aber nicht
+  durch das Dokument browsen: kein Lesemodus, kein „alles vorlesen“, kein Springen zwischen
+  Überschriften. Überschriften, Listenebenen und die Position in einer Tabelle werden nicht
+  angesagt, getippter Text auch nicht.
+- **PDFs** werden gar nicht vorgelesen; die Engine hat für sie keine Beschreibungen.
+- **Alternativtext**, den ein Dokument mitbringt, wird vorgelesen und beim Speichern erhalten; es
+  gibt noch keinen Dialog, um ihn zu einem Bild hinzuzufügen.
+- **Exportierte PDFs** sind nicht getaggt (PDF/UA).
+- Ein vollständiger Durchgang mit NVDA, VoiceOver und TalkBack steht noch aus.
 
-For an accessibility statement this means "partially conformant", with the points above as the
-content that is not accessible.
+Für eine Erklärung zur Barrierefreiheit heißt das „teilweise konform“, mit den Punkten oben als den
+Inhalten, die nicht barrierefrei sind.

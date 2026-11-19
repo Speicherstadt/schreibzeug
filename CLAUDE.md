@@ -33,10 +33,8 @@ and name the source file in comments and commit messages where it settles a deta
 Update what the change affects, in the same pull request, and only that:
 
 - the tests for what changed (unit, integration, engine, E2E, collaboration, format fidelity);
-- the docs in `docs/` that describe it, in both languages: the English page `x.md` and its German
-  translation `x.de.md` (same headings with the same anchor ids, `{ #id }`);
-- both READMEs (`README.md` in English, `README.de.md` in German) when a feature a user sees is
-  added, changed or removed;
+- the docs in `docs/` that describe it, in German (`x.md`; there is no English version);
+- the README (`README.md`, German only) when a feature a user sees is added, changed or removed;
 - the interface texts in both languages (`apps/web/messages/de.json`, `en.json`);
 - the screenshots after a change to the look: **Actions → Update screenshots → Run workflow**, then
   look at the new pictures.
@@ -72,10 +70,10 @@ mkdocs build --strict    # when docs/ or mkdocs.yml changed
 
 - Commands as root (`sudo`, `pkexec`) are run by the user; don't work around that.
 - The user's running processes are not stopped; use other ports for tests.
-- Language: code, comments and commits in English; docs in English (`x.md`) and German
-  (`x.de.md`), both kept the same in every change; the app's interface in German and
-  English. Every text a person reads goes into `apps/web/messages/de.json` and `en.json` (Paraglide,
-  `m.<file>_<name>()`), in both languages in the same change; none is written in the code.
+- Language: code, comments and commits in English; README and docs in German only (one
+  `README.md`, one `docs/x.md` per page); the app's interface in German and English. Every text a
+  person reads goes into `apps/web/messages/de.json` and `en.json` (Paraglide, `m.<file>_<name>()`),
+  in both languages in the same change; none is written in the code.
   `apps/web/i18n.test.ts` (part of `bun run test`) fails otherwise. Details in
   `docs/architecture.md#interface-texts`.
 

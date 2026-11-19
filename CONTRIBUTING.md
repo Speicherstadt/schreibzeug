@@ -33,12 +33,13 @@ When you change the desktop app's Rust code, also run `cargo fmt --check`,
 `cargo clippy -- -D warnings` and `cargo test` in `apps/desktop/src-tauri`.
 
 With the change, update what it affects, and only that: the tests, the pages in `docs/` that
-describe it, and both READMEs (`README.md` in English, `README.de.md` in German) when something a
-user sees is added, changed or removed.
+describe it, and the README when something a user sees is added, changed or removed. The README and
+the docs are in German only.
 
 Some conventions:
 
-- Code, comments, docs and commit messages in English; the app's interface in German.
+- Code, comments and commit messages in English; the README and the docs in German; the app's
+  interface in German and English (`apps/web/messages/de.json` and `en.json`).
 - Written functionally: small pure functions, function components and hooks, no classes, errors
   as values. A file does one thing; split it past about 400 lines.
 - Every call into the engine (`sdkjs`) goes through `packages/editor-core` and should name the

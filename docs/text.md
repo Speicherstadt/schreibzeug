@@ -1,86 +1,96 @@
-# Markdown and text files
+# Markdown- und Textdateien { #markdown-and-text-files }
 
-Schreibzeug opens Markdown notes (`.md`) and plain text files (`.txt`) in an editor of their own,
-creates them from "Neu", and saves them as what they are: the same encoding, the same line
-endings, no own format. A file nobody edited is never written.
+Schreibzeug öffnet Markdown-Notizen (`.md`) und reine Textdateien (`.txt`) in einem eigenen Editor,
+legt sie über „Neu“ an und speichert sie als das, was sie sind: dieselbe Kodierung, dieselben
+Zeilenenden, kein eigenes Format. Eine Datei, die niemand bearbeitet hat, wird nie geschrieben.
 
-![A Markdown note in the live view: headings, a task list and a quote shown formatted, the marks only in the line being edited](screenshots/text-light.png)
+![Eine Markdown-Notiz in der Live-Ansicht: Überschriften, eine Aufgabenliste und ein Zitat formatiert dargestellt, die Zeichen nur in der Zeile, die gerade bearbeitet wird](screenshots/text-light.png)
 
-## Writing Markdown
+## Markdown schreiben { #writing-markdown }
 
-The editor is [CodeMirror 6](https://codemirror.net) (MIT), in `packages/text-editor`. It keeps
-the text as Markdown and only shows it formatted; there is no rich-text model that would write the
-Markdown anew on every save (lists, blank lines and tables stay as they were typed). Three views,
-remembered per browser:
+Der Editor ist [CodeMirror 6](https://codemirror.net) (MIT), in `packages/text-editor`. Er behält
+den Text als Markdown und zeigt ihn nur formatiert an; es gibt kein Rich-Text-Modell, das das
+Markdown bei jedem Speichern neu schreiben würde (Listen, Leerzeilen und Tabellen bleiben, wie sie
+getippt wurden). Drei Ansichten, pro Browser gemerkt:
 
-| View | What it shows |
+| Ansicht | Was sie zeigt |
 |---|---|
-| Live | Headings, bold, italic, code, links, quotes, bullets and task boxes formatted; the marks (`#`, `**`, the link's address …) appear in the lines the cursor is in. Tables and code blocks stay as source, in monospace. |
-| Geteilt | The source on the left, a preview on the right, rendered from the same parser (`@lezer/markdown` with GitHub's tables, task lists and strikethrough). |
-| Quelltext | The source alone, in monospace. |
+| Live | Überschriften, fett, kursiv, Code, Links, Zitate, Aufzählungspunkte und Aufgabenkästchen formatiert; die Zeichen (`#`, `**`, die Adresse des Links …) erscheinen in den Zeilen, in denen der Cursor steht. Tabellen und Codeblöcke bleiben Quelltext, in Festbreitenschrift. |
+| Geteilt | Links der Quelltext, rechts eine Vorschau, gerendert vom selben Parser (`@lezer/markdown` mit den Tabellen, Aufgabenlisten und dem Durchstreichen von GitHub). |
+| Quelltext | Der Quelltext allein, in Festbreitenschrift. |
 
-The toolbar and the "Format" menu write Markdown into the text, as typing it would: a heading
-level for the line, `**` around the selection (taken away again inside bold), `- `, `1. ` or
-`- [ ] ` before the selected lines, a link, a table with a header row, a rule. Ticking a task's box
-in the live view writes `[x]`. Strg+B and Strg+I work as in the other editors; Enter continues a
-list or a quote. The commands are pure functions over CodeMirror's state
-(`src/commands.ts`), tested without a browser.
+Die Werkzeugleiste und das Menü „Format“ schreiben Markdown in den Text, so wie es Tippen täte:
+eine Überschriftenebene für die Zeile, `**` um die Auswahl (innerhalb von Fettem wieder entfernt),
+`- `, `1. ` oder `- [ ] ` vor die ausgewählten Zeilen, einen Link, eine Tabelle mit Kopfzeile, eine
+Trennlinie. Ein Häkchen im Kästchen einer Aufgabe in der Live-Ansicht schreibt `[x]`. Strg+B und
+Strg+I funktionieren wie in den anderen Editoren; Enter setzt eine Liste oder ein Zitat fort. Die
+Befehle sind reine Funktionen über dem Zustand von CodeMirror (`src/commands.ts`), ohne Browser
+getestet.
 
-The preview escapes every text: raw HTML in the Markdown shows as text, and links and images only
-go to `http(s)`, `mailto` or a relative address (`src/preview.ts`).
+Die Vorschau maskiert jeden Text: Rohes HTML im Markdown erscheint als Text, und Links und Bilder
+führen nur zu `http(s)`, `mailto` oder einer relativen Adresse (`src/preview.ts`).
 
-A `.txt` file opens in the same editor in monospace, without toolbar, preview or Markdown.
+Eine `.txt`-Datei öffnet sich im selben Editor in Festbreitenschrift, ohne Werkzeugleiste, Vorschau
+oder Markdown.
 
-## Keeping the file as it is
+## Die Datei lassen, wie sie ist { #keeping-the-file-as-it-is }
 
-`src/codec.ts` reads the bytes and writes them back:
+`src/codec.ts` liest die Bytes und schreibt sie zurück:
 
-- **Encoding**: a byte order mark decides (UTF-8, UTF-16 LE/BE); without one, UTF-8 when the bytes
-  are valid UTF-8, else Windows-1252, which older German text files from Windows use. A character
-  the file's encoding has no byte for (an emoji in a Windows-1252 file) is not dropped: the save
-  fails with a message naming it.
-- **Byte order mark**: kept when there was one; a new file has none.
-- **Line endings**: the editor works with `\n`; the save writes the ending most lines had (LF, CRLF
-  or CR), also for lines pasted with another one. A new file uses LF.
+- **Kodierung**: Eine Byte-Order-Mark entscheidet (UTF-8, UTF-16 LE/BE); ohne eine UTF-8, wenn die
+  Bytes gültiges UTF-8 sind, sonst Windows-1252, das ältere deutsche Textdateien aus Windows
+  verwenden. Ein Zeichen, für das die Kodierung der Datei kein Byte hat (ein Emoji in einer
+  Windows-1252-Datei), wird nicht verworfen: Das Speichern scheitert mit einer Meldung, die es
+  nennt.
+- **Byte-Order-Mark**: bleibt erhalten, wenn es eine gab; eine neue Datei hat keine.
+- **Zeilenenden**: Der Editor arbeitet mit `\n`; das Speichern schreibt das Ende, das die meisten
+  Zeilen hatten (LF, CRLF oder CR), auch für Zeilen, die mit einem anderen eingefügt wurden. Eine
+  neue Datei nutzt LF.
 
-The status bar shows the cursor, the encoding, the line ending and the kind of file. An unchanged
-text with one kind of line ending encodes to the same bytes it was read from
-(`test/codec.test.ts`); in a file whose lines end in different ways, a save gives them all the
-most common ending. That is why an unchanged file is never written: saving without a change stores
-nothing, and `write_text` appends to the bytes as they are.
+Die Statusleiste zeigt den Cursor, die Kodierung, das Zeilenende und die Art der Datei. Ein
+unveränderter Text mit einer einzigen Art Zeilenende ergibt beim Kodieren dieselben Bytes, aus
+denen er gelesen wurde (`test/codec.test.ts`); in einer Datei, deren Zeilen unterschiedlich enden,
+gibt ein Speichern allen das häufigste Ende. Deshalb wird eine unveränderte Datei nie geschrieben:
+Speichern ohne Änderung speichert nichts, und `write_text` hängt an die Bytes an, wie sie sind.
 
-## Saving
+## Speichern { #saving }
 
-A text file has no editing session and no relay: the editor saves the whole file, by hand or two
-seconds after the last change (15 seconds after a failed save). Every save is made **over the
-version it was made from**: it sends `If-Match: "<sha256>"`, the SHA-256 of the bytes it opened or
-last stored, and the server stores it only while that is still the newest version
-(`apps/server/src/files/repository.ts` `addVersion`, checked in the same transaction; on the
-desktop the bytes on disk, so a write by another program counts too). Otherwise it answers 409 with
-`CHANGED_SINCE`, and the editor stops saving on its own and asks:
+Eine Textdatei hat keine Bearbeitungssitzung und kein Relay: Der Editor speichert die ganze Datei,
+von Hand oder zwei Sekunden nach der letzten Änderung (15 Sekunden nach einem gescheiterten
+Speichern). Jedes Speichern geschieht **über der Version, aus der es entstand**: Es schickt
+`If-Match: "<sha256>"`, den SHA-256 der Bytes, die es geöffnet oder zuletzt gespeichert hat, und
+der Server speichert es nur, solange das noch die neueste Version ist
+(`apps/server/src/files/repository.ts` `addVersion`, in derselben Transaktion geprüft; auf dem
+Desktop die Bytes auf der Festplatte, sodass auch ein Schreiben durch ein anderes Programm zählt).
+Sonst antwortet er 409 mit `CHANGED_SINCE`, und der Editor hört auf, von selbst zu speichern, und
+fragt:
 
-- **Neue Fassung laden** throws this text away and opens the newest version;
-- **Als Kopie speichern** keeps this text as "… (Kopie).md" beside it and opens that.
+- **Neue Fassung laden** verwirft diesen Text und öffnet die neueste Version;
+- **Als Kopie speichern** behält diesen Text als „… (Kopie).md“ daneben und öffnet diese.
 
-Two windows on one note therefore never overwrite each other unnoticed. Real-time co-editing of
-text files, with the others' cursors, would need a relay of its own (Yjs over a WebSocket route);
-it is not part of this yet.
+Zwei Fenster auf einer Notiz überschreiben sich deshalb nie unbemerkt. Echtzeit-Bearbeitung von
+Textdateien zu mehreren, mit den Cursorn der anderen, bräuchte ein eigenes Relay (Yjs über eine
+WebSocket-Route); das gehört noch nicht dazu.
 
-Versions, restoring, sharing, links, copies and renaming work as for every other file
-([files](files.md)).
+Versionen, Wiederherstellen, Teilen, Links, Kopien und Umbenennen funktionieren wie für jede andere
+Datei ([Dateien](files.md)).
 
-## Claude and other MCP clients
+## Claude und andere MCP-Clients { #claude-and-other-mcp-clients }
 
-`read_document` reads `.md` and `.txt`, `upload_file` with `text` creates a note, and `write_text`
-replaces or appends to the text of a note or text file in the file's own encoding and line endings,
-made over the version it read ([MCP server](mcp.md#tools)).
+`read_document` liest `.md` und `.txt`, `upload_file` mit `text` legt eine Notiz an, und
+`write_text` ersetzt den Text einer Notiz oder Textdatei oder hängt an ihn an, in der eigenen
+Kodierung und mit den Zeilenenden der Datei, über der Version, die es gelesen hat
+([MCP-Server](mcp.md#tools)).
 
-## Tests
+## Tests { #tests }
 
-- `packages/text-editor/test`: encoding, byte order mark and line endings round trip; the toolbar's
-  commands; the preview and its escaping; the editor's "modified" state and views (happy-dom).
-- `apps/server/test/files.test.ts`, `apps/local/test/files.test.ts`: empty notes and text files,
-  saves over a version, a refused save leaving the file as it was, two saves over the same version.
-- `apps/server/test/mcp-create.test.ts`: `write_text` in a Windows-1252 file with CRLF.
-- `e2e/text.spec.ts`: a note created from "Neu", formatted from the toolbar and saved on its own;
-  the split view; a Windows file kept byte for byte; two windows on one note.
+- `packages/text-editor/test`: Kodierung, Byte-Order-Mark und Zeilenenden im Hin und Zurück; die
+  Befehle der Werkzeugleiste; die Vorschau und ihr Maskieren; der Zustand „geändert“ und die
+  Ansichten des Editors (happy-dom).
+- `apps/server/test/files.test.ts`, `apps/local/test/files.test.ts`: leere Notizen und
+  Textdateien, Speichern über einer Version, ein abgelehntes Speichern, das die Datei lässt, wie sie
+  war, zwei Speichervorgänge über derselben Version.
+- `apps/server/test/mcp-create.test.ts`: `write_text` in einer Windows-1252-Datei mit CRLF.
+- `e2e/text.spec.ts`: eine Notiz, über „Neu“ angelegt, über die Werkzeugleiste formatiert und von
+  selbst gespeichert; die geteilte Ansicht; eine Windows-Datei Byte für Byte erhalten; zwei Fenster
+  auf einer Notiz.
