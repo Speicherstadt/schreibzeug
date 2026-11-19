@@ -229,7 +229,7 @@ app. Checks, tests and architecture: [Development](https://schreibzeug.app/devel
 
 ## 🧩 More from us
 
-More open-source apps for your own server, for email, accounting, a document archive and more: **[speicherstadt.app](https://speicherstadt.app)**
+More open-source apps for your own server, covering email, accounting, a document archive and more: **[speicherstadt.app](https://speicherstadt.app)**
 
 ## 🤝 Contributing
 

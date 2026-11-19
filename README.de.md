@@ -233,7 +233,7 @@ Prüfungen, Tests und Architektur: [Entwicklung](https://schreibzeug.app/de/deve
 
 ## 🧩 Mehr von uns
 
-Weitere Open-Source-Apps für deinen eigenen Server, für Mail, Buchhaltung, ein Dokumentenarchiv und mehr: **[speicherstadt.app](https://speicherstadt.app)**
+Weitere Open-Source-Apps für deinen eigenen Server, etwa für Mail, Buchhaltung, ein Dokumentenarchiv und mehr: **[speicherstadt.app](https://speicherstadt.app)**
 
 ## 🤝 Mitmachen
 
