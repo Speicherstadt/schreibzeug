@@ -5,8 +5,8 @@ Relay für die Zusammenarbeit und den MCP-Endpunkt über einen Port ausliefert. 
 speichert, liegt in einem Datenordner: die SQLite-Datenbank `schreibzeug.db`, die Dateiinhalte
 unter `blobs/` und `auth-secret`.
 
-Keinen eigenen Server oder keine eigene IT? Schreibzeug gibt es gehostet oder über einen
-IT-Dienstleister aus dem [Partnerprogramm](support.md).
+Keinen eigenen Server oder keine eigene IT? Schreibzeug gibt es auf Anfrage gehostet oder über einen
+IT-Dienstleister aus dem Partnerprogramm, siehe [Gehostet oder mit Partner](hosted.md).
 
 ## Mit Docker Compose { #with-docker-compose }
 

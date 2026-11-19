@@ -141,7 +141,7 @@ http://localhost:3000. Einstellungen, ein eigener Reverse Proxy, Backups und Upd
 [Installationsanleitung](https://schreibzeug.app/de/installation.html).
 Die Desktop-App beschreibt [Desktop-App](https://schreibzeug.app/de/desktop.html); ihre Installer für Windows, macOS und Linux hängen an jedem [Release](https://github.com/Speicherstadt/schreibzeug/releases).
 
-Keinen eigenen Server oder keine eigene IT? Schreibzeug gibt es gehostet oder über einen IT-Dienstleister aus dem [Partnerprogramm](https://speicherstadt.app/partner/).
+Keinen eigenen Server oder keine eigene IT? Schreibzeug gibt es auf Anfrage gehostet oder über einen IT-Dienstleister aus dem [Partnerprogramm](https://speicherstadt.app/partner/).
 
 ## FAQ
 
