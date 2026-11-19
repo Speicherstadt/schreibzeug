@@ -33,7 +33,7 @@ When you change the desktop app's Rust code, also run `cargo fmt --check`,
 `cargo clippy -- -D warnings` and `cargo test` in `apps/desktop/src-tauri`.
 
 With the change, update what it affects, and only that: the tests, the pages in `docs/` that
-describe it, and both READMEs (`README.md` in English, `README.de.md` in German) when something a
+describe it, and both READMEs (`README.md` in German, `README.en.md` in English) when something a
 user sees is added, changed or removed.
 
 Some conventions:

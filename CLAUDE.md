@@ -35,7 +35,7 @@ Update what the change affects, in the same pull request, and only that:
 - the tests for what changed (unit, integration, engine, E2E, collaboration, format fidelity);
 - the docs in `docs/` that describe it, in both languages: the English page `x.md` and its German
   translation `x.de.md` (same headings with the same anchor ids, `{ #id }`);
-- both READMEs (`README.md` in English, `README.de.md` in German) when a feature a user sees is
+- both READMEs (`README.md` in German, `README.en.md` in English) when a feature a user sees is
   added, changed or removed;
 - the interface texts in both languages (`apps/web/messages/de.json`, `en.json`);
 - the screenshots after a change to the look: **Actions → Update screenshots → Run workflow**, then
