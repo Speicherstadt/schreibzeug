@@ -233,8 +233,7 @@ Prüfungen, Tests und Architektur: [Entwicklung](https://schreibzeug.app/de/deve
 
 ## 🧩 Mehr von uns
 
-- Suchst du einen Ersatz für Gmail oder Google Workspace? **[Kontext](https://github.com/Speicherstadt/kontext)**: Mail, Kalender, Kontakte, Chat und Telefonie für dein Team, auf deinem eigenen Server.
-- Machst du deine Buchhaltung selbst? **[Haben](https://github.com/firsttris/haben)**: Rechnungen mit E-Rechnung, Belege, Bankabgleich und die Umsatzsteuer-Voranmeldung an ELSTER.
+Weitere Open-Source-Apps für deinen eigenen Server, etwa für Mail, Buchhaltung, ein Dokumentenarchiv und mehr: **[speicherstadt.app](https://speicherstadt.app)**
 
 ## 🤝 Mitmachen
 
@@ -249,11 +248,12 @@ Sicherheitslücken bitte vertraulich melden ([SECURITY.md](SECURITY.md)).
 
 <div align="center">
 
-⭐ Gefällt dir Schreibzeug? Ein [Stern auf GitHub](https://github.com/Speicherstadt/schreibzeug) hilft anderen, es zu finden.<br>
-🐛 [Fehler melden](https://github.com/Speicherstadt/schreibzeug/issues/new?template=bug_report.yml) · 💡 [Funktion vorschlagen](https://github.com/Speicherstadt/schreibzeug/issues/new?template=feature_request.yml)
+⭐ **Gefällt dir Schreibzeug?** Ein [Stern auf GitHub](https://github.com/Speicherstadt/schreibzeug) hilft anderen, es zu finden.
+
+[Fehler melden](https://github.com/Speicherstadt/schreibzeug/issues/new?template=bug_report.yml) &nbsp;·&nbsp; [Funktion vorschlagen](https://github.com/Speicherstadt/schreibzeug/issues/new?template=feature_request.yml)
 
 <sub>Lizenz: <a href="LICENSE">AGPL-3.0</a> · © Tristan Teufel und Mitwirkende · <a href="README.md">English version</a><br>
-Wer eine veränderte Version weitergibt oder für andere betreibt, muss ihren Quellcode unter der AGPL anbieten; eine kommerzielle Lizenz ohne diese Pflichten gibt es über <a href="https://teufel-it.de">teufel-it.de</a>.<br>
+Wer eine veränderte Version weitergibt oder für andere betreibt, muss ihren Quellcode unter der AGPL anbieten. Für IT-Dienstleister: Partnerschaft mit direktem Draht zur Entwicklung, dazu Einrichtung und Support über <a href="https://teufel-it.de">teufel-it.de</a>.<br>
 Schreibzeug baut auf der Open-Source-Engine Euro-Office auf und steht in keiner Verbindung zu Euro-Office, ONLYOFFICE, Microsoft oder Google.</sub>
 
 </div>

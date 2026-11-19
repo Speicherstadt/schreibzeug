@@ -229,8 +229,7 @@ app. Checks, tests and architecture: [Development](https://schreibzeug.app/devel
 
 ## 🧩 More from us
 
-- Looking for a replacement for Gmail or Google Workspace? **[Kontext](https://github.com/Speicherstadt/kontext)**: mail, calendar, contacts, chat and calls for your team, on your own server.
-- Doing your own books in Germany? **[Haben](https://github.com/firsttris/haben)**: invoices with e-invoicing, receipts, bank reconciliation and VAT returns via ELSTER.
+More open-source apps for your own server, covering email, accounting, a document archive and more: **[speicherstadt.app](https://speicherstadt.app)**
 
 ## 🤝 Contributing
 
@@ -244,11 +243,12 @@ Security problems please report privately ([SECURITY.md](SECURITY.md)).
 
 <div align="center">
 
-⭐ Like Schreibzeug? A [star on GitHub](https://github.com/Speicherstadt/schreibzeug) helps others find it.<br>
-🐛 [Report a bug](https://github.com/Speicherstadt/schreibzeug/issues/new?template=bug_report.yml) · 💡 [Request a feature](https://github.com/Speicherstadt/schreibzeug/issues/new?template=feature_request.yml)
+⭐ **Like Schreibzeug?** A [star on GitHub](https://github.com/Speicherstadt/schreibzeug) helps others find it.
+
+[Report a bug](https://github.com/Speicherstadt/schreibzeug/issues/new?template=bug_report.yml) &nbsp;·&nbsp; [Request a feature](https://github.com/Speicherstadt/schreibzeug/issues/new?template=feature_request.yml)
 
 <sub>License: <a href="LICENSE">AGPL-3.0</a> · © Tristan Teufel and contributors · <a href="README.de.md">Deutsche Version</a><br>
-Changed versions you pass on or run for others must offer their source code under the AGPL; a commercial license without these obligations is available via <a href="https://teufel-it.de">teufel-it.de</a>.<br>
+Changed versions you pass on or run for others must offer their source code under the AGPL. For IT service providers: partnership with a direct line to the developers, plus setup and support via <a href="https://teufel-it.de">teufel-it.de</a>.<br>
 Schreibzeug builds on the open-source Euro-Office engine and is not affiliated with Euro-Office, ONLYOFFICE, Microsoft or Google.</sub>
 
 </div>
