@@ -164,7 +164,8 @@ Tauri's sources with `apps/desktop/patches/*.patch` applied (once, into
 `src-tauri/target/patched-cli/`), and the desktop package's scripts use it: `tauri`
 (`cd apps/desktop && bun run tauri …`; the root has no such script), `desktop:dev` and `desktop:build`
 (CI's `desktop` job builds it on `main`, so a release, which runs on its tag and reads `main`'s
-cache, finds it there instead of spending four minutes on it);
+cache, finds it there instead of spending four minutes on it; both run on Ubuntu 24.04 and the cache
+key names the runner image, since a CLI built on a newer Ubuntu needs a newer glibc);
 Windows and macOS use the published CLI. The script stops when a patch no longer applies to a new
 version: then check whether that release fixes it and remove the patch as described in
 `apps/desktop/patches/README.md`.
