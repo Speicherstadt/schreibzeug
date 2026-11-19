@@ -54,7 +54,7 @@ bun run test             # vitest on Bun: unit + integration (SQLite, see docs/f
 bun run test:e2e e2e/<spec>.ts   # playwright: the specs the change touches; all of them run in CI
 bun run build
 cargo fmt --check && cargo clippy -- -D warnings && cargo test   # in apps/desktop, when it changed
-mkdocs build --strict    # when docs/ or mkdocs.yml changed
+zensical build --strict  # when docs/ or mkdocs.yml changed
 ```
 
 ## Commits
