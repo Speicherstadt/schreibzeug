@@ -22,7 +22,7 @@ RUN bun install --frozen-lockfile && bun run build
 # system packages and few known vulnerabilities. Wolfi is rolling; the digest keeps the build
 # reproducible and Renovate raises it (group "Wolfi"). Nothing but Bun runs here, and Bun needs only
 # glibc (its NEEDED entries: libc, ld-linux, libpthread, libdl, libm), which wolfi-base has.
-FROM cgr.dev/chainguard/wolfi-base:latest@sha256:833c48f1faf32c90e6f9501a2410a9aa28ceb2c594102edd4470053c30efa089
+FROM cgr.dev/chainguard/wolfi-base:latest@sha256:be019c1c74fe69204a42c4e10bc4d886a49bf5403ffa74374ef7baa408fc9a26
 # The same Bun as in the build stage (glibc build); Renovate raises oven/bun at both places.
 COPY --from=docker.io/oven/bun:1.4-slim /usr/local/bin/bun /usr/local/bin/bun
 # The user "bun" with UID 1000 as in oven/bun's image, so existing volumes stay readable.
