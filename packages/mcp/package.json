@@ -15,7 +15,7 @@
     "@schreibzeug/ooxml": "workspace:*",
     "@schreibzeug/pdf-sign": "workspace:*",
     "@schreibzeug/text-editor": "workspace:*",
-    "pdfjs-dist": "6.4.299",
+    "pdfjs-dist": "6.5.438",
     "zod": "4.6.7"
   }
 }
