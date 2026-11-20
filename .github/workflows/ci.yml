@@ -62,10 +62,38 @@ jobs:
       - run: bun install --frozen-lockfile
       - run: bun run test
 
-  # The desktop app's Rust side (apps/desktop/src-tauri): format, lints, tests
-  desktop:
+  # Whether a pull request touches the desktop app. Its job needs GTK from the runners' Ubuntu
+  # mirror, which at times takes ten minutes; a pull request that leaves apps/desktop alone skips
+  # it. Every other run (main, a release, by hand) builds it: main's run keeps the patched Tauri
+  # CLI in the cache for the release.
+  changes:
     # Draft pull requests do not build; "Ready for review" starts the run
     if: ${{ !github.event.pull_request.draft }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      desktop: ${{ steps.desktop.outputs.changed }}
+    steps:
+      - if: github.event_name == 'pull_request'
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - id: desktop
+        env:
+          EVENT: ${{ github.event_name }}
+          BASE: ${{ github.event.pull_request.base.sha }}
+        run: |
+          if [[ "$EVENT" != pull_request ]] ||
+            git diff --name-only "$BASE" HEAD | grep -qE '^(apps/desktop/|\.github/workflows/ci\.yml$)'; then
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          fi
+
+  # The desktop app's Rust side (apps/desktop/src-tauri): format, lints, tests
+  desktop:
+    needs: changes
+    if: ${{ needs.changes.outputs.desktop == 'true' }}
     # GTK 4.14 or newer for the CEF runtime (tauri-winit-gtk4): Ubuntu 24.04. The same Ubuntu as
     # the Linux packages in desktop.yml: the patched Tauri CLI built and cached here is the one
     # the release uses, and a CLI built on a newer Ubuntu needs a newer glibc than 24.04 has.

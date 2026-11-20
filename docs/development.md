@@ -47,7 +47,9 @@ installiertes Chromium verwenden: `PLAYWRIGHT_CHROMIUM_PATH=/path/to/chrome bun 
 CI (`.github/workflows/ci.yml`) führt all das aus, die E2E-Suite in drei Shards, dazu die
 Rust-Prüfungen der Desktop-App und eine Validierung der E-Rechnungen gegen EN 16931 und PDF/A-3.
 Entwurfs-Pull-Requests und Änderungen nur an Markdown oder `docs/` starten sie nicht; „Ready for
-review“ schon.
+review“ schon. Die Rust-Prüfungen laufen in einem Pull Request nur, wenn er `apps/desktop/` oder
+`ci.yml` ändert (sie brauchen GTK vom Ubuntu-Mirror der Runner, der manchmal zehn Minuten braucht);
+auf `main` und vor einem Release immer.
 
 `checks` ([firsttris/workflows](https://github.com/firsttris/workflows#checks), eingestellt in `checks.json`)
 schlägt bei einer Quelldatei über 400 Zeilen fehl, die nicht in `.checks/large-files.txt` steht; diese
