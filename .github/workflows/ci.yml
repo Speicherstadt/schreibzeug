@@ -97,7 +97,7 @@ jobs:
     # GTK 4.14 or newer for the CEF runtime (tauri-winit-gtk4): Ubuntu 24.04. The same Ubuntu as
     # the Linux packages in desktop.yml: the patched Tauri CLI built and cached here is the one
     # the release uses, and a CLI built on a newer Ubuntu needs a newer glibc than 24.04 has.
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     timeout-minutes: 30
     env:
       # Chromium (CEF, about 1 GB) is downloaded here once and kept in the Actions cache
