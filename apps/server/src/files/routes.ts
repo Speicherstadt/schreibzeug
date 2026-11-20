@@ -1,5 +1,6 @@
 import { zValidator } from "@hono/zod-validator";
 import {
+  type ApiError,
   createBlankFileSchema,
   createFolderSchema,
   createInviteSchema,
@@ -15,8 +16,9 @@ import {
   updateNodeSchema,
 } from "@schreibzeug/files-api";
 import { blankDocx, blankPptx, blankXlsx } from "@schreibzeug/ooxml";
-import { type Context, Hono } from "hono";
+import { type Context, Hono, type TypedResponse } from "hono";
 import { bodyLimit } from "hono/body-limit";
+import type { JSONParsed } from "hono/utils/types";
 import { z } from "zod";
 import type { BlobStore } from "../blobs";
 import type { Database } from "../db/database";
@@ -73,12 +75,22 @@ export const validate = <T extends "json" | "query" | "param" | "form", S extend
     }
   });
 
+/**
+ * What `respond` returns, written out: since hono 4.13.19 `JSONParsed` carries a recursion guard
+ * (dist/types/utils/types.d.ts, `JSONParsedInner`), and the inferred type of the generic function
+ * grew past what tsc serializes into the declaration file (TS7056). Same type as inferred, so the
+ * typed client (`hc<AppType>`) sees no difference.
+ */
+type Responded<R> =
+  | (Response & TypedResponse<JSONParsed<R>, 200 | 201, "json">)
+  | (Response & TypedResponse<JSONParsed<{ error: ApiError }>, ReturnType<typeof statusOf>, "json">);
+
 export const respond = <T, R>(
   c: Context,
   result: Result<T>,
   map: (value: T) => R,
   status: 200 | 201 = 200,
-) =>
+): Responded<R> =>
   result.ok
     ? c.json(map(result.value), status)
     : c.json({ error: result.error }, statusOf(result.error.kind));
