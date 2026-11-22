@@ -207,7 +207,7 @@ const slideBinding: EditorBinding<
   // text editor (spelling.ts).
   contentReady: (api, win, { spellCheck, phone }) => {
     api.SetDrawingFreeze(false);
-    smoothTouchScrolling(win, api.WordControl.paintMessageLoop);
+    smoothTouchScrolling(win, { loop: api.WordControl.paintMessageLoop });
     api.asc_setSpellCheck(spellCheck);
     // The comment marks on the slides, as web-apps shows them (presentationeditor main Main.js).
     api.asc_showComments();

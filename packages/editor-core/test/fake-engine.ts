@@ -277,6 +277,8 @@ export const createFakeEngine = (): FakeEngine => {
             RecalculateAllAtOnce: record(calls, "RecalculateAllAtOnce"),
           },
           IsReaderMode: () => false,
+          ReaderFontSizes: [12, 14, 16, 18, 22, 28, 36, 48, 72],
+          ReaderFontSizeCur: 2,
         },
         ChangeReaderMode: record(calls, "ChangeReaderMode"),
         asc_SetViewRulers: record(calls, "asc_SetViewRulers"),

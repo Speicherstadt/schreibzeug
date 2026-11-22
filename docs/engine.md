@@ -330,20 +330,6 @@ Folienliste unter der Folie (`thumbnails-position: bottom`) und ihre Notizen aus
 „Ansicht → Notizen“, so wie es der mobile Präsentationseditor von web-apps hat
 (`presentationeditor/mobile` `Main.jsx`).
 
-Auf einem Touch-Bildschirm (`(pointer: coarse)`: Handy und Tablet, nicht ein Laptop, der auch Touch kann)
-zeichnen Text- und Präsentationseditor bei jedem Bildschirmbild neu, damit das Scrollen mit dem Finger
-flüssig ist (`packages/editor-core/src/paint-loop.ts`). Die Engine zeichnet in einer Schleife
-(`common/Drawings/WorkEvents.js` `PaintMessageLoop`, mit 40 ms angelegt in `word/Drawing/HtmlPage.js` und
-`slide/Drawing/HtmlPage.js`). Ohne die Einstellung `mobile` zeichnet sie höchstens alle 40 ms
-(`isUseInterval`), also mit 25 Bildern pro Sekunde, und in Browsern, die sie nicht als Chrome oder Safari
-erkennt (etwa Firefox), läuft die Schleife sogar über einen 40-ms-Timer statt über
-`requestAnimationFrame`. Der mobile Editor von web-apps setzt `mobile: true` und zeichnet bei jedem Bild.
-Diese Einstellung ändert aber noch viel mehr (Fokus der Eingabe, Lineale, Scrollleisten), deshalb stellt
-`editor-core` bei `asc_onDocumentContentReady` nur die Schleife um: `isUseInterval` aus und, wo der
-Browser es hat, `requestAnimationFrame` an. Eine Schleife, die schon auf dem Timer läuft, wird direkt
-umgehängt, nicht über `Stop`, denn das ruft ein `this.clearTimeout` auf, das die Schleife nicht hat. Am
-Desktop bleibt alles, wie die Engine es vorsieht. Tabellen zeichnen ohne diese Schleife.
-
 Ein Rechtsklick ins Dokument lässt die Engine `asc_onContextMenu` mit einem `CContextMenuData` schicken
 (`word/api.js` `sync_ContextMenuCallback`): den Punkt relativ zu ihrem Ansichtselement und ob er in einer
 Kopf- oder Fußzeile lag. `editor-core` fügt die Lage des Ansichtselements im Frame hinzu
@@ -359,6 +345,45 @@ Ausschneiden, Kopieren und Einfügen aus einem Menü laufen über die Engine (`c
 `Button_Copy`, `Button_Cut`, `Button_Paste`), die die asynchrone Clipboard-API benutzt; der Frame erlaubt
 das (`allow="clipboard-read; clipboard-write"`). Lehnt der Browser ab, antwortet der Eintrag mit `false`,
 und die App sagt, welche Tasten du nehmen kannst, wie web-apps.
+
+## Scrollen auf dem Touch-Bildschirm { #touch-scrolling }
+
+Auf einem Touch-Bildschirm (`(pointer: coarse)`: Handy und Tablet, nicht ein Laptop, der auch Touch kann)
+ändert Schreibzeug drei Dinge an der Engine, damit das Scrollen mit dem Finger flüssig ist und keine weißen
+Seiten zeigt. Gemessen wurde auf einem emulierten Handy mit 393 px Breite und Pixeldichte 3,5: Erst alle drei
+zusammen ergeben weniger ruckelnde Bilder als vorher und keine weißen Seiten mehr. Nur die Bremse zu lösen,
+war schlechter als vorher.
+
+1. **Jedes Bild zeichnen** (`packages/editor-core/src/paint-loop.ts`). Die Engine zeichnet in einer Schleife
+   (`common/Drawings/WorkEvents.js` `PaintMessageLoop`, mit 40 ms angelegt in `word/Drawing/HtmlPage.js`
+   und `slide/Drawing/HtmlPage.js`). Ohne die Einstellung `mobile` zeichnet sie höchstens alle 40 ms
+   (`isUseInterval`), also mit 25 Bildern pro Sekunde, und in Browsern, die sie nicht als Chrome oder Safari
+   erkennt (etwa Firefox), läuft die Schleife über einen 40-ms-Timer statt über `requestAnimationFrame`. Der
+   mobile Editor von web-apps setzt `mobile: true` und zeichnet bei jedem Bild. Diese Einstellung ändert aber
+   noch viel mehr (Fokus der Eingabe, Lineale, Scrollleisten, der Editor für Diagramme), deshalb stellt
+   `editor-core` bei `asc_onDocumentContentReady` nur die Schleife um. Eine Schleife, die schon auf dem Timer
+   läuft, wird direkt umgehängt, nicht über `Stop`, denn das ruft ein `this.clearTimeout` auf, das die
+   Schleife nicht hat.
+2. **Pixeldichte höchstens 2** (`engine/frame/editor/touch-pixel-ratio.js`, in den Frame-Seiten von Text und
+   Präsentation vor sdkjs geladen). sdkjs bemisst jedes Canvas nach `window.devicePixelRatio`
+   (`common/device_scale.js` `checkDeviceScale`, `common/browser.js` `checkZoom`). Bei 3,5 hat das Canvas
+   gut dreimal so viele Pixel wie bei 2, und das Neuzeichnen kommt beim Scrollen nicht mehr hinterher. Text
+   ist bei 2 einen Hauch weniger scharf.
+3. **Seiten auch beim Weiterrollen zeichnen** (nur Text). Lässt der Finger los, rollt der Text weiter. Solange
+   das animiert, setzt der Touch-Manager `NoneRepaintPages` (`common/Scrolls/mobileTouchManagerBase.js`
+   `CMobileDelegateEditor.ScrollTo`), und `OnPaint` zeigt nur Seiten, die schon gezeichnet sind; alle anderen
+   bleiben weiß, bis das Rollen endet, und Seiten außerhalb des Bildes verwirft die Engine
+   (`StopRenderingPage`). `editor-core` hebt das nach jedem `ScrollTo` wieder auf. Beim Zoomen mit zwei
+   Fingern hält die Engine die Seiten weiter zurück.
+
+Die Schriftgröße der mobilen Ansicht hängt an Breite und Pixeldichte: `SetNewMobileMode` setzt den Text auf
+die Seitenbreite geteilt durch die Pixeldichte und skaliert ihn mit der Lese-Schriftgröße geteilt durch 16
+(`ReaderFontSizes`, Standard 16). Bei 393 px und Pixeldichte 3,5 war der Fließtext etwa 22 CSS-Pixel groß
+(drei, vier Wörter pro Zeile), bei Pixeldichte 2 nur noch 13. `word-mobile-view.ts` wählt deshalb beim
+Einschalten die Lese-Schriftgröße, die etwa 18 CSS-Pixel ergibt (`readingFontSize`, bei 393 px und
+Pixeldichte 2 die Stufe 22), und schreibt sie vor `ChangeReaderMode` in `ReaderFontSizeCur`, damit die
+Engine den Text nur einmal setzt. Am Desktop bleibt das Zeichnen, wie die Engine es vorsieht. Tabellen
+zeichnen ohne diese Schleife und ohne Seiten.
 
 ## Seitenlayout und Abstände { #page-layout-and-spacing }
 

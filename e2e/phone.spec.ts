@@ -131,6 +131,73 @@ const paintLoop = async (page: Page) => {
   });
 };
 
+/**
+ * Whether the text engine holds its pages back while they glide after a flick: its touch manager
+ * scrolls as iScroll does then (common/Scrolls/mobileTouchManagerBase.js ScrollTo, isAnimating),
+ * without a direction, so nothing moves; tests only.
+ */
+const holdsPagesWhileGliding = async (page: Page): Promise<boolean | undefined> => {
+  const frame = await (await page.getByTestId("engine-frame").elementHandle())?.contentFrame();
+  if (!frame) throw new Error("No engine frame.");
+  return frame.evaluate(() => {
+    const control = (
+      window as unknown as {
+        editor?: {
+          WordControl: {
+            NoneRepaintPages: boolean;
+            MobileTouchManager: { delegate: { ScrollTo(scroll: object): void } } | null;
+          };
+        };
+      }
+    ).editor?.WordControl;
+    control?.MobileTouchManager?.delegate.ScrollTo({ isAnimating: true, directionLocked: 0 });
+    return control?.NoneRepaintPages;
+  });
+};
+
+test("a text document draws its pages while they glide after a flick", async ({ page }, testInfo) => {
+  const errors = collectErrors(page);
+  await signUp(page, credentialsFor(testInfo));
+  await page.goto("/");
+  await upload(page, helloDocx, "hello.docx");
+  await page.getByRole("link", { name: "hello.docx", exact: true }).click();
+  await expectEditorReady(page, errors);
+  expect(await holdsPagesWhileGliding(page)).toBe(false);
+  expect(errors).toEqual([]);
+});
+
+test.describe("on a screen as dense as today's phones", () => {
+  test.use({ deviceScaleFactor: 3.5 });
+
+  test("the engine draws at density 2 and lays the mobile view out at a size to read", async ({
+    page,
+  }, testInfo) => {
+    const errors = collectErrors(page);
+    await signUp(page, credentialsFor(testInfo));
+    await page.goto("/");
+    await upload(page, helloDocx, "hello.docx");
+    await page.getByRole("link", { name: "hello.docx", exact: true }).click();
+    await expectEditorReady(page, errors);
+    await expect.poll(() => inMobileView(page)).toBe(true);
+    const frame = await (await page.getByTestId("engine-frame").elementHandle())?.contentFrame();
+    if (!frame) throw new Error("No engine frame.");
+    // common/browser.js AscBrowser.retinaPixelRatio and word/Drawing/HtmlPage.js ReaderFontSizes; tests only.
+    const drawn = await frame.evaluate(() => {
+      const win = window as unknown as {
+        AscCommon: { AscBrowser: { retinaPixelRatio: number } };
+        editor: { WordControl: { ReaderFontSizes: number[]; ReaderFontSizeCur: number } };
+      };
+      const control = win.editor.WordControl;
+      return {
+        pixelRatio: win.AscCommon.AscBrowser.retinaPixelRatio,
+        fontSize: control.ReaderFontSizes[control.ReaderFontSizeCur],
+      };
+    });
+    expect(drawn).toEqual({ pixelRatio: 2, fontSize: 22 });
+    expect(errors).toEqual([]);
+  });
+});
+
 for (const file of ["hello.docx", "vortrag.pptx"]) {
   test(`${file} draws on every frame while a finger scrolls, not every 40 ms`, async ({ page }, testInfo) => {
     const errors = collectErrors(page);

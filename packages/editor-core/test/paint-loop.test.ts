@@ -1,5 +1,12 @@
 import { describe, expect, it } from "vitest";
-import { isTouchScreen, type PaintLoop, paintEveryFrame, smoothTouchScrolling } from "../src/paint-loop";
+import {
+  drawPagesWhileGliding,
+  isTouchScreen,
+  type MobileScrollDelegate,
+  type PaintLoop,
+  paintEveryFrame,
+  smoothTouchScrolling,
+} from "../src/paint-loop";
 
 /** common/Drawings/WorkEvents.js PaintMessageLoop as the engine makes it, with what was started. */
 const fakeLoop = (overrides: Partial<PaintLoop> = {}) => {
@@ -18,6 +25,28 @@ const fakeLoop = (overrides: Partial<PaintLoop> = {}) => {
     ...overrides,
   };
   return { loop, started };
+};
+
+/**
+ * mobileTouchManagerBase.js CMobileDelegateEditor: ScrollTo holds the pages back while the scroll
+ * animates. `glide` scrolls as after a flick and tells whether the pages are held back then.
+ */
+const fakeDelegate = () => {
+  const scrolled: unknown[] = [];
+  const delegate: MobileScrollDelegate = {
+    prototype: {
+      ScrollTo(scroll) {
+        scrolled.push(scroll);
+        this.HtmlPage.NoneRepaintPages = (scroll as { isAnimating: boolean }).isAnimating;
+      },
+    },
+  };
+  const glide = () => {
+    const page = { HtmlPage: { NoneRepaintPages: false } };
+    delegate.prototype.ScrollTo.call(page, { isAnimating: true });
+    return page.HtmlPage.NoneRepaintPages;
+  };
+  return { delegate, glide, scrolled };
 };
 
 const screen = (coarse: boolean) => ({
@@ -65,16 +94,27 @@ describe("paint loop", () => {
     expect(loop.id).toBe(7);
   });
 
-  it("changes the loop only where a finger is the main pointer", () => {
+  it("changes the engine only where a finger is the main pointer", () => {
     const desktop = fakeLoop().loop;
-    smoothTouchScrolling(screen(false), desktop);
+    const desktopDelegate = fakeDelegate();
+    smoothTouchScrolling(screen(false), { loop: desktop, delegate: desktopDelegate.delegate });
     expect(desktop.isUseInterval).toBe(true);
+    expect(desktopDelegate.glide()).toBe(true);
 
     const phone = fakeLoop().loop;
-    smoothTouchScrolling(screen(true), phone);
+    const phoneDelegate = fakeDelegate();
+    smoothTouchScrolling(screen(true), { loop: phone, delegate: phoneDelegate.delegate });
     expect(phone.isUseInterval).toBe(false);
+    expect(phoneDelegate.glide()).toBe(false);
 
-    expect(() => smoothTouchScrolling(screen(true), undefined)).not.toThrow();
+    expect(() => smoothTouchScrolling(screen(true), {})).not.toThrow();
+  });
+
+  it("draws the pages while they glide, and still scrolls as the engine does", () => {
+    const { delegate, glide, scrolled } = fakeDelegate();
+    drawPagesWhileGliding(delegate);
+    expect(glide()).toBe(false);
+    expect(scrolled).toEqual([{ isAnimating: true }]);
   });
 
   it("takes a browser without media queries for no touch screen", () => {

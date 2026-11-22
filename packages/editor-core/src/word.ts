@@ -208,7 +208,10 @@ const wordBinding: EditorBinding<
     });
     return {
       view: createViewCommands(api),
-      mobileView: createMobileViewCommands(api),
+      mobileView: createMobileViewCommands(api, () => ({
+        width: win.innerWidth,
+        pixelRatio: win.devicePixelRatio,
+      })),
       search: createSearchCommands(
         api,
         () => new win.AscCommon.CSearchSettings(),
@@ -264,7 +267,10 @@ const wordBinding: EditorBinding<
     api.asc_showComments(false);
     // Others' text is not highlighted; web-apps sets this for the text editor only (Collaboration.jsx).
     if (shared) api.SetCollaborativeMarksShowType(win.Asc.c_oAscCollaborativeMarksShowType.None);
-    smoothTouchScrolling(win, api.WordControl.paintMessageLoop);
+    smoothTouchScrolling(win, {
+      loop: api.WordControl.paintMessageLoop,
+      delegate: win.AscCommon.CMobileDelegateEditor,
+    });
     api.Resize();
     api.zoomFitToWidth();
   },

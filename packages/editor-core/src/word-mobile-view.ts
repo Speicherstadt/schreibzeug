@@ -13,14 +13,46 @@ export type MobileViewCommands = {
   set: (on: boolean) => void;
 };
 
+/** The engine area in CSS pixels and the pixel density the engine draws at. */
+export type EngineScreen = { width: number; pixelRatio: number };
+
 type MobileViewApi = Pick<WordEngineApi, "ChangeReaderMode" | "asc_SetViewRulers" | "zoomFitToWidth"> & {
-  WordControl: Pick<WordEngineApi["WordControl"], "IsReaderMode" | "m_oLogicDocument">;
+  WordControl: Pick<
+    WordEngineApi["WordControl"],
+    "IsReaderMode" | "m_oLogicDocument" | "ReaderFontSizes" | "ReaderFontSizeCur"
+  >;
 };
 
-export const createMobileViewCommands = (api: MobileViewApi): MobileViewCommands => ({
+/**
+ * The mobile view's text grows with the screen's width and pixel density: word/Drawing/HtmlPage.js
+ * SetNewMobileMode lays the text out on the page width divided by the density and fits that to
+ * the screen, scaled by the reader font size over 16. Measured on a phone 393 px wide at density
+ * 2, the size 22 gives body text of about 18 CSS pixels, five or six words a line; the engine's
+ * default 16 gives 13. The size is chosen so other screens get about the same.
+ */
+const READING = { fontSize: 22, width: 393, pixelRatio: 2 };
+
+/** The engine's reader font size (of `sizes`, word/Drawing/HtmlPage.js ReaderFontSizes) for this screen. */
+export const readingFontSize = (sizes: readonly number[], { width, pixelRatio }: EngineScreen): number => {
+  const wanted = (READING.fontSize * READING.width * READING.pixelRatio) / (width * pixelRatio);
+  return sizes.reduce((best, size) => (Math.abs(size - wanted) < Math.abs(best - wanted) ? size : best));
+};
+
+export const createMobileViewCommands = (
+  api: MobileViewApi,
+  screen: () => EngineScreen,
+): MobileViewCommands => ({
   set: (on) => {
     // ChangeReaderMode switches; the engine says which way it stands.
-    if (api.WordControl.IsReaderMode() !== on) api.ChangeReaderMode();
+    if (api.WordControl.IsReaderMode() !== on) {
+      // Read by SetNewMobileMode as the view comes on, so the text is laid out once, at that size;
+      // IncreaseReaderFontSize would lay it out again for every step.
+      if (on) {
+        const sizes = api.WordControl.ReaderFontSizes;
+        api.WordControl.ReaderFontSizeCur = sizes.indexOf(readingFontSize(sizes, screen()));
+      }
+      api.ChangeReaderMode();
+    }
     api.asc_SetViewRulers(!on);
     api.zoomFitToWidth();
   },

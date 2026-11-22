@@ -2,7 +2,7 @@ import type { HeaderFooterApi } from "./header-footer";
 import type { LayoutApi, ParagraphSpacing, SectionProps } from "./layout";
 import type { HyperlinkProps, LinkApi, SelectedObject } from "./links";
 import type { EngineHighlight, MarkingApi } from "./marking";
-import type { PaintLoop } from "./paint-loop";
+import type { MobileScrollDelegate, PaintLoop } from "./paint-loop";
 import type { DisplayModes, RevisionTypes } from "./review";
 import type {
   DesignApi,
@@ -338,6 +338,9 @@ export interface WordEngineApi
     };
     /** word/Drawing/HtmlPage.js: whether the mobile view shows (word-mobile-view.ts). */
     IsReaderMode(): boolean;
+    /** word/Drawing/HtmlPage.js: the mobile view's font sizes and which one it lays the text out at. */
+    ReaderFontSizes: number[];
+    ReaderFontSizeCur: number;
     /** word/Drawing/HtmlPage.js: the loop that draws the pages (paint-loop.ts). */
     paintMessageLoop?: PaintLoop;
   };
@@ -476,6 +479,8 @@ export interface WordWindow extends EngineWindow {
   AscCommonWord: { BinaryFileWriter: new (document: unknown) => { Write(): string } };
   /** word/Editor/Paragraph/ComplexFields/types.js */
   AscWord: { fieldtype_MERGEFIELD: number };
+  /** common/Scrolls/mobileTouchManagerBase.js: how a finger scrolls the pages (paint-loop.ts). */
+  AscCommon: EngineWindow["AscCommon"] & { CMobileDelegateEditor?: MobileScrollDelegate };
 }
 
 /** A field of the document (word/Editor/Field.js `ParaField`). */
