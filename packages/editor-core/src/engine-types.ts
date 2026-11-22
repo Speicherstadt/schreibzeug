@@ -2,6 +2,7 @@ import type { HeaderFooterApi } from "./header-footer";
 import type { LayoutApi, ParagraphSpacing, SectionProps } from "./layout";
 import type { HyperlinkProps, LinkApi, SelectedObject } from "./links";
 import type { EngineHighlight, MarkingApi } from "./marking";
+import type { PaintLoop } from "./paint-loop";
 import type { DisplayModes, RevisionTypes } from "./review";
 import type {
   DesignApi,
@@ -337,6 +338,8 @@ export interface WordEngineApi
     };
     /** word/Drawing/HtmlPage.js: whether the mobile view shows (word-mobile-view.ts). */
     IsReaderMode(): boolean;
+    /** word/Drawing/HtmlPage.js: the loop that draws the pages (paint-loop.ts). */
+    paintMessageLoop?: PaintLoop;
   };
   /** word/api.js: switches between the pages and the mobile view (word-mobile-view.ts). */
   ChangeReaderMode(): void;
@@ -869,7 +872,11 @@ export interface SlideEngineApi
    * slide/Drawing/DrawingDocument.js ToRendererPart: every slide as drawing commands for a PDF,
    * what slide/api.js `_downloadAs` sends (the second argument: only the selected slides).
    */
-  WordControl: { m_oDrawingDocument: { ToRendererPart(noBase64: true, isSelection: boolean): Uint8Array } };
+  WordControl: {
+    m_oDrawingDocument: { ToRendererPart(noBase64: true, isSelection: boolean): Uint8Array };
+    /** slide/Drawing/HtmlPage.js: the loop that draws the slides (paint-loop.ts). */
+    paintMessageLoop?: PaintLoop;
+  };
 }
 
 /** The presentation editor's frame (engine/frame/editor/slide/main). */

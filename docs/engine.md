@@ -330,6 +330,20 @@ Folienliste unter der Folie (`thumbnails-position: bottom`) und ihre Notizen aus
 „Ansicht → Notizen“, so wie es der mobile Präsentationseditor von web-apps hat
 (`presentationeditor/mobile` `Main.jsx`).
 
+Auf einem Touch-Bildschirm (`(pointer: coarse)`: Handy und Tablet, nicht ein Laptop, der auch Touch kann)
+zeichnen Text- und Präsentationseditor bei jedem Bildschirmbild neu, damit das Scrollen mit dem Finger
+flüssig ist (`packages/editor-core/src/paint-loop.ts`). Die Engine zeichnet in einer Schleife
+(`common/Drawings/WorkEvents.js` `PaintMessageLoop`, mit 40 ms angelegt in `word/Drawing/HtmlPage.js` und
+`slide/Drawing/HtmlPage.js`). Ohne die Einstellung `mobile` zeichnet sie höchstens alle 40 ms
+(`isUseInterval`), also mit 25 Bildern pro Sekunde, und in Browsern, die sie nicht als Chrome oder Safari
+erkennt (etwa Firefox), läuft die Schleife sogar über einen 40-ms-Timer statt über
+`requestAnimationFrame`. Der mobile Editor von web-apps setzt `mobile: true` und zeichnet bei jedem Bild.
+Diese Einstellung ändert aber noch viel mehr (Fokus der Eingabe, Lineale, Scrollleisten), deshalb stellt
+`editor-core` bei `asc_onDocumentContentReady` nur die Schleife um: `isUseInterval` aus und, wo der
+Browser es hat, `requestAnimationFrame` an. Eine Schleife, die schon auf dem Timer läuft, wird direkt
+umgehängt, nicht über `Stop`, denn das ruft ein `this.clearTimeout` auf, das die Schleife nicht hat. Am
+Desktop bleibt alles, wie die Engine es vorsieht. Tabellen zeichnen ohne diese Schleife.
+
 Ein Rechtsklick ins Dokument lässt die Engine `asc_onContextMenu` mit einem `CContextMenuData` schicken
 (`word/api.js` `sync_ContextMenuCallback`): den Punkt relativ zu ihrem Ansichtselement und ob er in einer
 Kopf- oder Fußzeile lag. `editor-core` fügt die Lage des Ansichtselements im Frame hinzu

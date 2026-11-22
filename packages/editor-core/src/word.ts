@@ -16,6 +16,7 @@ import { createLayoutCommands, type LayoutCommands, readLineSpacing, readSection
 import { createLinkCommands, type HyperlinkProps, type LinkCommands, readLink } from "./links";
 import { readListKind } from "./lists";
 import { createMarkingCommands, type MarkingCommands, readHighlight } from "./marking";
+import { smoothTouchScrolling } from "./paint-loop";
 import { createReviewCommands, type ReviewCommands, readRevision, trackingOf } from "./review";
 import { createSearchCommands, type SearchCommands } from "./search";
 import {
@@ -263,6 +264,7 @@ const wordBinding: EditorBinding<
     api.asc_showComments(false);
     // Others' text is not highlighted; web-apps sets this for the text editor only (Collaboration.jsx).
     if (shared) api.SetCollaborativeMarksShowType(win.Asc.c_oAscCollaborativeMarksShowType.None);
+    smoothTouchScrolling(win, api.WordControl.paintMessageLoop);
     api.Resize();
     api.zoomFitToWidth();
   },

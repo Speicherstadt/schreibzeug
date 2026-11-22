@@ -112,6 +112,38 @@ test("a presentation keeps its slide list under the slide and its notes hidden",
   );
 });
 
+/**
+ * How the engine's paint loop runs (common/Drawings/WorkEvents.js PaintMessageLoop on
+ * HtmlPage.js WordControl); tests only.
+ */
+const paintLoop = async (page: Page) => {
+  const frame = await (await page.getByTestId("engine-frame").elementHandle())?.contentFrame();
+  if (!frame) throw new Error("No engine frame.");
+  return frame.evaluate(() => {
+    const loop = (
+      window as unknown as {
+        editor?: {
+          WordControl: { paintMessageLoop: { isUseInterval: boolean; isUseRequestAnimationFrame: boolean } };
+        };
+      }
+    ).editor?.WordControl.paintMessageLoop;
+    return { everyFrame: loop?.isUseInterval === false, animationFrames: loop?.isUseRequestAnimationFrame };
+  });
+};
+
+for (const file of ["hello.docx", "vortrag.pptx"]) {
+  test(`${file} draws on every frame while a finger scrolls, not every 40 ms`, async ({ page }, testInfo) => {
+    const errors = collectErrors(page);
+    await signUp(page, credentialsFor(testInfo));
+    await page.goto("/");
+    await upload(page, join(import.meta.dirname, "../test-files", file), file);
+    await page.getByRole("link", { name: file, exact: true }).click();
+    await expectEditorReady(page, errors);
+    expect(await paintLoop(page)).toEqual({ everyFrame: true, animationFrames: true });
+    expect(errors).toEqual([]);
+  });
+}
+
 test("a PDF gives its pages the width of the screen, without the page thumbnails beside them", async ({
   page,
 }, testInfo) => {

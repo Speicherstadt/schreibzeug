@@ -12,6 +12,7 @@ import {
 import { textsOf } from "./engine-texts";
 import type { EngineWindow, SlideEngineApi, SlideEventArgs, SlideWindow } from "./engine-types";
 import { textEvents } from "./events";
+import { smoothTouchScrolling } from "./paint-loop";
 import { createSearchCommands, type SearchCommands } from "./search";
 import { createDesignCommands, type DesignCommands, readThemes, readTransition } from "./slide-design";
 import { createSlideShow, hideShowElement, SLIDE_SHOW_ELEMENT, type SlideShow } from "./slide-show";
@@ -204,8 +205,9 @@ const slideBinding: EditorBinding<
   },
   // web-apps presentationeditor/mobile Main.jsx onDocumentContentReady; spell checking as in the
   // text editor (spelling.ts).
-  contentReady: (api, _win, { spellCheck, phone }) => {
+  contentReady: (api, win, { spellCheck, phone }) => {
     api.SetDrawingFreeze(false);
+    smoothTouchScrolling(win, api.WordControl.paintMessageLoop);
     api.asc_setSpellCheck(spellCheck);
     // The comment marks on the slides, as web-apps shows them (presentationeditor main Main.js).
     api.asc_showComments();
