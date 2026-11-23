@@ -608,6 +608,18 @@ ihre Tasten-Events wieder ein (`keepFocusOnClick` in `src/frame.ts`). Es prüft 
 Haupttaste losgelassen wird: Ein Klick in die Notizen der Präsentation lässt den Fokus danach auf dem Body
 der Seite. Ein Rechtsklick bleibt dort unberührt, weil dann das Kontextmenü der App den Fokus hat.
 
+Auf iPhone und iPad (Safari und jeder andere Browser dort) legt die Textengine statt des Textfelds ein
+durchsichtiges, bearbeitbares `div` über das ganze Canvas, weil iOS die Tastatur nur offen hält, solange
+Fingertipps auf einem Eingabefeld landen (`common/text_input2.js`, `isSafariMobile`). Dieses `div` lässt
+keine Berührung durch und ist nicht bearbeitbar, bis `g_inputContext.showKeyboard()` es einschaltet; das tut
+die Engine nur im Modus `mobile: true` beim Loslassen des Fingers (`word/Drawing/mobileTouchManager.js`).
+Schreibzeug lässt die Engine im Desktop-Modus (siehe [Scrollen auf dem Touch-Bildschirm](#touch-scrolling)),
+und der Fokus bei `pointerdown` ließ die Tastatur kurz aufgehen und gleich wieder zugehen. Ist die Eingabe
+der Engine dieses `div`, fokussiert `keepFocusOnClick` deshalb nicht bei `pointerdown`, sondern ruft nach
+einem Tippen (`touchend`, ein Finger, kaum bewegt) `showKeyboard()` auf und fokussiert dann die Eingabe,
+noch in der Geste, die iOS für die Tastatur verlangt. Wer scrollt oder mit zwei Fingern zoomt, bekommt keine
+Tastatur.
+
 Der Weg wieder hinaus ist F6: Im Dokument gehört Tab der Engine (ein Tabulator, die nächste Zelle, das
 nächste Formularfeld), und Escape und Umschalt+Tab bleiben ebenfalls dort. `shortcutOf` (`src/view.ts`)
 nimmt F6 und Umschalt+F6 im Frame vor der Engine ab, so wie Strg+F; die Web-App wechselt zur Menüleiste,

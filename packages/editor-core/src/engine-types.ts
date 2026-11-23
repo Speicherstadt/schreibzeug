@@ -457,6 +457,8 @@ export interface EngineWindow extends Window {
      * while it runs, also after Strg+Alt+Z, which the engine handles itself.
      */
     EditorActionSpeaker?: { isLanched: boolean };
+    /** common/text_input2.js: the engine's text input; showKeyboard switches its iOS overlay on (frame.ts). */
+    g_inputContext?: { showKeyboard(): void };
   };
 }
 
