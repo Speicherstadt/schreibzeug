@@ -264,6 +264,8 @@ export const createFakeEngine = (): FakeEngine => {
           return true;
         },
         asc_endFindText: record(calls, "asc_endFindText"),
+        // common/docscoapi.js getParticipantName, from the relay's participant list.
+        CoAuthoringApi: { getParticipantName: (id) => (id === "anna-1" ? "Anna" : "") },
         WordControl: {
           m_oDrawingDocument: {
             ToRendererPart: (noBase64, isPrint) => {

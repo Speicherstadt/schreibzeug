@@ -7,6 +7,7 @@ import { Toolbar } from "../toolbar/toolbar";
 import { ContextMenu } from "../ui/context-menu";
 import { Dialog } from "../ui/dialog";
 import { clipboardHint } from "./common-menus";
+import { useCursorLabels } from "./cursor-labels";
 import { DocumentArea } from "./document-area";
 import { EditorHeader } from "./editor-header";
 import { screenReaderSwitch } from "./file-menu";
@@ -68,6 +69,7 @@ export const WordView = ({
     onCreateFile,
     name,
   });
+  const cursorLabels = useCursorLabels(editor);
   const chrome = useEditorChrome(editor, container, name, file.readOnly, () => void saving.save());
   const comments = useCommentsPanel(editor, state, file.readOnly);
   const mobileView = useMobileView(editor?.mobileView ?? null);
@@ -161,6 +163,7 @@ export const WordView = ({
           searchState={state.search}
           searchBar={chrome.searchBar}
           readOnly={file.readOnly}
+          cursorLabels={cursorLabels}
         />
         {comments.panel}
       </div>

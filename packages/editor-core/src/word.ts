@@ -2,6 +2,12 @@ import { createEngineColor } from "./colors";
 import { createTextCommands, type TextCommands } from "./commands";
 import { type CommentCommands, createCommentCommands } from "./comments";
 import {
+  type CursorLabelListener,
+  cursorLabelSource,
+  ENGINE_VIEW_ID,
+  keepCursorLabels,
+} from "./cursor-labels";
+import {
   EDITOR_FORMAT,
   type EditorBinding,
   type OpenedDocument,
@@ -68,6 +74,8 @@ export type WordEditor = OpenedDocument<EditorState> & {
   search: SearchCommands;
   /** Someone right-clicked in the document; the listener shows the menu. Returns the unsubscribe. */
   onContextMenu: (listener: ContextMenuListener) => () => void;
+  /** The names over the others' cursors in a shared document; the listener gets them at once. */
+  onCursorLabels: (listener: CursorLabelListener) => () => void;
   /** Serienbriefe: recipients, merge fields, preview, the letters as a new document. */
   mailMerge: MailMergeCommands;
 };
@@ -132,6 +140,7 @@ const wordBinding: EditorBinding<
     | "mobileView"
     | "search"
     | "onContextMenu"
+    | "onCursorLabels"
     | "mailMerge"
   >
 > = {
@@ -218,6 +227,7 @@ const wordBinding: EditorBinding<
         () => dispatch({ type: "searchCurrent", current: -1, total: 0 }),
       ),
       onContextMenu,
+      onCursorLabels: cursorLabelSource(api, () => win.document.getElementById(ENGINE_VIEW_ID)),
       links: createLinkCommands(
         api,
         () => new win.Asc.CHyperlinkProperty(),
@@ -266,7 +276,10 @@ const wordBinding: EditorBinding<
     // does with live commenting on; resolved comments stay unmarked.
     api.asc_showComments(false);
     // Others' text is not highlighted; web-apps sets this for the text editor only (Collaboration.jsx).
-    if (shared) api.SetCollaborativeMarksShowType(win.Asc.c_oAscCollaborativeMarksShowType.None);
+    if (shared) {
+      api.SetCollaborativeMarksShowType(win.Asc.c_oAscCollaborativeMarksShowType.None);
+      keepCursorLabels(win.AscCommon);
+    }
     smoothTouchScrolling(win, {
       loop: api.WordControl.paintMessageLoop,
       delegate: win.AscCommon.CMobileDelegateEditor,

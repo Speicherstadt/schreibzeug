@@ -82,6 +82,7 @@ export {
   type SearchState,
 } from "./core-state";
 export { decodeCsv } from "./csv";
+export type { CursorLabel, CursorLabelListener } from "./cursor-labels";
 export {
   convertForEngine,
   type DocumentFormat,

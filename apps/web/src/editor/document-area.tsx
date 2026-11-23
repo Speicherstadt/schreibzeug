@@ -1,5 +1,6 @@
-import type { SearchCommands, SearchState } from "@schreibzeug/editor-core";
+import type { CursorLabel, SearchCommands, SearchState } from "@schreibzeug/editor-core";
 import type { RefObject } from "react";
+import { CursorLabels } from "./cursor-labels";
 import { SearchBar } from "./search-bar";
 import type { useSearchBar } from "./use-search-bar";
 
@@ -10,12 +11,25 @@ export type DocumentAreaProps = {
   searchState: SearchState;
   searchBar: ReturnType<typeof useSearchBar>;
   readOnly: boolean;
+  /** The names over the others' cursors in a shared document. */
+  cursorLabels?: readonly CursorLabel[];
 };
 
-/** The document itself, with the search bar over its top right corner when it is open. */
-export const DocumentArea = ({ container, search, searchState, searchBar, readOnly }: DocumentAreaProps) => (
+/**
+ * The document itself, with the others' names over their cursors and the search bar over its top
+ * right corner when it is open.
+ */
+export const DocumentArea = ({
+  container,
+  search,
+  searchState,
+  searchBar,
+  readOnly,
+  cursorLabels = [],
+}: DocumentAreaProps) => (
   <div className="relative min-h-0 min-w-0 flex-1">
     <div ref={container} className="h-full bg-[var(--muted)]" />
+    {cursorLabels.length > 0 && <CursorLabels labels={cursorLabels} />}
     {searchBar.mode && (
       <SearchBar
         search={search}

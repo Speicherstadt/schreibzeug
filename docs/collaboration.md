@@ -100,6 +100,32 @@ macht das WebSocket-Upgrade mit Hono auf Bun. Fehlerhafte Nachrichten schließen
 4400, eine unbekannte Datei mit 4404, verlorener Zugriff mit 4403, eine beendete Anmeldung mit 4401
 (`src/collab/limits.ts` `SOCKET_CLOSE`).
 
+## Die Namen über den Cursorn { #names-over-the-cursors }
+
+In einem Textdokument steht über dem Cursor jeder anderen Person ihr Name, in ihrer Farbe
+(`packages/editor-core/src/cursor-labels.ts`, `apps/web/src/editor/cursor-labels.tsx`). Die Engine
+zeichnet den fremden Cursor selbst, als schmalen Strich, und bittet ihre Oberfläche um das Schild:
+`asc_onShowForeignCursorLabel` bringt die Verbindung der Person, die Oberkante des Cursors relativ zur
+Ansicht der Engine (`#id_main_view`) und die Farbe, `asc_onHideForeignCursorLabel` nimmt es weg
+(`common/CollaborativeEditingBase.js`). Den Namen liest `editor-core` aus der Teilnehmerliste, die das
+Relay schickt (`common/docscoapi.js` `getParticipantName`); fehlt er, steht dort „Gast“. Die Web-App
+zeichnet das Schild über dem Frame, so wie web-apps es tut (`documenteditor/main`
+`controller/DocumentHolderExt.js` `onShowForeignCursorLabel`).
+
+Von sich aus zeigt die Engine das Schild nur, nachdem Änderungen dieser Person angekommen sind, oder
+solange die Maus über dem Cursor steht, und nimmt es nach 1,5 Sekunden wieder weg
+(`FOREIGN_CURSOR_LABEL_HIDETIME`). Ein Cursor, der nur wandert, bekommt keins
+(`word/Editor/Document.js` `Update_ForeignCursor`). Auf dem Handy gibt es keine Maus, und gerade der Name
+unterscheidet den fremden Cursor vom eigenen. Deshalb lässt `editor-core` in einer gemeinsamen Sitzung
+die Engine nach jedem `Update_ForeignCursorPosition` ihr eigenes `Show_ForeignCursorLabel` aufrufen und
+setzt die Wartezeit auf das Längste, was `setTimeout` annimmt. Das Schild bleibt, bis die Person geht
+(`Remove_ForeignCursorXY`).
+
+Präsentationen haben keine Namensschilder: Die Präsentations-Engine merkt sich keine Position für ein
+Schild (ihr `Update_ForeignCursorPosition` ruft `Add_ForeignCursorXY` nicht auf), und sie zeigt einen
+fremden Text-Cursor nur, solange man selbst in einem Textfeld steht
+(`common/Drawings/CommonController.js` `drawingsUpdateForeignCursor`).
+
 ## Verbindung verloren { #losing-the-connection }
 
 Der Kanal verbindet sich von selbst neu, mit wachsender Pause bis zu fünf Sekunden. Solange die
@@ -205,4 +231,5 @@ Sperren, `collab-limits.test.ts` die Obergrenze des Protokolls und das Ende unt�
 `e2e/collaboration.spec.ts` öffnet dieselbe Datei in zwei Browser-Kontexten: Beide tippen und sehen
 den Text des anderen; einer verliert seine Verbindung, wartet, bis sie zurückkommt, und bearbeitet
 weiter; eine Änderung wird gespeichert, ohne dass jemand „Speichern“ drückt; zwei Personen füllen
-eine Tabelle; und zwei bearbeiten verschiedene Textfelder einer Folie.
+eine Tabelle; zwei bearbeiten verschiedene Textfelder einer Folie; und jede Person sieht den Namen der
+anderen über deren Cursor, auch nach den 1,5 Sekunden, nach denen die Engine ihn sonst wegnimmt.

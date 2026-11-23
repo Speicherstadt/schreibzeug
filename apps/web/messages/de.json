@@ -1009,5 +1009,6 @@
   "archive_dialog_step_sending": "Wird ans Archiv gesendet …",
   "archive_dialog_running": "Wird abgelegt …",
   "archive_dialog_confirm": "Ablegen",
-  "archive_dialog_done": "Im Archiv abgelegt."
+  "archive_dialog_done": "Im Archiv abgelegt.",
+  "cursor_labels_guest": "Gast"
 }

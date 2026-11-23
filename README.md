@@ -42,8 +42,8 @@ Schreibzeug ist ein kleiner Server mit eigener Oberfläche und eigener Dateiverw
   .odt – Word, Excel und LibreOffice öffnen sie wie vorher.
 - **Ausgereifte Kompatibilität**: Die Engine ist Euro-Office, der Open-Source-Fork von ONLYOFFICE;
   Tabellen, Änderungsverfolgung, Kommentare, Diagramme und Pivot-Tabellen kommen heil an.
-- **Gemeinsam in Echtzeit**: Mehrere Leute in derselben Datei, mit Cursorn und Kommentaren live,
-  ohne Dokumentenserver.
+- **Gemeinsam in Echtzeit**: Mehrere Leute in derselben Datei, mit Kommentaren live und dem Namen der
+  anderen über ihrem Cursor, ohne Dokumentenserver.
 - **E-Rechnungen**: ZUGFeRD-Rechnungen direkt aus einem Rechnungsdokument, E-Rechnungen in PDFs
   werden gelesen und angezeigt.
 - **Mit der Tastatur bedienbar**: Menüs und Werkzeugleisten gehen ohne Maus –

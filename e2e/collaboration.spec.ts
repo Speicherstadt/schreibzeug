@@ -97,6 +97,34 @@ test("two people edit the same document and see each other's text", async ({ pag
   expect([...errors, ...ben.errors].filter((line) => line.includes("[engine]"))).toEqual([]);
 });
 
+test("each sees the other's name over their cursor, and it stays", async ({ page, browser }, testInfo) => {
+  const errors = collectErrors(page);
+  await openOwnFolder(page, testInfo);
+  await upload(page, helloDocx, "hello.docx");
+  await page.getByRole("link", { name: "hello.docx", exact: true }).click();
+  await expectEditorReady(page, errors);
+  const ben = await openAs(browser, page.url(), testInfo);
+
+  // Anna puts her cursor at the end of the first line; the engine sends it in her next pause.
+  await page.bringToFront();
+  await page.getByTestId("engine-frame").click({ position: { x: 640, y: 210 } });
+  await page.keyboard.press("End");
+  const label = ben.page.getByTestId("cursor-labels").getByText("Anna Berger", { exact: true });
+  await expect(label).toBeVisible({ timeout: 30_000 });
+  // The engine would take it down after 1.5 s (FOREIGN_CURSOR_LABEL_HIDETIME).
+  await ben.page.waitForTimeout(3_000);
+  await expect(label).toBeVisible();
+  // On top of her cursor, inside the document.
+  const box = await label.boundingBox();
+  const frame = await ben.page.getByTestId("engine-frame").boundingBox();
+  expect(box && frame && box.y > frame.y && box.x > frame.x).toBe(true);
+
+  // When she leaves, her name goes.
+  await page.close();
+  await expect(label).toBeHidden({ timeout: 30_000 });
+  expect([...errors, ...ben.errors].filter((line) => line.includes("[engine]"))).toEqual([]);
+});
+
 test("someone who loses the connection waits, reconnects and edits on", async ({
   page,
   browser,

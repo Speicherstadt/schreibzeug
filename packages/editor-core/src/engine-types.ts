@@ -1,3 +1,4 @@
+import type { CursorLabelArgs, ForeignCursors } from "./cursor-labels";
 import type { HeaderFooterApi } from "./header-footer";
 import type { LayoutApi, ParagraphSpacing, SectionProps } from "./layout";
 import type { HyperlinkProps, LinkApi, SelectedObject } from "./links";
@@ -146,6 +147,9 @@ export interface ViewApi {
 
 /** Events of the text editor we subscribe to, with the arguments sdkjs passes (word/api.js `sendEvent`). */
 export type WordEventArgs = TextEventArgs & {
+  /** The name over another person's cursor (cursor-labels.ts). */
+  asc_onShowForeignCursorLabel: CursorLabelArgs["asc_onShowForeignCursorLabel"];
+  asc_onHideForeignCursorLabel: CursorLabelArgs["asc_onHideForeignCursorLabel"];
   /** word/api.js sync_ParaStyleName */
   asc_onParaStyleName: [name: string];
   /** word/api.js sync_InitEditorStyles: the paragraph styles of the document and the defaults */
@@ -249,6 +253,8 @@ export interface EngineApiBase<Events extends CommonEventArgs> {
   ): void;
   asc_setDocInfo(info: EngineDocInfo): void;
   asc_getEditorPermissions(): void;
+  /** common/docscoapi.js CDocsCoApi: the participants the relay announced. */
+  CoAuthoringApi: { getParticipantName(id: string): string };
   asc_LoadDocument(): void;
   asc_openDocumentFromBytes(data: Uint8Array): void;
   /** apiBase.js: called by onEndLoadDocInfo in offline mode to open the local file. */
@@ -429,6 +435,10 @@ export interface EngineWindow extends Window {
   AscCommon: {
     /** common/commonDefines.js `offlineMode`: a document URL that switches off the server connection. */
     offlineMode: string;
+    /** common/CollaborativeEditingBase.js: how long the name over another's cursor stays (cursor-labels.ts). */
+    FOREIGN_CURSOR_LABEL_HIDETIME?: number;
+    /** common/CollaborativeEditingBase.js: the others' cursors in a shared document (cursor-labels.ts). */
+    CollaborativeEditing?: ForeignCursors;
     align_Right: number;
     align_Left: number;
     align_Center: number;

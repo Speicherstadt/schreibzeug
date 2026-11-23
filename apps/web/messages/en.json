@@ -1009,5 +1009,6 @@
   "archive_dialog_step_sending": "Sending to the archive…",
   "archive_dialog_running": "Archiving…",
   "archive_dialog_confirm": "Archive",
-  "archive_dialog_done": "Saved to the archive."
+  "archive_dialog_done": "Saved to the archive.",
+  "cursor_labels_guest": "Guest"
 }
