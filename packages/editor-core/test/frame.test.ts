@@ -81,6 +81,46 @@ describe("keepFocusOnClick", () => {
   });
 });
 
+describe("keepFocusOnClick with the engine's iOS input", () => {
+  const touch = (type: string, x: number, y: number, fingers = 1) =>
+    Object.assign(new Event(type), {
+      changedTouches: [{ clientX: x, clientY: y }],
+      touches:
+        type === "touchstart" ? Array.from({ length: fingers }, () => ({ clientX: x, clientY: y })) : [],
+    });
+  const fakeIosFrame = () => {
+    const target = new EventTarget();
+    const body = {};
+    const calls: string[] = [];
+    const input = { tagName: "DIV", focus: () => calls.push("focus") };
+    const win = {
+      addEventListener: target.addEventListener.bind(target),
+      document: { hasFocus: () => false, body, activeElement: body },
+      AscCommon: { g_inputContext: { showKeyboard: () => calls.push("showKeyboard") } },
+    };
+    keepFocusOnClick(win as never, () => input as never);
+    return { dispatch: (event: Event) => target.dispatchEvent(event), calls };
+  };
+
+  it("switches the input on and focuses it once a tap ends, not when the finger lands", () => {
+    const frame = fakeIosFrame();
+    frame.dispatch(touch("touchstart", 100, 200));
+    frame.dispatch(new Event("pointerdown"));
+    expect(frame.calls).toEqual([]);
+    frame.dispatch(touch("touchend", 104, 203));
+    expect(frame.calls).toEqual(["showKeyboard", "focus"]);
+  });
+
+  it("opens no keyboard after a finger scrolled or two fingers zoomed", () => {
+    const frame = fakeIosFrame();
+    frame.dispatch(touch("touchstart", 100, 200));
+    frame.dispatch(touch("touchend", 100, 320));
+    frame.dispatch(touch("touchstart", 100, 200, 2));
+    frame.dispatch(touch("touchend", 100, 200));
+    expect(frame.calls).toEqual([]);
+  });
+});
+
 describe("createStore", () => {
   it("does not notify when the state stays the same", () => {
     const store = createStore({ n: 1 });

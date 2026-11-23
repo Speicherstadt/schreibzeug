@@ -42,6 +42,56 @@ const isEngineLoaded = (win: Window | null, kind: EditorKind): win is EngineWind
 
 type FocusableWindow = Pick<Window, "addEventListener"> & {
   document: Pick<Document, "hasFocus" | "activeElement" | "body">;
+  AscCommon?: Pick<EngineWindow["AscCommon"], "g_inputContext">;
+};
+
+/**
+ * Whether the engine takes the keys through its iOS input: on Safari for iPhone and iPad the text
+ * editor puts a transparent contenteditable div over the whole canvas instead of the small textarea,
+ * because iOS keeps the keyboard only while taps land on a text input (common/text_input2.js
+ * CTextInput2, `isSafariMobile` and the Word editor).
+ */
+const isTouchOverlay = (input: Pick<HTMLElement, "tagName"> | null | undefined): boolean =>
+  input?.tagName === "DIV";
+
+/** How far a finger may move and still tap rather than scroll, in CSS pixels. */
+const TAP_SLOP = 10;
+
+type TouchPoint = { clientX: number; clientY: number };
+const firstTouch = (event: Pick<TouchEvent, "changedTouches">): TouchPoint | undefined =>
+  event.changedTouches[0];
+
+/**
+ * On iOS, opens the keyboard after a tap, as the engine's mobile mode does on touchend
+ * (word/Drawing/mobileTouchManager.js mainOnTouchEnd -> showKeyboard). The engine's overlay lets no
+ * touch through and is not editable until `g_inputContext.showKeyboard()` switches it on
+ * (common/text_input2.js showKeyboard, setReadOnlyWrapper); in the desktop mode Schreibzeug runs
+ * the engine in, nothing calls it. Focusing at pointerdown instead shows the keyboard for a moment
+ * and iOS closes it again once the touch ends on the canvas. Focusing in touchend keeps the user
+ * gesture iOS needs to show the keyboard. A finger that scrolled opens nothing.
+ */
+const openKeyboardOnTap = (win: FocusableWindow, input: () => HTMLElement): void => {
+  let start: TouchPoint | undefined;
+  win.addEventListener(
+    "touchstart",
+    (event: TouchEvent) => {
+      start = event.touches.length === 1 && isTouchOverlay(input()) ? firstTouch(event) : undefined;
+    },
+    true,
+  );
+  win.addEventListener(
+    "touchend",
+    (event: TouchEvent) => {
+      const end = firstTouch(event);
+      const tapped =
+        start && end && Math.hypot(end.clientX - start.clientX, end.clientY - start.clientY) <= TAP_SLOP;
+      start = undefined;
+      if (!tapped) return;
+      win.AscCommon?.g_inputContext?.showKeyboard();
+      input().focus();
+    },
+    true,
+  );
 };
 
 /**
@@ -51,9 +101,13 @@ type FocusableWindow = Pick<Window, "addEventListener"> & {
  * document "focus" event sdkjs listens for (common/text_input2.js), which turns key events back on.
  * It is checked again when the main button is released: a click into the presentation's notes leaves the
  * focus on the page's body (slide/Drawing/HtmlPage.js, the notes pane's own mouse handling).
+ * With the engine's iOS input the keyboard opens on a tap instead (openKeyboardOnTap).
  */
 export const keepFocusOnClick = (win: FocusableWindow, input: () => HTMLElement): void => {
+  // The engine makes its input while it starts, so which one it is is asked at every touch.
+  openKeyboardOnTap(win, input);
   const refocus = () => {
+    if (isTouchOverlay(input())) return;
     const { document } = win;
     // Nothing in the frame holds the keys; an element of the engine that does keeps them.
     if (!document.hasFocus() || document.activeElement === document.body) input().focus();
