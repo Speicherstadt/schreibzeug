@@ -201,8 +201,18 @@ Sicherheit“ → „Dennoch öffnen“. Linux-Pakete brauchen keine Signatur.
 Server und arbeitet mit Dateien in seinem Ordner; `apps/desktop/src/*.test.ts` deckt die Startseite
 ab.
 
+## Eine Datei öffnen { #opening-a-file }
+
+Öffnet das System eine Datei mit der App (Doppelklick, „Öffnen mit“), zeigt der lokale Server den
+Ordner der Datei, und das Fenster geht direkt in den Editor: macOS meldet die Datei als
+`RunEvent::Opened`, Windows und Linux übergeben sie als Argument. Der Ordner wird wie ein gewählter
+gemerkt. Die Adresse (`/edit/<id>`) kennt die App ohne Rückfrage, weil die ID einer Datei direkt im
+Ordner die UUID v5 ihres Namens ist (`apps/local/src/ids.ts`, `src-tauri/src/opened.rs`). Lässt
+sich der Ordner nicht lesen, etwa bei einem Anhang aus Mail auf macOS (geschützter Container,
+„Operation not permitted“), zeigt die Startseite das als Meldung. Die Datei, die vor dem Laden der
+Startseite ankommt, holt sich die Startseite selbst (`take_opened`).
+
 ## Als Nächstes { #next }
 
 - Lokale und Server-Dateien nebeneinander, mehrere Ordner.
-- Schreibzeug als Standard-App für .docx, .xlsx und .pptx.
 - Signieren und Updates über den Tauri-Updater.

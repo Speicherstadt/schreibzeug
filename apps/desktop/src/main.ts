@@ -112,7 +112,16 @@ const servers = load();
 showRecent(servers);
 const query = new URLSearchParams(window.location.search);
 showError(query.get("error"));
-// Straight back to where it was last, unless the menu asked for the choice.
-const place = placeToOpen(read(LAST_KEY), servers, query.has("choose"));
-if (place?.kind === "local" && inApp) void openLocal();
-if (place?.kind === "server") void connect(place.url);
+// A file the system opened comes first; else straight back to where it was last, unless the menu
+// asked for the choice.
+const continueWhereItWas = () => {
+  const place = placeToOpen(read(LAST_KEY), servers, query.has("choose"));
+  if (place?.kind === "local" && inApp) void openLocal();
+  if (place?.kind === "server") void connect(place.url);
+};
+if (inApp) {
+  invoke<string | null>("take_opened").then(
+    (url) => (url ? window.location.assign(url) : continueWhereItWas()),
+    (error) => showError(String(error)),
+  );
+} else continueWhereItWas();
