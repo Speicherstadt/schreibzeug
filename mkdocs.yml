@@ -15,7 +15,7 @@ copyright: >-
   Lizenz AGPL-3.0 · © Tristan Teufel und Mitwirkende · Schreibzeug baut auf der Open-Source-Engine
   Euro-Office auf und steht in keiner Verbindung zu Euro-Office, ONLYOFFICE, Microsoft oder Google.
   · <a href="https://teufel-it.de/de/impressum/">Impressum</a>
-  · <a href="https://speicherstadt.app/datenschutz/">Datenschutz</a>
+  · <a href="https://speicherstadt.org/datenschutz/">Datenschutz</a>
 
 docs_dir: docs
 # Pages as installation.html rather than installation/: the README links to them so, and relative

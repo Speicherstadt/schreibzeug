@@ -17,7 +17,7 @@ fragt nach einem Partner oder dem gehosteten Betrieb (info@teufel-it.de).
 ## Partnerprogramm { #partner-programme }
 
 IT-Dienstleister und Hoster, die Schreibzeug für ihre Kunden einrichten und betreuen wollen, werden
-Partner: siehe [Partnerprogramm](https://speicherstadt.app/partner/).
+Partner: siehe [Partnerprogramm](https://speicherstadt.org/partner/).
 
 ## Fragen { #questions }
 
