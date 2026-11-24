@@ -203,6 +203,14 @@ ab.
 
 ## Eine Datei öffnen { #opening-a-file }
 
+Die App meldet sich beim System als Editor für die Formate, die Schreibzeug öffnet (`kindOf` in
+`apps/web/src/lib/format.ts`): .docx, .doc, .rtf, .odt, .xlsx, .xls, .csv, .ods, .pptx, .ppt, .odp,
+.pdf, .md und .txt (`bundle.fileAssociations` in `tauri.conf.json`, Rang „Alternate“). So steht sie
+unter „Öffnen mit“ und lässt sich als Standard festlegen, ohne Word oder LibreOffice zu verdrängen.
+Jede Zuordnung nennt ihren MIME-Typ, denn unter Linux schreibt das Paket nur diesen in die
+`.desktop`-Datei; deren Vorlage (`src-tauri/linux/schreibzeug.desktop`) ergänzt `%F` im `Exec`, sonst
+übergibt der Dateimanager die Datei nicht.
+
 Öffnet das System eine Datei mit der App (Doppelklick, „Öffnen mit“), zeigt der lokale Server den
 Ordner der Datei, und das Fenster geht direkt in den Editor: macOS meldet die Datei als
 `RunEvent::Opened`, Windows und Linux übergeben sie als Argument. Der Ordner wird wie ein gewählter
@@ -215,4 +223,6 @@ Startseite ankommt, holt sich die Startseite selbst (`take_opened`).
 ## Als Nächstes { #next }
 
 - Lokale und Server-Dateien nebeneinander, mehrere Ordner.
+- Unter Windows und Linux eine Datei, die bei laufender App geöffnet wird, im laufenden Fenster
+  zeigen statt in einer zweiten App (eine Instanz).
 - Signieren und Updates über den Tauri-Updater.
