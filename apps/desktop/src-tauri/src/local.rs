@@ -54,6 +54,11 @@ pub fn unlock_url(base: &str, token: &str) -> String {
     format!("{base}/api/local/unlock?token={token}")
 }
 
+/// The same, going on to `to`, a path of the app (gate.ts `unlock`) rather than its start page.
+pub fn unlock_url_to(base: &str, token: &str, to: &str) -> String {
+    format!("{}&to={}", unlock_url(base, token), to.replace('/', "%2F"))
+}
+
 /// A key nobody can guess: 24 random bytes as hex.
 pub fn new_token() -> Result<String, String> {
     let mut bytes = [0u8; 24];
@@ -171,6 +176,14 @@ mod tests {
         assert_eq!(
             unlock_url("http://127.0.0.1:5", "ab12"),
             "http://127.0.0.1:5/api/local/unlock?token=ab12"
+        );
+    }
+
+    #[test]
+    fn unlocks_and_goes_on_to_a_page() {
+        assert_eq!(
+            unlock_url_to("http://127.0.0.1:5", "ab12", "/edit/x"),
+            "http://127.0.0.1:5/api/local/unlock?token=ab12&to=%2Fedit%2Fx"
         );
     }
 
