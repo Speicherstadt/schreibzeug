@@ -7,6 +7,7 @@
 mod downloads;
 mod local;
 mod opened;
+mod opening;
 mod settings;
 mod windows;
 
@@ -26,8 +27,6 @@ const CHOOSE_SERVER: &str = "choose-server";
 struct LocalState {
     token: String,
     running: Mutex<Option<local::Running>>,
-    /// A file the system asked to open that the window has not shown yet.
-    pending: Mutex<Option<PathBuf>>,
 }
 
 /// The system's documents folder; at home "Documents" where none is configured, else home itself.
@@ -137,51 +136,6 @@ fn keep_folder(app: &AppHandle, folder: &Path) -> Result<(), String> {
     settings::write(&settings_file(app)?, &settings).map_err(|error| error.to_string())
 }
 
-/// The editor's address for a file the system opens: its folder becomes the one shown, unless the
-/// folder cannot be read (macOS Mail's attachments), which is said instead of a page that fails.
-fn opened_file_url(app: &AppHandle, path: &Path) -> Result<String, String> {
-    let target = opened::target_of(path).ok_or("Diese Datei lässt sich nicht öffnen.")?;
-    std::fs::read_dir(&target.folder)
-        .map_err(|error| opened::unreadable_folder(&target.folder, &error))?;
-    keep_folder(app, &target.folder)?;
-    let base = ensure_local(app)?;
-    let token = &app.state::<LocalState>().token;
-    Ok(local::unlock_url_to(
-        &base,
-        token,
-        &opened::editor_path(&target.name),
-    ))
-}
-
-/// The address of the file waiting to be shown, if there is one.
-fn open_pending(app: &AppHandle) -> Result<Option<String>, String> {
-    let path = app
-        .state::<LocalState>()
-        .pending
-        .lock()
-        .map_err(|error| error.to_string())?
-        .take();
-    path.map(|path| opened_file_url(app, &path)).transpose()
-}
-
-/// A file to show. Before the start page has loaded it waits for the page, which asks for it
-/// (take_opened); afterwards the window goes there at once.
-#[cfg(target_os = "macos")]
-fn open_file(app: &AppHandle, path: PathBuf) {
-    if let Ok(mut pending) = app.state::<LocalState>().pending.lock() {
-        *pending = Some(path);
-    }
-    let Some(start) = windows::start_page() else {
-        return;
-    };
-    let app = app.clone();
-    std::thread::spawn(move || match open_pending(&app) {
-        Ok(Some(url)) => navigate_main(&app, &url),
-        Ok(None) => {}
-        Err(error) => navigate_main(&app, &start_page(start, Some(&error))),
-    });
-}
-
 fn navigate_main(app: &AppHandle, url: &str) {
     if let (Some(window), Ok(url)) = (app.get_webview_window(MAIN_WINDOW), Url::parse(url)) {
         let _ = window.navigate(url);
@@ -193,14 +147,6 @@ fn navigate_main(app: &AppHandle, url: &str) {
 #[tauri::command]
 async fn open_local(app: AppHandle) -> Result<String, String> {
     tauri::async_runtime::spawn_blocking(move || local_start_url(&app))
-        .await
-        .map_err(|error| error.to_string())?
-}
-
-/// From the start page: the address of a file the system opened before the page loaded, or None.
-#[tauri::command]
-async fn take_opened(app: AppHandle) -> Result<Option<String>, String> {
-    tauri::async_runtime::spawn_blocking(move || open_pending(&app))
         .await
         .map_err(|error| error.to_string())?
 }
@@ -357,13 +303,13 @@ pub fn run() {
         .manage(LocalState {
             token,
             running: Mutex::new(None),
-            pending: Mutex::new(None),
         })
+        .manage(opening::Pending::default())
         .invoke_handler(tauri::generate_handler![
             open_local,
             local_folder,
             choose_folder,
-            take_opened
+            opening::take_opened
         ])
         .setup(|app| {
             windows::open_window(
@@ -376,13 +322,7 @@ pub fn run() {
                 app.handle().set_menu(menu(app.handle())?)?;
                 app.on_menu_event(|app, event| on_menu(app, event.id().as_ref()));
             }
-            // Windows and Linux pass the file as an argument; macOS sends RunEvent::Opened.
-            let args = std::env::args_os().skip(1);
-            if let Some(file) = opened::file_argument(args, Path::is_file) {
-                if let Ok(mut pending) = app.state::<LocalState>().pending.lock() {
-                    *pending = Some(file);
-                }
-            }
+            opening::from_arguments(app.handle());
             Ok(())
         })
         .build(tauri::generate_context!())
@@ -391,7 +331,7 @@ pub fn run() {
         #[cfg(target_os = "macos")]
         if let RunEvent::Opened { urls } = &event {
             if let Some(file) = opened::files_of(urls).last() {
-                open_file(app, file);
+                opening::open(app, file);
             }
         }
         if let RunEvent::Exit = event {
