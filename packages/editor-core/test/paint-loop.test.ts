@@ -3,6 +3,7 @@ import {
   drawPagesWhileGliding,
   isTouchScreen,
   type MobileScrollDelegate,
+  mobileConfig,
   type PaintLoop,
   paintEveryFrame,
   smoothTouchScrolling,
@@ -115,6 +116,12 @@ describe("paint loop", () => {
     drawPagesWhileGliding(delegate);
     expect(glide()).toBe(false);
     expect(scrolled).toEqual([{ isAnimating: true }]);
+  });
+
+  it("runs the engine in its mobile mode on a phone only", () => {
+    expect(mobileConfig({ phone: true })).toEqual({ mobile: true });
+    expect(mobileConfig({ phone: false })).toEqual({});
+    expect(mobileConfig({})).toEqual({});
   });
 
   it("takes a browser without media queries for no touch screen", () => {

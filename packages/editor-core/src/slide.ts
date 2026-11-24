@@ -12,7 +12,7 @@ import {
 import { textsOf } from "./engine-texts";
 import type { EngineWindow, SlideEngineApi, SlideEventArgs, SlideWindow } from "./engine-types";
 import { textEvents } from "./events";
-import { smoothTouchScrolling } from "./paint-loop";
+import { mobileConfig, smoothTouchScrolling } from "./paint-loop";
 import { createSearchCommands, type SearchCommands } from "./search";
 import { createDesignCommands, type DesignCommands, readThemes, readTransition } from "./slide-design";
 import { createSlideShow, hideShowElement, SLIDE_SHOW_ELEMENT, type SlideShow } from "./slide-show";
@@ -107,6 +107,7 @@ const slideBinding: EditorBinding<
       translate: textsOf(options).translate,
       // The slide list under the slide on a phone (slide/api.js thumbnailsPosition).
       ...(options.phone ? { "thumbnails-position": "bottom" } : {}),
+      ...mobileConfig(options),
     });
     api.SetFontRenderingMode(fontRenderingMode(win.devicePixelRatio));
     api.SetDrawingFreeze(true);
@@ -213,6 +214,9 @@ const slideBinding: EditorBinding<
     api.asc_showComments();
     // The notes under the slide, as web-apps' desktop editor shows them unless hidden (Main.js);
     // its mobile editor has none, so on a phone they wait for "Ansicht → Notizen".
+    // The mobile mode switches the notes off for good (slide/api.js asc_setViewMode setNotesEnable);
+    // they are switched on again, hidden, so "Ansicht → Notizen" can show them.
+    if (phone) api.WordControl.setNotesEnable?.(true);
     api.asc_ShowNotes(!phone);
     api.Resize();
     api.zoomFitToPage();

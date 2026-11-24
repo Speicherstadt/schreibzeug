@@ -110,6 +110,16 @@ test("a presentation keeps its slide list under the slide and its notes hidden",
     "aria-checked",
     "false",
   );
+  // The mobile mode switches the notes off; slide.ts allows them again, so the menu shows them.
+  await page.getByRole("menuitemcheckbox", { name: "Notizen" }).click();
+  const shown = () =>
+    frame.evaluate(() =>
+      (
+        window as unknown as { editor: { WordControl: { IsNotesShown(): boolean } } }
+      ).editor.WordControl.IsNotesShown(),
+    );
+  await expect.poll(shown).toBe(true);
+  expect(errors).toEqual([]);
 });
 
 /**
@@ -250,3 +260,24 @@ test("the menus stay on a phone's screen", async ({ page }, testInfo) => {
   }
   expect(offScreen).toEqual([]);
 });
+
+for (const file of ["hello.docx", "preise.xlsx", "vortrag.pptx", "rechnung.pdf"]) {
+  test(`${file} runs the engine in its mobile mode on a phone`, async ({ page }, testInfo) => {
+    const errors = collectErrors(page);
+    await signUp(page, credentialsFor(testInfo));
+    await page.goto("/");
+    await upload(page, join(import.meta.dirname, "../test-files", file), file);
+    await page.getByRole("link", { name: file, exact: true }).click();
+    await expectEditorReady(page, errors);
+    const frame = await (await page.getByTestId("engine-frame").elementHandle())?.contentFrame();
+    if (!frame) throw new Error("No engine frame.");
+    // common/apiBase.js: `mobile: true` in the config (paint-loop.ts mobileConfig).
+    const mobile = await frame.evaluate(
+      () =>
+        (window as unknown as { Asc: { editor?: { isMobileVersion?: boolean } } }).Asc.editor
+          ?.isMobileVersion,
+    );
+    expect(mobile).toBe(true);
+    expect(errors).toEqual([]);
+  });
+}

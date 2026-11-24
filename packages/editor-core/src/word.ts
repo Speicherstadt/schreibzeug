@@ -22,7 +22,7 @@ import { createLayoutCommands, type LayoutCommands, readLineSpacing, readSection
 import { createLinkCommands, type HyperlinkProps, type LinkCommands, readLink } from "./links";
 import { readListKind } from "./lists";
 import { createMarkingCommands, type MarkingCommands, readHighlight } from "./marking";
-import { smoothTouchScrolling } from "./paint-loop";
+import { mobileConfig, smoothTouchScrolling } from "./paint-loop";
 import { createReviewCommands, type ReviewCommands, readRevision, trackingOf } from "./review";
 import { createSearchCommands, type SearchCommands } from "./search";
 import {
@@ -148,7 +148,11 @@ const wordBinding: EditorBinding<
   createApi: (win, options) => {
     limitSpellLanguages(win.AscCommon);
     useDedicatedSpellWorker(win);
-    const api = new win.Asc.asc_docs_api({ "id-view": "editor_sdk", translate: textsOf(options).translate });
+    const api = new win.Asc.asc_docs_api({
+      "id-view": "editor_sdk",
+      translate: textsOf(options).translate,
+      ...mobileConfig(options),
+    });
     api.SetFontRenderingMode(fontRenderingMode(win.devicePixelRatio));
     return api;
   },

@@ -457,8 +457,6 @@ export interface EngineWindow extends Window {
      * while it runs, also after Strg+Alt+Z, which the engine handles itself.
      */
     EditorActionSpeaker?: { isLanched: boolean };
-    /** common/text_input2.js: the engine's text input; showKeyboard switches its iOS overlay on (frame.ts). */
-    g_inputContext?: { showKeyboard(): void };
   };
 }
 
@@ -893,6 +891,8 @@ export interface SlideEngineApi
     m_oDrawingDocument: { ToRendererPart(noBase64: true, isSelection: boolean): Uint8Array };
     /** slide/Drawing/HtmlPage.js: the loop that draws the slides (paint-loop.ts). */
     paintMessageLoop?: PaintLoop;
+    /** slide/Drawing/HtmlPage.js: allows the notes pane, which the mobile mode switches off (slide.ts). */
+    setNotesEnable?(enabled: boolean): void;
   };
 }
 

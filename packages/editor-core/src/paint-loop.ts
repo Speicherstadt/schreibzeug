@@ -58,6 +58,17 @@ export const drawPagesWhileGliding = (delegate: MobileScrollDelegate): void => {
   };
 };
 
+/**
+ * The engine's mobile mode on a phone, as web-apps' mobile editors run it (`mobile: true`,
+ * documenteditor/mobile Main.jsx; common/apiBase.js isMobileVersion): the keyboard opens after a
+ * tap (word/Drawing/mobileTouchManager.js showKeyboard, needed for Safari on iOS), the paint loop
+ * draws every frame, and touch targets, zoom and the spreadsheet's cell editing are made for a
+ * finger. It hides rulers and scroll bars and the presentation's notes (switched on again in
+ * slide.ts).
+ */
+export const mobileConfig = (options: { phone?: boolean | undefined }): { mobile?: true } =>
+  options.phone ? { mobile: true } : {};
+
 /** A finger is the main pointer: a phone or a tablet, not a laptop that also has a touch screen. */
 export const isTouchScreen = (win: Pick<Window, "matchMedia">): boolean => {
   try {

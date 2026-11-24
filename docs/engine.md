@@ -358,12 +358,11 @@ war schlechter als vorher.
    (`common/Drawings/WorkEvents.js` `PaintMessageLoop`, mit 40 ms angelegt in `word/Drawing/HtmlPage.js`
    und `slide/Drawing/HtmlPage.js`). Ohne die Einstellung `mobile` zeichnet sie höchstens alle 40 ms
    (`isUseInterval`), also mit 25 Bildern pro Sekunde, und in Browsern, die sie nicht als Chrome oder Safari
-   erkennt (etwa Firefox), läuft die Schleife über einen 40-ms-Timer statt über `requestAnimationFrame`. Der
-   mobile Editor von web-apps setzt `mobile: true` und zeichnet bei jedem Bild. Diese Einstellung ändert aber
-   noch viel mehr (Fokus der Eingabe, Lineale, Scrollleisten, der Editor für Diagramme), deshalb stellt
-   `editor-core` bei `asc_onDocumentContentReady` nur die Schleife um. Eine Schleife, die schon auf dem Timer
-   läuft, wird direkt umgehängt, nicht über `Stop`, denn das ruft ein `this.clearTimeout` auf, das die
-   Schleife nicht hat.
+   erkennt (etwa Firefox), läuft die Schleife über einen 40-ms-Timer statt über `requestAnimationFrame`. Auf dem
+   Handy läuft die Engine im mobilen Modus und zeichnet von sich aus bei jedem Bild (siehe
+   [Mobiler Modus auf dem Handy](#mobile-mode-on-a-phone)); auf dem Tablet stellt `editor-core` bei
+   `asc_onDocumentContentReady` die Schleife um. Eine Schleife, die schon auf dem Timer läuft, wird direkt
+   umgehängt, nicht über `Stop`, denn das ruft ein `this.clearTimeout` auf, das die Schleife nicht hat.
 2. **Pixeldichte höchstens 2** (`engine/frame/editor/touch-pixel-ratio.js`, in den Frame-Seiten von Text und
    Präsentation vor sdkjs geladen). sdkjs bemisst jedes Canvas nach `window.devicePixelRatio`
    (`common/device_scale.js` `checkDeviceScale`, `common/browser.js` `checkZoom`). Bei 3,5 hat das Canvas
@@ -384,6 +383,27 @@ Einschalten die Lese-Schriftgröße, die etwa 18 CSS-Pixel ergibt (`readingFontS
 Pixeldichte 2 die Stufe 22), und schreibt sie vor `ChangeReaderMode` in `ReaderFontSizeCur`, damit die
 Engine den Text nur einmal setzt. Am Desktop bleibt das Zeichnen, wie die Engine es vorsieht. Tabellen
 zeichnen ohne diese Schleife und ohne Seiten.
+
+## Mobiler Modus auf dem Handy { #mobile-mode-on-a-phone }
+
+Auf einem Handy (Bildschirm schmaler als 640 px, `isPhone` in `apps/web/src/editor/use-mobile-view.ts`)
+startet `editor-core` die Engine aller vier Editoren mit `mobile: true`, so wie die mobilen Editoren von
+web-apps (`documenteditor/mobile` `Main.jsx`; `common/apiBase.js` `isMobileVersion`;
+`mobileConfig` in `src/paint-loop.ts`). Die Engine hat diesen Modus für Touch gebaut:
+
+- Die Tastatur geht nach einem Tippen auf und bleibt beim Scrollen zu. Auf iPhone und iPad legt die Textengine
+  ein durchsichtiges, bearbeitbares `div` über das Canvas (`common/text_input2.js`, `isSafariMobile`), das erst
+  `showKeyboard()` beim Loslassen des Fingers einschaltet (`word/Drawing/mobileTouchManager.js`); ohne den
+  Modus ging die Tastatur auf und gleich wieder zu. `keepFocusOnClick` (`src/frame.ts`) lässt deshalb auf dem
+  Handy Fingertipps der Engine und fokussiert nur bei Maus und Stift.
+- Die Schleife zeichnet bei jedem Bild (`common/Drawings/WorkEvents.js` `isUseInterval`).
+- Diagramme und Formen sind mit dem Finger leichter zu treffen, man kann bis auf die ganze Seite herauszoomen,
+  und die Zellbearbeitung der Tabelle öffnet und schließt die Tastatur selbst (`cell/view/CellEditorView.js`).
+
+Der Modus blendet Lineale und Scrollleisten aus und schaltet die Notizen der Präsentation ab
+(`slide/api.js` `asc_setViewMode`, `setNotesEnable(false)`). `slide.ts` erlaubt sie bei
+`asc_onDocumentContentReady` wieder (`WordControl.setNotesEnable(true)`), versteckt, sodass „Ansicht →
+Notizen“ sie zeigt. Tablet und Desktop bleiben im Desktop-Modus.
 
 ## Seitenlayout und Abstände { #page-layout-and-spacing }
 
@@ -607,18 +627,6 @@ Engine (`api.getFocusElement()`, `common/apiBase.js`); der eigene `focus`-Handle
 ihre Tasten-Events wieder ein (`keepFocusOnClick` in `src/frame.ts`). Es prüft noch einmal, wenn die
 Haupttaste losgelassen wird: Ein Klick in die Notizen der Präsentation lässt den Fokus danach auf dem Body
 der Seite. Ein Rechtsklick bleibt dort unberührt, weil dann das Kontextmenü der App den Fokus hat.
-
-Auf iPhone und iPad (Safari und jeder andere Browser dort) legt die Textengine statt des Textfelds ein
-durchsichtiges, bearbeitbares `div` über das ganze Canvas, weil iOS die Tastatur nur offen hält, solange
-Fingertipps auf einem Eingabefeld landen (`common/text_input2.js`, `isSafariMobile`). Dieses `div` lässt
-keine Berührung durch und ist nicht bearbeitbar, bis `g_inputContext.showKeyboard()` es einschaltet; das tut
-die Engine nur im Modus `mobile: true` beim Loslassen des Fingers (`word/Drawing/mobileTouchManager.js`).
-Schreibzeug lässt die Engine im Desktop-Modus (siehe [Scrollen auf dem Touch-Bildschirm](#touch-scrolling)),
-und der Fokus bei `pointerdown` ließ die Tastatur kurz aufgehen und gleich wieder zugehen. Ist die Eingabe
-der Engine dieses `div`, fokussiert `keepFocusOnClick` deshalb nicht bei `pointerdown`, sondern ruft nach
-einem Tippen (`touchend`, ein Finger, kaum bewegt) `showKeyboard()` auf und fokussiert dann die Eingabe,
-noch in der Geste, die iOS für die Tastatur verlangt. Wer scrollt oder mit zwei Fingern zoomt, bekommt keine
-Tastatur.
 
 Der Weg wieder hinaus ist F6: Im Dokument gehört Tab der Engine (ein Tabulator, die nächste Zelle, das
 nächste Formularfeld), und Escape und Umschalt+Tab bleiben ebenfalls dort. `shortcutOf` (`src/view.ts`)

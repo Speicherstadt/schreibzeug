@@ -11,6 +11,7 @@ import {
 import { beforeOpening, silencePdfScripts } from "./document-scripts";
 import { textsOf } from "./engine-texts";
 import type { EngineWindow } from "./engine-types";
+import { mobileConfig } from "./paint-loop";
 import { type PdfColor, rgbOf } from "./pdf-color";
 import { addInkSignature, type Stroke } from "./pdf-signature";
 import {
@@ -241,8 +242,10 @@ type PdfParts = Pick<PdfEditor, "commands" | "signature" | "pages" | "view" | "c
  */
 const pdfBinding: EditorBinding<PdfWindow, PdfEventArgs, PdfEngineApi, PdfState, PdfEvent, PdfParts> = {
   format: EDITOR_FORMAT.pdf,
-  createApi: (win) =>
-    beforeOpening(new win.Asc.PDFEditorApi({ "id-view": "editor_sdk" }), () => silencePdfScripts(win)),
+  createApi: (win, options) =>
+    beforeOpening(new win.Asc.PDFEditorApi({ "id-view": "editor_sdk", ...mobileConfig(options) }), () =>
+      silencePdfScripts(win),
+    ),
   initialState: initialPdfState,
   reduce: reducePdfState,
   events: () => ({

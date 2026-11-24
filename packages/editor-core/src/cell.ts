@@ -37,6 +37,7 @@ import { withoutCustomFunctions } from "./document-scripts";
 import { textsOf } from "./engine-texts";
 import type { CellEngineApi, CellEventArgs, CellWindow, EngineWindow } from "./engine-types";
 import { uniqueSorted } from "./events";
+import { mobileConfig } from "./paint-loop";
 import type { SearchCommands } from "./search";
 import {
   type ContextMenuListener,
@@ -146,6 +147,7 @@ const cellBinding: EditorBinding<
       "id-view": "editor_sdk",
       "id-input": FORMULA_INPUT_ID,
       translate: textsOf(options).translate,
+      ...mobileConfig(options),
     });
     api.asc_setFontRenderingMode(fontRenderingMode(win.devicePixelRatio));
     // Stored until the full API has loaded (cell/api.js asc_setLocale, tmpLCID).

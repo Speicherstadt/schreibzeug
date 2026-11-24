@@ -454,7 +454,7 @@ export const openDocument = <
       const stopProgress = followProgress(options.collaboration?.channel, dispatch);
       subscribe(base, coreEvents(win.Asc.c_oAscAsyncAction.Disconnect), dispatch);
       subscribe(api, binding.events(win), dispatch);
-      keepFocusOnClick(win, () => api.getFocusElement());
+      keepFocusOnClick(win, () => api.getFocusElement(), options.phone === true);
       const screenReader = followScreenReader(win, base, options.screenReader === true, dispatch);
       const shortcuts = createListeners<AppShortcut>();
       const onKey = (event: KeyboardEvent) => {
