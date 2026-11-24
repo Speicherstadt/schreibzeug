@@ -618,7 +618,10 @@ und der Fokus bei `pointerdown` ließ die Tastatur kurz aufgehen und gleich wied
 der Engine dieses `div`, fokussiert `keepFocusOnClick` deshalb nicht bei `pointerdown`, sondern ruft nach
 einem Tippen (`touchend`, ein Finger, kaum bewegt) `showKeyboard()` auf und fokussiert dann die Eingabe,
 noch in der Geste, die iOS für die Tastatur verlangt. Wer scrollt oder mit zwei Fingern zoomt, bekommt keine
-Tastatur.
+Tastatur. Geht die Tastatur wieder zu (das `div` verliert den Fokus), schaltet `keepFocusOnClick` es mit
+`setReadOnlyWrapper(true)` wieder aus: Im Desktop-Modus fokussiert die Engine ihre Eingabe bei jedem
+Aufsetzen eines Fingers, solange sie den Fokus nicht hat (`mainOnTouchStart`, nur ohne `mobile`), und ein
+eingeschaltetes `div` holte so bei jedem Scrollen die Tastatur.
 
 Der Weg wieder hinaus ist F6: Im Dokument gehört Tab der Engine (ein Tabulator, die nächste Zelle, das
 nächste Formularfeld), und Escape und Umschalt+Tab bleiben ebenfalls dort. `shortcutOf` (`src/view.ts`)

@@ -69,9 +69,24 @@ const firstTouch = (event: Pick<TouchEvent, "changedTouches">): TouchPoint | und
  * the engine in, nothing calls it. Focusing at pointerdown instead shows the keyboard for a moment
  * and iOS closes it again once the touch ends on the canvas. Focusing in touchend keeps the user
  * gesture iOS needs to show the keyboard. A finger that scrolled opens nothing.
+ *
+ * Once the keyboard closes (the overlay loses focus), the overlay is switched off again. In desktop
+ * mode the engine focuses its input at every touchstart it gets while it lacks the focus
+ * (word/Drawing/mobileTouchManager.js mainOnTouchStart, `!isMobileVersion`), which with an editable
+ * overlay brings the keyboard up whenever a finger starts to scroll; a switched-off overlay is not
+ * editable, so that focus shows nothing.
  */
 const openKeyboardOnTap = (win: FocusableWindow, input: () => HTMLElement): void => {
   let start: TouchPoint | undefined;
+  win.addEventListener(
+    "focusout",
+    (event: FocusEvent) => {
+      const overlay = input();
+      if (event.target === overlay && isTouchOverlay(overlay))
+        win.AscCommon?.g_inputContext?.setReadOnlyWrapper(true);
+    },
+    true,
+  );
   win.addEventListener(
     "touchstart",
     (event: TouchEvent) => {

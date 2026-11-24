@@ -96,10 +96,17 @@ describe("keepFocusOnClick with the engine's iOS input", () => {
     const win = {
       addEventListener: target.addEventListener.bind(target),
       document: { hasFocus: () => false, body, activeElement: body },
-      AscCommon: { g_inputContext: { showKeyboard: () => calls.push("showKeyboard") } },
+      AscCommon: {
+        g_inputContext: {
+          showKeyboard: () => calls.push("showKeyboard"),
+          setReadOnlyWrapper: (readOnly: boolean) => calls.push(`readOnly ${readOnly}`),
+        },
+      },
     };
     keepFocusOnClick(win as never, () => input as never);
-    return { dispatch: (event: Event) => target.dispatchEvent(event), calls };
+    const focusOut = (from: unknown) =>
+      Object.defineProperty(new Event("focusout"), "target", { value: from });
+    return { dispatch: (event: Event) => target.dispatchEvent(event), calls, input, focusOut };
   };
 
   it("switches the input on and focuses it once a tap ends, not when the finger lands", () => {
@@ -118,6 +125,15 @@ describe("keepFocusOnClick with the engine's iOS input", () => {
     frame.dispatch(touch("touchstart", 100, 200, 2));
     frame.dispatch(touch("touchend", 100, 200));
     expect(frame.calls).toEqual([]);
+  });
+
+  it("switches the input off again once the keyboard closes, so the next scroll brings none up", () => {
+    const frame = fakeIosFrame();
+    frame.dispatch(touch("touchstart", 100, 200));
+    frame.dispatch(touch("touchend", 100, 200));
+    frame.dispatch(frame.focusOut({}));
+    frame.dispatch(frame.focusOut(frame.input));
+    expect(frame.calls).toEqual(["showKeyboard", "focus", "readOnly true"]);
   });
 });
 
