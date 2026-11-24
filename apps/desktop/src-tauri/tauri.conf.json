@@ -32,38 +32,114 @@
     ],
     "fileAssociations": [
       {
-        "ext": ["docx", "docm", "doc", "dotx", "dotm", "dot", "rtf", "odt"],
-        "name": "Word document",
+        "ext": ["docx"],
+        "name": "Schreibzeug.docx",
+        "description": "Word document",
+        "mimeType": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
         "role": "Editor",
         "rank": "Alternate"
       },
       {
-        "ext": ["xlsx", "xlsm", "xls", "xltx", "xltm", "xlt", "csv", "ods"],
-        "name": "Excel spreadsheet",
+        "ext": ["doc"],
+        "name": "Schreibzeug.doc",
+        "description": "Word 97-2003 document",
+        "mimeType": "application/msword",
         "role": "Editor",
         "rank": "Alternate"
       },
       {
-        "ext": ["pptx", "pptm", "ppt", "ppsx", "ppsm", "pps", "potx", "potm", "pot", "odp"],
-        "name": "PowerPoint presentation",
+        "ext": ["rtf"],
+        "name": "Schreibzeug.rtf",
+        "description": "Rich Text document",
+        "mimeType": "application/rtf",
+        "role": "Editor",
+        "rank": "Alternate"
+      },
+      {
+        "ext": ["odt"],
+        "name": "Schreibzeug.odt",
+        "description": "OpenDocument text",
+        "mimeType": "application/vnd.oasis.opendocument.text",
+        "role": "Editor",
+        "rank": "Alternate"
+      },
+      {
+        "ext": ["xlsx"],
+        "name": "Schreibzeug.xlsx",
+        "description": "Excel workbook",
+        "mimeType": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        "role": "Editor",
+        "rank": "Alternate"
+      },
+      {
+        "ext": ["xls"],
+        "name": "Schreibzeug.xls",
+        "description": "Excel 97-2003 workbook",
+        "mimeType": "application/vnd.ms-excel",
+        "role": "Editor",
+        "rank": "Alternate"
+      },
+      {
+        "ext": ["csv"],
+        "name": "Schreibzeug.csv",
+        "description": "CSV file",
+        "mimeType": "text/csv",
+        "role": "Editor",
+        "rank": "Alternate"
+      },
+      {
+        "ext": ["ods"],
+        "name": "Schreibzeug.ods",
+        "description": "OpenDocument spreadsheet",
+        "mimeType": "application/vnd.oasis.opendocument.spreadsheet",
+        "role": "Editor",
+        "rank": "Alternate"
+      },
+      {
+        "ext": ["pptx"],
+        "name": "Schreibzeug.pptx",
+        "description": "PowerPoint presentation",
+        "mimeType": "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+        "role": "Editor",
+        "rank": "Alternate"
+      },
+      {
+        "ext": ["ppt"],
+        "name": "Schreibzeug.ppt",
+        "description": "PowerPoint 97-2003 presentation",
+        "mimeType": "application/vnd.ms-powerpoint",
+        "role": "Editor",
+        "rank": "Alternate"
+      },
+      {
+        "ext": ["odp"],
+        "name": "Schreibzeug.odp",
+        "description": "OpenDocument presentation",
+        "mimeType": "application/vnd.oasis.opendocument.presentation",
         "role": "Editor",
         "rank": "Alternate"
       },
       {
         "ext": ["pdf"],
-        "name": "PDF document",
+        "name": "Schreibzeug.pdf",
+        "description": "PDF document",
+        "mimeType": "application/pdf",
         "role": "Editor",
         "rank": "Alternate"
       },
       {
-        "ext": ["md", "markdown"],
-        "name": "Markdown text",
+        "ext": ["md"],
+        "name": "Schreibzeug.md",
+        "description": "Markdown text",
+        "mimeType": "text/markdown",
         "role": "Editor",
         "rank": "Alternate"
       },
       {
         "ext": ["txt"],
-        "name": "Plain text",
+        "name": "Schreibzeug.txt",
+        "description": "Plain text",
+        "mimeType": "text/plain",
         "role": "Editor",
         "rank": "Alternate"
       }
@@ -73,11 +149,12 @@
       "../../web/dist/": "web/"
     },
     "linux": {
+      "deb": {
+        "desktopTemplate": "linux/schreibzeug.desktop"
+      },
       "rpm": {
-        "compression": {
-          "type": "zstd",
-          "level": 3
-        }
+        "desktopTemplate": "linux/schreibzeug.desktop",
+        "compression": { "type": "zstd", "level": 3 }
       }
     },
     "windows": {
