@@ -138,7 +138,7 @@ http://localhost:3000. Einstellungen, ein eigener Reverse Proxy, Backups und Upd
 [Installationsanleitung](https://schreibzeug.app/installation.html).
 Die Desktop-App beschreibt [Desktop-App](https://schreibzeug.app/desktop.html); ihre Installer für Windows, macOS und Linux hängen an jedem [Release](https://github.com/Speicherstadt/schreibzeug/releases).
 
-Keinen eigenen Server oder keine eigene IT? Schreibzeug gibt es auf Anfrage gehostet oder über einen IT-Dienstleister aus dem [Partnerprogramm](https://speicherstadt.app/partner/).
+Keinen eigenen Server oder keine eigene IT? Schreibzeug gibt es auf Anfrage gehostet oder über einen IT-Dienstleister aus dem [Partnerprogramm](https://speicherstadt.org/partner/).
 
 ## FAQ
 
@@ -230,7 +230,7 @@ Prüfungen, Tests und Architektur: [Entwicklung](https://schreibzeug.app/develop
 
 ## Mehr von uns
 
-Weitere Open-Source-Apps für deinen eigenen Server, etwa für Mail, Buchhaltung, ein Dokumentenarchiv und mehr: **[speicherstadt.app](https://speicherstadt.app)**
+Weitere Open-Source-Apps für deinen eigenen Server, etwa für Mail, Buchhaltung, ein Dokumentenarchiv und mehr: **[speicherstadt.org](https://speicherstadt.org)**
 
 ## Mitwirken
 
@@ -260,7 +260,7 @@ Sicherheitslücken bitte vertraulich melden ([SECURITY.md](SECURITY.md)).
 
 <sub>Lizenz: <a href="LICENSE">AGPL-3.0</a> · © Tristan Teufel und Mitwirkende<br>
 Wer eine veränderte Version weitergibt oder für andere betreibt, muss ihren Quellcode unter der AGPL anbieten.<br>
-Für IT-Dienstleister und Hoster: <a href="https://speicherstadt.app/partner/">Partnerprogramm</a>.<br>
+Für IT-Dienstleister und Hoster: <a href="https://speicherstadt.org/partner/">Partnerprogramm</a>.<br>
 Schreibzeug baut auf der Open-Source-Engine Euro-Office auf und steht in keiner Verbindung zu Euro-Office, ONLYOFFICE, Collabora, CryptPad, Microsoft oder Google; die Namen sind Marken ihrer Inhaber.</sub>
 
 </div>
