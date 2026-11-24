@@ -146,7 +146,11 @@ fn opened_file_url(app: &AppHandle, path: &Path) -> Result<String, String> {
     keep_folder(app, &target.folder)?;
     let base = ensure_local(app)?;
     let token = &app.state::<LocalState>().token;
-    Ok(local::unlock_url_to(&base, token, &opened::editor_path(&target.name)))
+    Ok(local::unlock_url_to(
+        &base,
+        token,
+        &opened::editor_path(&target.name),
+    ))
 }
 
 /// The address of the file waiting to be shown, if there is one.
@@ -373,7 +377,7 @@ pub fn run() {
                 app.on_menu_event(|app, event| on_menu(app, event.id().as_ref()));
             }
             // Windows and Linux pass the file as an argument; macOS sends RunEvent::Opened.
-            let args = std::env::args().skip(1);
+            let args = std::env::args_os().skip(1);
             if let Some(file) = opened::file_argument(args, Path::is_file) {
                 if let Ok(mut pending) = app.state::<LocalState>().pending.lock() {
                     *pending = Some(file);
