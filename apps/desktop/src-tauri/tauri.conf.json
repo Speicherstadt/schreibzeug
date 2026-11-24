@@ -32,38 +32,20 @@
     ],
     "fileAssociations": [
       {
-        "ext": ["docx", "doc"],
+        "ext": ["docx", "docm", "doc", "dotx", "dotm", "dot", "rtf", "odt"],
         "name": "Word document",
         "role": "Editor",
         "rank": "Alternate"
       },
       {
-        "ext": ["xlsx", "xls"],
+        "ext": ["xlsx", "xlsm", "xls", "xltx", "xltm", "xlt", "csv", "ods"],
         "name": "Excel spreadsheet",
         "role": "Editor",
         "rank": "Alternate"
       },
       {
-        "ext": ["pptx", "ppt"],
+        "ext": ["pptx", "pptm", "ppt", "ppsx", "ppsm", "pps", "potx", "potm", "pot", "odp"],
         "name": "PowerPoint presentation",
-        "role": "Editor",
-        "rank": "Alternate"
-      },
-      {
-        "ext": ["odt"],
-        "name": "OpenDocument text",
-        "role": "Editor",
-        "rank": "Alternate"
-      },
-      {
-        "ext": ["ods"],
-        "name": "OpenDocument spreadsheet",
-        "role": "Editor",
-        "rank": "Alternate"
-      },
-      {
-        "ext": ["odp"],
-        "name": "OpenDocument presentation",
         "role": "Editor",
         "rank": "Alternate"
       },
@@ -92,7 +74,10 @@
     },
     "linux": {
       "rpm": {
-        "compression": { "type": "zstd", "level": 3 }
+        "compression": {
+          "type": "zstd",
+          "level": 3
+        }
       }
     },
     "windows": {
