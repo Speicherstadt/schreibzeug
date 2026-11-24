@@ -48,6 +48,42 @@
         "name": "PowerPoint presentation",
         "role": "Editor",
         "rank": "Alternate"
+      },
+      {
+        "ext": ["odt"],
+        "name": "OpenDocument text",
+        "role": "Editor",
+        "rank": "Alternate"
+      },
+      {
+        "ext": ["ods"],
+        "name": "OpenDocument spreadsheet",
+        "role": "Editor",
+        "rank": "Alternate"
+      },
+      {
+        "ext": ["odp"],
+        "name": "OpenDocument presentation",
+        "role": "Editor",
+        "rank": "Alternate"
+      },
+      {
+        "ext": ["pdf"],
+        "name": "PDF document",
+        "role": "Editor",
+        "rank": "Alternate"
+      },
+      {
+        "ext": ["md", "markdown"],
+        "name": "Markdown text",
+        "role": "Editor",
+        "rank": "Alternate"
+      },
+      {
+        "ext": ["txt"],
+        "name": "Plain text",
+        "role": "Editor",
+        "rank": "Alternate"
       }
     ],
     "externalBin": ["binaries/schreibzeug-local"],
