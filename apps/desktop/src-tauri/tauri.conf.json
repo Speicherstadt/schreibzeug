@@ -30,6 +30,26 @@
       "icons/icon.icns",
       "icons/icon.ico"
     ],
+    "fileAssociations": [
+      {
+        "ext": ["docx", "doc"],
+        "name": "Word document",
+        "role": "Editor",
+        "rank": "Alternate"
+      },
+      {
+        "ext": ["xlsx", "xls"],
+        "name": "Excel spreadsheet",
+        "role": "Editor",
+        "rank": "Alternate"
+      },
+      {
+        "ext": ["pptx", "ppt"],
+        "name": "PowerPoint presentation",
+        "role": "Editor",
+        "rank": "Alternate"
+      }
+    ],
     "externalBin": ["binaries/schreibzeug-local"],
     "resources": {
       "../../web/dist/": "web/"
