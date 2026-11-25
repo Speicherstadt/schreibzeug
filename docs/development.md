@@ -55,8 +55,8 @@ auf `main` und vor einem Release immer.
 schlägt bei einer Quelldatei über 400 Zeilen fehl, die nicht in `.checks/large-files.txt` steht; diese
 älteren Dateien werden in einer eigenen Änderung geteilt. Ebenso schlägt es bei einem Ring von Importen
 zwischen Modulen fehl (den Ordnern unter `packages/` und `apps/*/src/`). Biome weist auf Funktionen über 80 Zeilen hin, und
-in einem Pull Request nennt `bun checks pr` eine Funktion, die neu oder darüber gewachsen ist, dazu Code ohne
-Doku und einen Fix ohne Test.
+in einem Pull Request nennt der Workflow „PR-Regeln“ eine Funktion, die neu oder darüber gewachsen ist, dazu Code
+ohne Doku und einen Fix ohne Test ([Mitwirken](mitwirken.md#automatische-pruefungen)).
 
 Alle Skripte der `package.json` in der Wurzel:
 
