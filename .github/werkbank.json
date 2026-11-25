@@ -1,0 +1,9 @@
+{
+  "$kommentar": "Einstellungen für die Werkbank (https://github.com/Speicherstadt/werkbank); Standards in werkzeug/konfiguration.ts",
+  "board": { "owner": "Speicherstadt", "nummer": 0 },
+  "anleitung": "https://schreibzeug.app/mitwirken.html#wenn-eine-prüfung-anschlägt",
+  "uebernehmen": "https://schreibzeug.app/mitwirken.html#etwas-übernehmen",
+  "konventionen": "AGENTS.md, Arbeitsweise",
+  "heikel": ["^engine/", "^packages/editor-core/src/"],
+  "grosseDateien": ".checks/large-files.txt"
+}

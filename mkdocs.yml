@@ -43,6 +43,7 @@ nav:
       - Architektur: architecture.md
       - Die Engine: engine.md
       - Entwicklung: development.md
+      - Mitwirken: mitwirken.md
 
 theme:
   name: material

@@ -1,6 +1,6 @@
 name: Bug report
 description: Something does not work, or a file looks or behaves differently than in the program that made it.
-labels: ["bug"]
+labels: ["fehler"]
 body:
   - type: markdown
     attributes:

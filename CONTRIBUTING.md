@@ -1,53 +1,14 @@
-# Contributing
+# Mitwirken
 
-Issues and pull requests are welcome. For a bug, please use the
-[bug form](https://github.com/Speicherstadt/schreibzeug/issues/new?template=bug_report.yml); for a
-rendering or compatibility problem, attach the file that shows it (or a small one that reproduces
-it) and say which program made it. For a larger change, open an issue first, so we can agree on the
-way before you spend time on it. Security problems go privately, see [SECURITY.md](SECURITY.md).
+Issues und Pull Requests sind willkommen. Für einen Fehler bitte das
+[Formular](https://github.com/Speicherstadt/schreibzeug/issues/new?template=bug_report.yml) nehmen; bei einem Problem
+mit der Darstellung die Datei anhängen, die es zeigt (oder eine kleine, die es nachstellt), und das Programm nennen,
+das sie erzeugt hat. Für eine größere Änderung zuerst ein Issue, damit wir uns über den Weg einig sind.
+Sicherheitsprobleme gehen vertraulich, siehe [SECURITY.md](SECURITY.md).
 
-## Setting up
-
-You need [Bun](https://bun.sh) 1.4 or newer and **Linux x86_64**: preparing the editing engine
-(`bun run engine:prepare`, which `bun run dev` runs first) downloads the pinned Euro-Office release
-(about 630 MB) and runs its font generator, a Linux x86_64 binary. The preparation unpacks the
-release with `ar`, `tar -xJ` and `unzip`; on Debian or Ubuntu they come with `binutils`, `xz-utils`
-and `unzip`. On macOS or Windows, work in a Linux VM or container. How to run it, the scripts and
-the stack are in [Development](https://schreibzeug.app/development.html); how the
-pieces fit in [Architecture](https://schreibzeug.app/architecture.html).
-
-## Before a pull request
-
-```sh
-bun install --frozen-lockfile
-bun run engine:prepare   # once, and after a change in engine/
-bun run typecheck        # tsc in every workspace
-bun run lint             # Biome (bun run format fixes what it can)
-bun run test             # Vitest on Bun: unit and integration tests
-bun run test:e2e e2e/<spec>.ts   # Playwright: the specs your change touches; CI runs all of them
-bun run build
-zensical build --strict  # when docs/ or mkdocs.yml changed (pip install -r requirements-docs.txt)
-```
-
-When you change the desktop app's Rust code, also run `cargo fmt --check`,
-`cargo clippy -- -D warnings` and `cargo test` in `apps/desktop/src-tauri`.
-
-With the change, update what it affects, and only that: the tests, the pages in `docs/` that
-describe it, and the README when something a user sees is added, changed or removed. The README and
-the docs are in German only.
-
-Some conventions:
-
-- Code, comments and commit messages in English; the README and the docs in German; the app's
-  interface in German and English (`apps/web/messages/de.json` and `en.json`).
-- Written functionally: small pure functions, function components and hooks, no classes, errors
-  as values. A file does one thing; split it past about 400 lines.
-- Every call into the engine (`sdkjs`) goes through `packages/editor-core` and should name the
-  engine source that settles it (e.g. `word/api.js`), since the engine's API is not documented.
-- Test files and fonts only if we may redistribute them: fonts under OFL or Apache 2.0, documents
-  written by us or under a free license, with their source in `test-files/README.md`.
-- No ONLYOFFICE or Euro-Office logos, names or interface assets in the product; icons come from
-  lucide.
+Wie ein Beitrag entsteht (Aufgabe übernehmen, Branch, Titel, Prüfungen, Review), steht unter
+[Mitwirken](https://schreibzeug.app/mitwirken.html); die Einrichtung unter
+[Entwicklung](https://schreibzeug.app/development.html). Agenten lesen zuerst [AGENTS.md](AGENTS.md).
 
 ## License of contributions
 
