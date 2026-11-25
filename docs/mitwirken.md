@@ -15,7 +15,7 @@ Vor jedem Push dieselben Prüfungen wie in der CI; die Befehle stehen im Skill [
 
 ## Etwas übernehmen { #etwas-uebernehmen }
 
-Wer mitbauen will, sucht sich eine Aufgabe im [Board](https://github.com/orgs/Speicherstadt/projects) aus:
+Wer mitbauen will, sucht sich eine Aufgabe im [Board](https://github.com/orgs/Speicherstadt/projects/4) aus:
 
 1. **Aussuchen:** eine Karte aus „Geplant“, am liebsten weit oben, denn die Reihenfolge ist die Priorität. Für den Einstieg eignen sich Issues mit dem Label `einstieg`. Ein Vorschlag ohne Issue bekommt zuerst ein Issue.
 2. **Übernehmen:** im Issue eine Zeile `/übernehmen` kommentieren, gern mit einem kurzen Plan darunter. Der Workflow „Übernehmen“ weist dir das Issue zu, schiebt die Karte nach „In Arbeit“ und bestätigt es im Issue; Schreibrecht brauchst du dafür nicht. Er lehnt mit Begründung ab, wenn das Issue schon vergeben ist, noch keine Karte hat oder schon umgesetzt ist.
