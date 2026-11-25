@@ -65,3 +65,15 @@ jobs:
       notes: "Docker: `tristanteu/schreibzeug:${{ needs.docker.outputs.version }}` (also `:${{ needs.docker.outputs.prerelease == 'true' && 'next' || 'latest' }}`)"
     permissions:
       contents: write
+
+  # Eine fertige Version schließt die Issues, die seit der vorigen mit `Umgesetzt #…` gemergt wurden (Werkbank)
+  issues-schliessen:
+    needs: release
+    if: ${{ !cancelled() && needs.release.result == 'success' }}
+    uses: Speicherstadt/werkbank/.github/workflows/issues-schliessen.yml@main
+    permissions:
+      contents: read
+      issues: write
+      pull-requests: read
+    with:
+      tag: ${{ github.ref_name }}

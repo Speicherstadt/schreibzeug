@@ -1,6 +1,6 @@
 name: Feature request
 description: Something Schreibzeug should do, or do differently.
-labels: ["enhancement"]
+labels: ["wunsch"]
 body:
   - type: markdown
     attributes:
