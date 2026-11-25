@@ -1,6 +1,6 @@
 {
   "$kommentar": "Einstellungen für die Werkbank (https://github.com/Speicherstadt/werkbank); Standards in werkzeug/konfiguration.ts",
-  "board": { "owner": "Speicherstadt", "nummer": 0 },
+  "board": { "owner": "Speicherstadt", "nummer": 4 },
   "anleitung": "https://schreibzeug.app/mitwirken.html#wenn-eine-pruefung-anschlaegt",
   "uebernehmen": "https://schreibzeug.app/mitwirken.html#etwas-uebernehmen",
   "konventionen": "AGENTS.md, Arbeitsweise",
