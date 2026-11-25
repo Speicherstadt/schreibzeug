@@ -66,7 +66,6 @@ Mitziehen, was die Änderung berührt, im selben Pull Request, und nur das:
   fehlschlagenden Test;
 - die Seiten in `docs/`, die es beschreiben (Deutsch, eine `x.md` je Seite);
 - das README (nur Deutsch), wenn eine Funktion, die Nutzer sehen, dazukommt, sich ändert oder wegfällt;
-- die Texte der Oberfläche in beiden Sprachen (`apps/web/messages/de.json`, `en.json`);
 - nach einer Änderung am Aussehen die Screenshots: **Actions → Update screenshots → Run workflow**, dann die neuen
   Bilder ansehen.
 
@@ -95,8 +94,6 @@ daran ändert; vor dem Merge ein unabhängiges Review durch einen eigenen Agente
   Doppelungen, kein toter Code, Kommentare sagen warum. SOLID und Entwurfsmuster als Funktionen, Daten und Closures,
   nie als Klassen oder Vererbung. Reine Funktionen, Seiteneffekte am Rand, Fehler als Werte. Eine Datei über ~400
   Zeilen und eine Funktion über ~80 werden geteilt; ein Refactor ändert kein Verhalten.
-- **Engine-Version:** `engine/` legt einen Euro-Office-Tag fest. Ein Update der Engine ist ein eigener Pull Request
-  und geht nur durch, wenn die Screenshots der Formattreue gleich bleiben.
 - **Dateien bleiben Dateien:** gespeichert wird immer im Originalformat (.docx, .xlsx, .pptx), kein eigenes Format.
 - **Lizenz:** das ganze Repository steht unter AGPL-3.0-only, weil die Oberfläche `sdkjs` einbindet; der Dialog „Über“
   verlinkt den laufenden Quellcode.
