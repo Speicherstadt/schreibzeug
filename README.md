@@ -10,6 +10,7 @@
 **Word-, Excel- und PowerPoint-Dateien bearbeiten – .docx, .xlsx, .pptx und PDF, Open Source**<br>
 Gemeinsam in Echtzeit, im Browser oder als Desktop-App. Ohne Dokumentenserver und ohne Tracking. Made in Europe.
 
+![Status: Beta](https://img.shields.io/badge/Status-Beta-orange)
 [![CI](https://github.com/Speicherstadt/schreibzeug/actions/workflows/ci.yml/badge.svg)](https://github.com/Speicherstadt/schreibzeug/actions/workflows/ci.yml)
 [![Release](https://img.shields.io/github/v/release/Speicherstadt/schreibzeug?logo=github&label=release)](https://github.com/Speicherstadt/schreibzeug/releases/latest)
 [![License: AGPL-3.0](https://img.shields.io/badge/license-AGPL--3.0-blue)](LICENSE)
@@ -27,6 +28,10 @@ Gemeinsam in Echtzeit, im Browser oder als Desktop-App. Ohne Dokumentenserver un
 🖱️ **[Demo ausprobieren](https://schreibzeug.app/demo/)** – die Editoren mit Beispieldateien, im Browser, ohne Installation
 
 </div>
+
+> [!WARNING]
+> **Beta:** Schreibzeug wird noch stark weiterentwickelt. Vor jedem Update ein Backup machen
+> ([Backups](https://schreibzeug.app/installation.html#backups)).
 
 ## Warum Schreibzeug?
 
