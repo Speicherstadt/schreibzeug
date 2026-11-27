@@ -50,6 +50,12 @@ jobs:
           cache-dependency-path: requirements-docs.txt
       - run: pip install -r requirements-docs.txt
       - run: zensical build --strict
+      # Start page as https://schreibzeug.app/, not index.html: canonical, og:url and sitemap. With
+      # use_directory_urls: false Zensical writes index.html, Google then reports it as a duplicate
+      - run: |
+          sed -i 's#"https://schreibzeug.app/index.html"#"https://schreibzeug.app/"#g' site/index.html
+          sed -i 's#<loc>https://schreibzeug.app/index.html</loc>#<loc>https://schreibzeug.app/</loc>#' site/sitemap.xml
+          grep -q '<link rel="canonical" href="https://schreibzeug.app/"' site/index.html
       - if: github.event_name != 'pull_request'
         uses: actions/cache/restore@v6
         with:

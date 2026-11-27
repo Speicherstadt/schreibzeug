@@ -1,15 +1,45 @@
-{#- Link previews (WhatsApp, Signal, Mail, LinkedIn): a page with `image:` in its front matter
-    shows that picture, its title and its description when its address is shared. -#}
+{#- Search engines and link previews (WhatsApp, Signal, Mail, LinkedIn): every page has Open
+    Graph with its title and description; a page with `image:` in its front matter shows that
+    picture. The start page also says what Schreibzeug is in structured data
+    (https://schema.org/SoftwareApplication); the 404 page stays out of the index. -#}
 {% extends "base.html" %}
 
 {% block extrahead %}
-  {% if page and page.meta and page.meta.image %}
-    <meta property="og:type" content="website">
-    <meta property="og:site_name" content="{{ config.site_name }}">
-    <meta property="og:title" content="{{ page.meta.og_title or page.title }}">
-    <meta property="og:description" content="{{ page.meta.description }}">
-    <meta property="og:url" content="{{ page.canonical_url }}">
-    <meta property="og:image" content="{{ config.site_url }}{{ page.meta.image }}">
-    <meta name="twitter:card" content="summary_large_image">
-  {% endif %}
+  {%- set seo_description = page.meta.description if page and page.meta and page.meta.description else config.site_description -%}
+  {%- set seo_title = (page.meta.og_title or page.title) if page and page.meta else config.site_name -%}
+  {%- set is_home = page and page.url == "index.html" -%}
+  {%- if not page or not page.canonical_url %}
+    <meta name="robots" content="noindex">
+  {%- endif %}
+  <meta property="og:type" content="{{ 'website' if is_home else 'article' }}">
+  <meta property="og:locale" content="de_DE">
+  <meta property="og:site_name" content="{{ config.site_name }}">
+  <meta property="og:title" content="{{ seo_title }}">
+  <meta property="og:description" content="{{ seo_description }}">
+  {%- if page and page.canonical_url %}
+  <meta property="og:url" content="{{ page.canonical_url }}">
+  {%- endif %}
+  {%- if page and page.meta and page.meta.image %}
+  <meta property="og:image" content="{{ config.site_url }}{{ page.meta.image }}">
+  <meta name="twitter:card" content="summary_large_image">
+  {%- endif %}
+  {%- if is_home %}
+  <script type="application/ld+json">
+    {{ {
+      "@context": "https://schema.org",
+      "@type": "SoftwareApplication",
+      "name": config.site_name,
+      "url": config.site_url,
+      "description": config.site_description,
+      "inLanguage": config.theme.language,
+      "applicationCategory": "BusinessApplication",
+      "operatingSystem": "Linux, Docker, Windows, macOS",
+      "isAccessibleForFree": true,
+      "license": "https://www.gnu.org/licenses/agpl-3.0.html",
+      "installUrl": config.site_url ~ "installation.html",
+      "offers": { "@type": "Offer", "price": "0", "priceCurrency": "EUR" },
+      "sameAs": [config.repo_url]
+    } | tojson }}
+  </script>
+  {%- endif %}
 {% endblock %}
