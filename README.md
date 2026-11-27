@@ -25,6 +25,8 @@ Gemeinsam in Echtzeit, im Browser oder als Desktop-App. Ohne Dokumentenserver un
 [Dokumentation](https://schreibzeug.app/) •
 [Entwicklung](#entwicklung)
 
+<sub>English: like Google Docs, but on your own server: edit Word, Excel and PowerPoint files (.docx, .xlsx, .pptx) and PDFs in the browser or in a desktop app for Windows, macOS and Linux, together in real time, without a separate document server and without tracking. The editing engine is Euro-Office, the open-source fork of ONLYOFFICE, so files stay real Office files. The app is in German and English; the [documentation](https://schreibzeug.app/) is in German.</sub>
+
 🖱️ **[Demo ausprobieren](https://schreibzeug.app/demo/)** – die Editoren mit Beispieldateien, im Browser, ohne Installation
 
 </div>
