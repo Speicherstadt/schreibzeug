@@ -5,10 +5,12 @@
     "beitrag-pruefen",
     "board-pflegen",
     "doku-pruefen",
+    "fehler-eingrenzen",
     "fork-pushen",
     "issue-schreiben",
     "prs-abarbeiten",
     "release",
-    "tdd-review"
+    "tdd-review",
+    "vorhaben-klaeren"
   ]
 }
