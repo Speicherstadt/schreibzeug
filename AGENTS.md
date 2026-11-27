@@ -22,7 +22,8 @@ Dateien. Aus der [Werkbank](https://github.com/Speicherstadt/werkbank) (gleich i
 Quellen, einfachste Lösung, Regeln), `tdd-review` (unabhängiges Review, ein Befund braucht einen fehlschlagenden
 Test), `doku-pruefen` (Review des Markdowns), `fork-pushen` (Push auf den Fork einer anderen Person),
 `prs-abarbeiten` (alle offenen Pull Requests, vom einfachsten Merge an), `issue-schreiben`, `board-pflegen` (das
-Board auf GitHub) und `release`. Aus diesem Projekt: `checks` (alle Prüfungen, auch Engine, Desktop und Doku).
+Board auf GitHub), `release`, `fehler-eingrenzen` (Ursache eines Fehlers über eine rote Prüfung finden) und
+`vorhaben-klaeren` (einen Plan vor dem Bauen mit der Person durchfragen). Aus diesem Projekt: `checks` (alle Prüfungen, auch Engine, Desktop und Doku).
 
 ## Referenzimplementierungen
 
