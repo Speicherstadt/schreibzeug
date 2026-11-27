@@ -1,6 +1,6 @@
-import { selectClass } from "../files/role-select";
 import { m } from "../paraglide/messages";
 import { getLocale, type Locale, locales, setLocale } from "../paraglide/runtime";
+import { Select } from "../ui/select";
 
 const languageName = (locale: Locale): string =>
   locale === "de" ? m.settings_language_german() : m.settings_language_english();
@@ -12,17 +12,17 @@ export const LanguageSection = () => (
       <h2 className="m-0 text-base font-semibold">{m.settings_language_title()}</h2>
       <p className="m-0 text-sm text-[var(--muted-foreground)]">{m.settings_language_hint()}</p>
     </div>
-    <select
+    <Select
       aria-label={m.settings_language_title()}
       value={getLocale()}
       onChange={(event) => setLocale(event.target.value as Locale)}
-      className={`${selectClass} self-start`}
+      className="self-start"
     >
       {locales.map((locale) => (
         <option key={locale} value={locale}>
           {languageName(locale)}
         </option>
       ))}
-    </select>
+    </Select>
   </section>
 );

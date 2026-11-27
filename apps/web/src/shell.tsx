@@ -130,6 +130,9 @@ export const Shell = () => {
             </span>
             {/* i18n-ignore: the product name */}
             <span className="text-[15px] font-semibold tracking-tight">Schreibzeug</span>
+            <span className="text-xs text-[var(--muted-foreground)]" data-testid="app-version">
+              {`v${import.meta.env.APP_VERSION}`}
+            </span>
           </Link>
         )}
         {/* On a phone the areas are one row that scrolls sideways, not a page wider than the screen. */}

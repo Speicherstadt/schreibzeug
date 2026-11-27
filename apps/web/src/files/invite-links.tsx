@@ -8,7 +8,8 @@ import { fileKeys } from "../api/files";
 import { formatDay } from "../lib/format";
 import { m } from "../paraglide/messages";
 import { Button } from "../ui/button";
-import { RoleSelect, selectClass } from "./role-select";
+import { Select } from "../ui/select";
+import { RoleSelect } from "./role-select";
 
 type Days = (typeof INVITE_DAYS)[number];
 
@@ -69,18 +70,17 @@ export const InviteLinks = ({ node }: { node: FileNode }) => {
       <span className="text-sm font-medium">{m.invite_links_title()}</span>
       <div className="flex gap-2">
         <RoleSelect value={role} label={m.invite_links_role()} onChange={setRole} />
-        <select
+        <Select
           aria-label={m.invite_links_valid()}
           value={days}
           onChange={(event) => setDays(Number(event.target.value) as Days)}
-          className={selectClass}
         >
           {INVITE_DAYS.map((value) => (
             <option key={value} value={value}>
               {daysLabel(value)}
             </option>
           ))}
-        </select>
+        </Select>
         <Button
           variant="outline"
           className="ml-auto"

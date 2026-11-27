@@ -11,6 +11,7 @@ import {
 import { RefreshCw, X } from "lucide-react";
 import { m } from "../paraglide/messages";
 import { Button } from "../ui/button";
+import { Select } from "../ui/select";
 
 /** Excel's names of the four areas. */
 export const AREA_LABELS: Record<PivotArea, string> = {
@@ -35,9 +36,6 @@ export const targetsOf = (item: PivotItem): PivotArea[] =>
     (area) => area !== item.area && (item.field !== VALUES_FIELD || area === "rows" || area === "columns"),
   );
 
-const selectClass =
-  "h-7 rounded-md border border-[var(--border)] bg-[var(--background)] px-1 text-xs outline-none focus:border-[var(--foreground)]";
-
 const ItemRow = ({ item, pivots }: { item: PivotItem; pivots: PivotCommands }) => (
   <li className="flex flex-wrap items-center gap-2 rounded-md px-1 py-1 text-sm hover:bg-[var(--muted)]">
     {/* A value's name ("Summe von Betrag") gets a line of its own, its two choices below it. */}
@@ -45,11 +43,11 @@ const ItemRow = ({ item, pivots }: { item: PivotItem; pivots: PivotCommands }) =
       {item.name}
     </span>
     {item.value?.summary !== undefined && (
-      <select
+      <Select
+        height="xs"
         aria-label={m.pivot_panel_summary_for({ name: item.name })}
         value={item.value.summary ?? ""}
         onChange={(event) => pivots.setSummary(item, event.target.value as (typeof PIVOT_SUMMARIES)[number])}
-        className={selectClass}
       >
         {item.value.summary === null && <option value="">{m.pivot_panel_other()}</option>}
         {PIVOT_SUMMARIES.map((summary) => (
@@ -57,13 +55,13 @@ const ItemRow = ({ item, pivots }: { item: PivotItem; pivots: PivotCommands }) =
             {SUMMARY_LABELS[summary]}
           </option>
         ))}
-      </select>
+      </Select>
     )}
-    <select
+    <Select
+      height="xs"
       aria-label={m.pivot_panel_move({ name: item.name })}
       value=""
       onChange={(event) => pivots.move(item, event.target.value as PivotArea)}
-      className={selectClass}
     >
       <option value="" disabled>
         {m.pivot_panel_move_to()}
@@ -73,7 +71,7 @@ const ItemRow = ({ item, pivots }: { item: PivotItem; pivots: PivotCommands }) =
           {AREA_LABELS[area]}
         </option>
       ))}
-    </select>
+    </Select>
   </li>
 );
 
