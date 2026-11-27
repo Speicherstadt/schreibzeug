@@ -10,10 +10,10 @@ import { type FormEvent, useState } from "react";
 import { messageOf } from "../api/client";
 import { useFiles } from "../api/context";
 import { claudeCommand, tokenKeys } from "../api/tokens";
-import { selectClass } from "../files/role-select";
 import { formatDay } from "../lib/format";
 import { m } from "../paraglide/messages";
 import { Button } from "../ui/button";
+import { Select } from "../ui/select";
 
 type Days = (typeof TOKEN_DAYS)[number] | null;
 
@@ -105,32 +105,30 @@ const CreateForm = ({ onCreated }: { onCreated: (created: CreatedAccessToken) =>
           onChange={(event) => setName(event.target.value)}
           className={`${inputClass} flex-1`}
         />
-        <select
+        <Select
           aria-label={m.access_tokens_scope()}
           value={scope}
           onChange={(event) => setScope(event.target.value as TokenScope)}
-          className={selectClass}
         >
           {(Object.keys(SCOPE_TEXT) as TokenScope[]).map((value) => (
             <option key={value} value={value}>
               {SCOPE_TEXT[value]()}
             </option>
           ))}
-        </select>
-        <select
+        </Select>
+        <Select
           aria-label={m.access_tokens_valid()}
           value={days ?? "never"}
           onChange={(event) =>
             setDays(event.target.value === "never" ? null : (Number(event.target.value) as Days))
           }
-          className={selectClass}
         >
           {[...TOKEN_DAYS, null].map((value) => (
             <option key={value ?? "never"} value={value ?? "never"}>
               {DAYS_TEXT(value)}
             </option>
           ))}
-        </select>
+        </Select>
         <Button type="submit" variant="primary" disabled={create.isPending}>
           <KeyRound size={15} />
           {m.access_tokens_create()}

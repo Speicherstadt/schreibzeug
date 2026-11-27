@@ -1,4 +1,4 @@
-import { ChevronDown } from "lucide-react";
+import { Select } from "../ui/select";
 
 export type ChoiceProps = {
   label: string;
@@ -18,27 +18,21 @@ export type ChoiceProps = {
 export const Choice = ({ label, value, options, disabled, onChange, className = "" }: ChoiceProps) => {
   const known = value === null || options.some((option) => option.value === value);
   return (
-    <span className={`relative inline-flex h-8 items-center ${className}`}>
-      <select
-        aria-label={label}
-        value={value ?? ""}
-        disabled={disabled}
-        onChange={(event) => onChange(event.target.value)}
-        className="h-8 w-full appearance-none truncate rounded-md border border-[var(--border)] bg-[var(--background)] pr-7 pl-2.5 text-sm text-[var(--foreground)] outline-none focus-visible:border-[var(--foreground)] disabled:opacity-40"
-      >
-        {value === null && <option value="">–</option>}
-        {!known && <option value={value}>{value}</option>}
-        {options.map((option) => (
-          <option key={option.value} value={option.value}>
-            {option.label}
-          </option>
-        ))}
-      </select>
-      <ChevronDown
-        size={14}
-        aria-hidden
-        className="pointer-events-none absolute right-2 text-[var(--muted-foreground)]"
-      />
-    </span>
+    <Select
+      aria-label={label}
+      value={value ?? ""}
+      disabled={disabled}
+      onChange={(event) => onChange(event.target.value)}
+      height="sm"
+      className={className}
+    >
+      {value === null && <option value="">–</option>}
+      {!known && <option value={value}>{value}</option>}
+      {options.map((option) => (
+        <option key={option.value} value={option.value}>
+          {option.label}
+        </option>
+      ))}
+    </Select>
   );
 };

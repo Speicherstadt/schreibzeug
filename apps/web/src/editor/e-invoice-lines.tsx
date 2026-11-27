@@ -2,6 +2,7 @@ import { UNITS as UNIT_LABELS, type UnitCode } from "@schreibzeug/einvoice/draft
 import { Plus, Trash2 } from "lucide-react";
 import { m } from "../paraglide/messages";
 import { Button } from "../ui/button";
+import { Select } from "../ui/select";
 import type { LineForm } from "./e-invoice";
 import { inputClass } from "./e-invoice-fields";
 
@@ -62,9 +63,10 @@ export const LinesTable = ({ lines, totals, showRate, onChange, onAdd }: LinesPr
                   />
                 </td>
                 <td className={cell}>
-                  <select
+                  <Select
+                    height="sm"
                     aria-label={m.e_invoice_lines_unit_of(position)}
-                    className={`${inputClass} w-28`}
+                    className="w-28"
                     value={line.unit}
                     onChange={(event) => update(index, { unit: event.target.value as UnitCode })}
                   >
@@ -73,7 +75,7 @@ export const LinesTable = ({ lines, totals, showRate, onChange, onAdd }: LinesPr
                         {label}
                       </option>
                     ))}
-                  </select>
+                  </Select>
                 </td>
                 <td className={cell}>
                   <input

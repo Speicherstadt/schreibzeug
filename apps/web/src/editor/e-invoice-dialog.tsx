@@ -3,6 +3,7 @@ import { useState } from "react";
 import { m } from "../paraglide/messages";
 import { Button } from "../ui/button";
 import { Dialog } from "../ui/dialog";
+import { Select } from "../ui/select";
 import {
   centsText,
   draftFromForm,
@@ -11,7 +12,7 @@ import {
   type PartyForm,
   type SellerForm,
 } from "./e-invoice";
-import { Field, inputClass, Section } from "./e-invoice-fields";
+import { Field, Section } from "./e-invoice-fields";
 import { LinesTable } from "./e-invoice-lines";
 import { money } from "./invoice";
 
@@ -163,14 +164,14 @@ const EInvoiceForm = ({
           />
           <label className="col-span-2 flex flex-col gap-1 text-xs">
             <span className="text-[var(--muted-foreground)]">{m.e_invoice_dialog_vat()}</span>
-            <select
-              className={inputClass}
+            <Select
+              height="sm"
               value={form.taxMode}
               onChange={(event) => set({ taxMode: event.target.value as InvoiceForm["taxMode"] })}
             >
               <option value="regular">{m.e_invoice_dialog_with_vat()}</option>
               <option value="small-business">{m.e_invoice_dialog_small_business()}</option>
-            </select>
+            </Select>
           </label>
         </div>
       </Section>

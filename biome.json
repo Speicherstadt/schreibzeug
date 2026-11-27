@@ -15,6 +15,9 @@
     "enabled": true,
     "rules": {
       "preset": "recommended",
+      "a11y": {
+        "noLabelWithoutControl": { "level": "error", "options": { "inputComponents": ["Select"] } }
+      },
       "complexity": {
         "noExcessiveLinesPerFunction": {
           "level": "info",
